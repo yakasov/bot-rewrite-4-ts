@@ -1,0 +1,118 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true
+  },
+  "extends": ["eslint:all"],
+  "overrides": [],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "array-element-newline": [
+      "warn",
+      {
+        "ArrayExpression": "consistent",
+        "ArrayPattern": { "minItems": 3, "multiline": true }
+      }
+    ],
+    "camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
+    "complexity": "off",
+    "consistent-return": "off",
+    "dot-location": ["error", "property"],
+    "func-names": "off",
+    "func-style": ["error", "declaration", { "allowArrowFunctions": true }],
+    "function-call-argument-newline": ["warn", "consistent"],
+    "function-paren-newline": ["error", "multiline-arguments"],
+    "id-length": "off",
+    "implicit-arrow-linebreak": "off",
+    "indent": ["warn", 2],
+    "linebreak-style": "off",
+    "max-len": [
+      "warn",
+      {
+        "code": 100,
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "max-lines": "off",
+    "max-lines-per-function": ["warn", 200],
+    "max-params": ["warn", 5],
+    "max-statements": "off",
+    "multiline-ternary": ["warn", "always-multiline"],
+    "newline-per-chained-call": ["warn", { "ignoreChainWithDepth": 1 }],
+    "no-await-in-loop": "off",
+    "no-console": "off",
+    "no-extra-parens": "off",
+    "no-inline-comments": "off",
+    "no-magic-numbers": "off",
+    "no-mixed-operators": [
+      "error",
+      {
+        "groups": [
+          ["&", "|", "^", "~", "<<", ">>", ">>>"],
+          ["&&", "||"]
+        ]
+      }
+    ],
+    "no-plusplus": "off",
+    "no-ternary": "off",
+    "no-undefined": "off",
+    "no-use-before-define": ["error", { "functions": false }],
+    "object-curly-spacing": ["error", "always"],
+    "object-property-newline": [
+      "warn",
+      {
+        "allowAllPropertiesOnSameLine": true,
+        "allowMultiplePropertiesPerLine": true
+      }
+    ],
+    "one-var": ["warn", "never"],
+    "padded-blocks": "off",
+    "prefer-destructuring": [
+      "error",
+      {
+        "VariableDeclarator": {
+          "array": false,
+          "object": true
+        },
+        "AssignmentExpression": {
+          "array": true,
+          "object": false
+        }
+      },
+      {
+        "enforceForRenamedProperties": false
+      }
+    ],
+    "quotes": ["warn", "double"],
+    "quote-props": [
+      "warn",
+      "as-needed",
+      {
+        "keywords": true,
+        "unnecessary": false,
+        "numbers": false
+      }
+    ],
+    "semi": ["warn", "always"],
+    "sort-keys": "off",
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ]
+  }
+}
