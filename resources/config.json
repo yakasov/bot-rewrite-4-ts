@@ -1,0 +1,28 @@
+{
+  "bot": {
+    "aiChannels": ["1087133384758792272", "542034119274790912"],
+
+    "allowResponses": true,
+    "responseChance": 0.5
+  },
+
+  "ids": {
+    "mainGuild": "271381095990296576",
+    "birthdayChannel": "509089139853885440",
+    "birthdayRole": "892388551671574568",
+    "fortniteChannel": "1294272060113158144"
+  },
+
+  "minecraft": {
+    "serverIp": "",
+    "serverPort": 25565,
+    "serverOwnerId": "203238971009007616"
+  },
+
+  "stats": {
+    "messageXPGain": 150,
+    "messageXPGainCooldown": 3,
+    "voiceChatXPGain": 0.8,
+    "XPPerLevel": 30
+  }
+}

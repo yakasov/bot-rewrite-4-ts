@@ -2,12 +2,12 @@ import { Client, GatewayIntentBits } from "discord.js";
 import moment from "moment-timezone";
 import { Config } from "../types/Config";
 import { Stats } from "../types/Stats";
-import { BotContext } from "./BotContext";
+import { BotContext } from "../types/BotContext";
 import { generateRollTable } from "../util/generateRollTable";
 
 export function createBotContext(
   config: Config,
-  loadedStats: Stats
+  loadedStats?: Stats
 ): BotContext {
   const client = new Client({
     allowedMentions: {

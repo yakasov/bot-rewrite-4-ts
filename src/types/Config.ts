@@ -1,5 +1,10 @@
 export interface Config {
-  aiChannels: [string];
+  bot: {
+    aiChannels: string[];
+
+    allowResponses: boolean;
+    responseChance: number;
+  },
 
   ids: {
     mainGuild: string;
@@ -13,8 +18,6 @@ export interface Config {
     serverPort: number;
     serverOwnerId: string;
   }
-
-  botResponseChance: number;
 
   stats: {
     messageXPGain: number;

@@ -1,8 +1,8 @@
 import { Client } from "discord.js";
-import { Config } from "../types/Config";
-import { FirstRun } from "../types/FirstRun";
-import { RollTableEntry } from "../types/RollTableEntry";
-import { Stats } from "../types/Stats";
+import { Config } from "./Config";
+import { FirstRun } from "./FirstRun";
+import { RollTableEntry } from "./RollTableEntry";
+import { Stats } from "./Stats";
 
 export interface BotContext {
   client: Client;
@@ -11,6 +11,6 @@ export interface BotContext {
   firstRun: FirstRun;
   rollTable: RollTableEntry[];
   splash: string;
-  stats: Stats;
+  stats?: Stats;
   uptime: number;
 }
