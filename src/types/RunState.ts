@@ -1,16 +1,16 @@
-export interface FirstRun {
+export interface RunState {
   birthdays: BirthdayStates;
   minecraft: MinecraftQueryStates;
 }
 
-enum MinecraftQueryStates {
+export enum MinecraftQueryStates {
   NORMAL = 0,
   FIRST_RUN = 1,
   ERROR_STOP = 2,
   ERROR_RETRY = 3
 }
 
-enum BirthdayStates {
+export enum BirthdayStates {
   NORMAL = 0,
   FIRST_RUN = 1
 }

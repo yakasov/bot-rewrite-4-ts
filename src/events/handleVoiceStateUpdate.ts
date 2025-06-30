@@ -1,6 +1,6 @@
 import { VoiceState } from "discord.js";
 
-export async function handleVoiceStateUpdate(oldState: VoiceState, newState: VoiceState) {
+export async function handleVoiceStateUpdate(oldState: VoiceState, newState: VoiceState): Promise<void> {
   if (newState.member?.user.bot) return;
 
   if (oldState.channel && !newState.channel) {

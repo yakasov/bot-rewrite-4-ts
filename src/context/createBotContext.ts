@@ -29,7 +29,7 @@ export function createBotContext(
     client,
     config,
     currentDate: moment().tz("Europe/London").toDate(),
-    firstRun: { birthdays: 1, minecraft: 1 },
+    runState: { birthdays: 1, minecraft: 1 },
     rollTable: generateRollTable(),
     splash: "",
     stats: loadedStats,
