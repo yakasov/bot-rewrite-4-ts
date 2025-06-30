@@ -30,7 +30,7 @@ async function getFortniteShop(): Promise<FortniteResponseData | undefined> {
 
     const data: FortniteResponse | undefined = await response.json();
     return data?.data;
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error fetching Fortnite shop:", err);
     return undefined;
   }

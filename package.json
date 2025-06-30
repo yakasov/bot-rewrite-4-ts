@@ -19,9 +19,11 @@
   },
   "homepage": "https://github.com/yakasov/bot-rewrite-4-ts#readme",
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
     "discord.js": "^14.20.0",
     "dotenv": "^16.5.0",
-    "moment-timezone": "^0.6.0"
+    "moment-timezone": "^0.6.0",
+    "scryfall-api": "^4.0.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.35.0",

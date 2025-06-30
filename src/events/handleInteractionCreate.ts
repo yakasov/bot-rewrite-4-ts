@@ -17,7 +17,7 @@ export async function handleInteractionCreate(interaction: Interaction) {
 
   try {
     await command.execute(interaction);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
 
     if (interaction.replied || interaction.deferred) {
