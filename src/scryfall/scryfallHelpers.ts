@@ -1,15 +1,15 @@
-import { Card } from "scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
 import { OracleResponse } from "../types/scryfall/OracleResponse";
+import { Card } from "scryfall-api";
 
 export async function getLowestHighestData(
   oracleId: string
 ): Promise<PricingData> {
-  const oracleData: OracleResponse = await fetch(
+  const oracleCards: Card[] = await fetch(
     `https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleId}&unique=prints`
   )
-    .then((response) => response.json())
-    .then((response) => response.data);
+    .then((response: Response) => response.json())
+    .then((response: OracleResponse) => response.data);
   const lowestHighestData: PricingData = {
     highestPrice: 0,
     highestSet: "",
@@ -18,7 +18,7 @@ export async function getLowestHighestData(
     lowestSet: "",
     lowestUrl: "",
   };
-  Object.values(oracleData.data).forEach((cardData) => {
+  Object.values(oracleCards).forEach((cardData) => {
     const lowestPrice: number = Math.min(
       parseFloat(cardData.prices.usd ?? "10000"),
       parseFloat(cardData.prices.usd_foil ?? "10000")
@@ -47,17 +47,4 @@ export async function getLowestHighestData(
   });
 
   return lowestHighestData;
-}
-
-export async function getImageUrl(
-  cardDetails: Card
-): Promise<[boolean, string]> {
-  if (
-    cardDetails.card_faces?.length === 2 &&
-    cardDetails.card_faces[0].image_uris
-  ) {
-    return [true, await combineImages(cardDetails)];
-  }
-
-  return [false, cardDetails.image_uris?.large ?? ""];
 }

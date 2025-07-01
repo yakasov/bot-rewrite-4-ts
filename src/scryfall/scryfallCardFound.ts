@@ -1,7 +1,8 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { Card, Cards } from "scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
-import { getImageUrl, getLowestHighestData } from "./scryfallHelpers";
+import { getLowestHighestData } from "./scryfallHelpers";
+import { getImageUrl } from "./scryfallImageHelpers";
 
 export async function scryfallCardFound(
   message: Message,

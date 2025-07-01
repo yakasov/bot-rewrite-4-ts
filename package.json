@@ -20,8 +20,11 @@
   "homepage": "https://github.com/yakasov/bot-rewrite-4-ts#readme",
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
+    "@types/sharp": "^0.31.1",
     "discord.js": "^14.20.0",
     "dotenv": "^16.5.0",
+    "join-images": "^1.1.5",
+    "mariadb": "^3.4.2",
     "moment-timezone": "^0.6.0",
     "scryfall-api": "^4.0.3"
   },

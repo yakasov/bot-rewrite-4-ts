@@ -33,6 +33,7 @@ export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\//gu;
 export const STEAM_URL_LINK: string =
   "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
 
+export const STATS_BACKUP_DIR: string = "./backups/";
 export const STATS_TOP_SCORES_N: number = 10;
 
 export const YT_MAX_AUDIO_SIZE: number = 33554432;

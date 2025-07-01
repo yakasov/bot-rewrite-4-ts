@@ -1,17 +1,14 @@
 import { Client, Collection, Command } from "discord.js";
-import { readdirSync } from "node:fs";
-import path from "node:path";
+import { getCommandFiles } from "../util/getCommandFiles";
 
 export async function loadCommands(client: Client) {
   if (!client.commands) client.commands = new Collection<string, Command>();
 
-  const commandFiles: string[] = readdirSync(".", { recursive: true }).filter(
-    (file: string | Buffer) => !(file instanceof Buffer)
-  ) as string[];
+  const commandsDir: string = __dirname;
+  const commandFiles: string[] = getCommandFiles(commandsDir);
 
-  for (const file of commandFiles) {
-    const filePath: string = path.join(__dirname, file);
-    const command = (await import(filePath)).default as Command;
+  for (const filePath of commandFiles) {
+    const command: Command = (await import(filePath)).default as Command;
 
     if ("data" in command && "execute" in command) {
       client.commands.set(command.data.name, command);
