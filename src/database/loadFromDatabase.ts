@@ -4,7 +4,7 @@ import { guildSelectQuery, userSelectQuery } from "./queries";
 import { Stats } from "../types/Stats";
 import { GuildsStructure, UserStatsStructure } from "../types/Database";
 
-export async function loadStatsFromDatabase(): Promise<Stats> {
+export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
   const pool: Pool = getDatabasePool();
 
   let conn: PoolConnection | null = null;
@@ -48,7 +48,7 @@ export async function loadStatsFromDatabase(): Promise<Stats> {
     return stats;
   } catch (err: any) {
     console.error("Error loading stats from database:", err);
-    throw err;
+    return undefined;
   } finally {
     if (conn) {
       conn.release();

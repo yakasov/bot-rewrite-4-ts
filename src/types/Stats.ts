@@ -3,9 +3,13 @@ export interface Stats {
 }
 
 export interface GuildStats {
-  allowResponses: boolean;
-  rankUpChannel: string;
-  [userId: string]: UserStats | boolean | string;
+  guild: {
+    allowResponses: boolean;
+    rankUpChannel: string;
+  },
+  users: {
+    [userId: string]: UserStats 
+  }
 }
 
 export interface UserStats {
@@ -19,4 +23,14 @@ export interface UserStats {
   name: string;
   totalXP: number;
   voiceTime: number;
+}
+
+export interface StatsEvent {
+  guildId: string;
+  type:
+    | "message"
+    | "joinedVoiceChannel"
+    | "inVoiceChannel"
+    | "leftVoiceChannel";
+  userId: string;
 }

@@ -8,6 +8,7 @@ export interface BotContext {
   client: Client;
   config: Config;
   currentDate: Date;
+  isStatsEnabled: boolean;
   runState: RunState;
   rollTable: RollTableEntry[];
   splash: string;
