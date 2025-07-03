@@ -23,6 +23,7 @@ export interface UserStats {
   name: string;
   totalXP: number;
   voiceTime: number;
+  [key: string]: number | string | undefined; 
 }
 
 export interface StatsEvent {

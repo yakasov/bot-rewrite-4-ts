@@ -4,24 +4,31 @@ import {
   ChatInputCommandInteraction,
   Interaction,
   User,
+  SlashCommandUserOption,
+  SlashCommandBooleanOption,
 } from "discord.js";
 import { REGEX_DISCORD_MESSAGE_LENGTH_SHORT } from "../../consts/constants";
 import {
+  formatTime,
   getNicknameFromInteraction,
   orderStatsByRank,
 } from "../../stats/statsHelpers";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
 import { BotContext } from "../../types/BotContext";
 import { GuildStats, UserStats } from "../../types/Stats";
+import {
+  getRequiredExperience,
+  getLevelName,
+} from "../../stats/experienceHelpers";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("profile")
     .setDescription("Shows personal statistics")
-    .addUserOption((opt) =>
+    .addUserOption((opt: SlashCommandUserOption) =>
       opt.setName("user").setDescription("The user to get the profile of")
     )
-    .addBooleanOption((opt) =>
+    .addBooleanOption((opt: SlashCommandBooleanOption) =>
       opt.setName("debug").setDescription("Whether to print the raw statistics")
     ),
   async execute(
@@ -47,23 +54,21 @@ export default {
       return;
     }
 
-    const found: {
+    const foundRankAndStats: {
       rank: number;
       userStats: UserStats;
     } | null = findUserStatsAndRank(guildStats, userId);
-    if (!found) {
+    if (!foundRankAndStats) {
       interaction.reply("Could not find user stats.");
       return;
     }
 
-    const { userStats, rank } = found;
-    const allUserStats: UserStats = guildStats.users[userStats[0]];
+    const { rank, userStats } = foundRankAndStats;
 
     if (debug) {
-      const outputMessage: string = JSON.stringify(allUserStats, null, 4);
-      const outputArray: RegExpMatchArray | [] = outputMessage.match(
-        REGEX_DISCORD_MESSAGE_LENGTH_SHORT
-      ) ?? []
+      const outputMessage: string = JSON.stringify(userStats, null, 4);
+      const outputArray: RegExpMatchArray | [] =
+        outputMessage.match(REGEX_DISCORD_MESSAGE_LENGTH_SHORT) ?? [];
       for (const r of outputArray) {
         await interaction.followUp(wrapCodeBlockString(r, "json"));
       }
@@ -72,19 +77,21 @@ export default {
 
     const outputMessage = formatProfileOutput(
       interaction,
+      context,
+      userId,
       userStats,
-      allUserStats,
       rank
     );
 
     await interaction.followUp(
       `Showing profile for ${getNicknameFromInteraction(
         interaction,
-        userStats[0].toString()
+        userId
       )}...`
     );
 
-    const outputArray: RegExpMatchArray | [] = outputMessage.match(REGEX_DISCORD_MESSAGE_LENGTH_SHORT) ?? [];
+    const outputArray: RegExpMatchArray | [] =
+      outputMessage.match(REGEX_DISCORD_MESSAGE_LENGTH_SHORT) ?? [];
     for (const r of outputArray) {
       await interaction.followUp({
         content: wrapCodeBlockString(r, "ansi"),
@@ -103,23 +110,30 @@ function findUserStatsAndRank(
   userStats: UserStats;
 } | null {
   const ranked: [string, UserStats, number][] = orderStatsByRank(guildStats);
-  const found: [string, UserStats, number] | undefined = ranked.find(([id]) => id === userId);
+  const found: [string, UserStats, number] | undefined = ranked.find(
+    ([id]) => id === userId
+  );
   return found ? { rank: found[2] + 1, userStats: found[1] } : null;
 }
 
-function formatProfileOutput(interaction: Interaction, userStats: (string | number)[], allUserStats: UserStats, rank: number) {
+function formatProfileOutput(
+  interaction: Interaction,
+  context: BotContext,
+  userId: string,
+  userStats: UserStats,
+  rank: number
+) {
   return `=== Profile for ${getNicknameFromInteraction(
     interaction,
-    userStats[0].toString()
+    userId
   )}, #${rank} on server ===\n    Messages: ${
-    allUserStats.messages
-  }\n    Voice Time: ${formatTime(
-    allUserStats.voiceTime
-  )}\n\n    Level: ${allUserStats.level} (${allUserStats.levelExperience}/${getRequiredExperience(
-    allUserStats.level
-  )})\n    Title: ${getTitle(
-    allUserStats
-  )}\n    Ranking: ${getLevelName(allUserStats.level)} (${
-    allUserStats.totalExperience
-  } XP)`;
+    userStats.messages
+  }\n    Voice Time: ${formatTime(userStats.voiceTime)}\n\n    Level: ${
+    userStats.level
+  } (${userStats.levelXP}/${getRequiredExperience(
+    userStats.level,
+    context.config
+  )})\n    Title: ${userStats.name}\n    Ranking: ${getLevelName(
+    userStats.level
+  )} (${userStats.totalXP} XP)`;
 }
