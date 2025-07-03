@@ -44,7 +44,7 @@ export function levelUp(
   }
 }
 
-function getLevelName(level: number): string {
+export function getLevelName(level: number): string {
   const ranks = ranksJSON as { [key: string]: string };
   let nameLevel: number = Math.floor(level / 10) + 1;
   const highestKey: number = parseInt(
@@ -56,7 +56,7 @@ function getLevelName(level: number): string {
   return `${ranks[`${nameLevel}` as string]}\u001b[0m`;
 }
 
-function getRequiredExperience(
+export function getRequiredExperience(
   level: number,
   config: BotContext["config"]
 ): number {

@@ -1,3 +1,4 @@
+import { GuildMember, Interaction } from "discord.js";
 import { BotContext } from "../types/BotContext";
 import { GuildStats, Stats, StatsEvent, UserStats } from "../types/Stats";
 import {
@@ -5,6 +6,7 @@ import {
   getRequiredExperienceCumulative,
   levelUp,
 } from "./experienceHelpers";
+import { REGEX_SANITIZE_STRING } from "../consts/constants";
 
 export function addToStats(event: StatsEvent, context: BotContext): void {
   if (!context.isStatsEnabled || !context.stats) return;
@@ -95,14 +97,42 @@ function checkAllUserStats(stats: Stats, context: BotContext): void {
   }
 }
 
-function orderStatsByRank(guildStats: GuildStats): [string, number][] {
-  const users = guildStats.users;
-  const userXPPairs: [string, number][] = Object.entries(users).map(
-    ([userId, userStats]) => [userId, userStats.totalXP]
-  );
-  return userXPPairs.sort(([, first], [, second]) => second - first);
+export function orderStatsByRank(
+  guildStats: GuildStats
+): [string, UserStats, number][] {
+  return Object.entries(guildStats.users).sort(
+    ([, first], [, second]) => second.totalXP - first.totalXP
+  ).map((array: [string, UserStats], index: number) => [...array, index]);
 }
 
 function getDateNowInSeconds(): number {
   return Math.floor(Date.now() / 1000);
+}
+
+export function getNicknameFromInteraction(
+  interaction: Interaction,
+  id: string = "",
+  sanitize: boolean = false
+): string | undefined {
+  // Used for fetching nickname from interaction
+  const member: GuildMember | undefined = interaction.guild?.members.cache
+    .filter((m) => m.id === (id !== "" ? id : interaction.user.id))
+    .first();
+  if (!member) return;
+
+  let name: string = member ? member.displayName : "???";
+  if (sanitize) {
+    name = name.replace(REGEX_SANITIZE_STRING, "");
+  }
+  return name;
+}
+
+export function formatTime(seconds: number): string {
+  const date: Date = new Date();
+  date.setSeconds(seconds);
+  const unitArray: string[] = date.toISOString().substr(8, 11).split(/:|T/u);
+  const days: number = parseInt(unitArray[0], 10) - 1;
+  return `${days < 10 ? " " : ""}${days}d ${unitArray[1]}h ${unitArray[2]}m ${
+    unitArray[3]
+  }s`;
 }

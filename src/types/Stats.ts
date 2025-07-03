@@ -42,3 +42,13 @@ export interface StatsMessage {
   accolade: string;
   title: string;
 }
+
+export interface TableData {
+  "#": number;
+  Name: string | undefined;
+  Level: string;
+  Msgs: number;
+  "Voice Time": string;
+  Title: string;
+  [key: string]: string | number | undefined;
+}
