@@ -33,6 +33,13 @@ export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\//gu;
 export const STEAM_URL_LINK: string =
   "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
 
+export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF: string = "135410033524604928";
+
+export const TWITTER_LINKS: string[] = [
+  "https://x.com/",
+  "https://twitter.com/",
+];
+
 export const STATS_BACKUP_DIR: string = "./backups/";
 export const STATS_TOP_SCORES_N: number = 10;
 

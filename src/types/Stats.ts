@@ -6,10 +6,10 @@ export interface GuildStats {
   guild: {
     allowResponses: boolean;
     rankUpChannel: string;
-  },
+  };
   users: {
-    [userId: string]: UserStats 
-  }
+    [userId: string]: UserStats;
+  };
 }
 
 export interface UserStats {
@@ -33,4 +33,12 @@ export interface StatsEvent {
     | "inVoiceChannel"
     | "leftVoiceChannel";
   userId: string;
+}
+
+export interface StatsMessage {
+  guildId: string;
+  userId: string;
+  subject: string;
+  accolade: string;
+  title: string;
 }

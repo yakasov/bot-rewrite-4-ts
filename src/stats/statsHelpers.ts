@@ -1,5 +1,10 @@
 import { BotContext } from "../types/BotContext";
-import { GuildStats, StatsEvent, UserStats } from "../types/Stats";
+import { GuildStats, Stats, StatsEvent, UserStats } from "../types/Stats";
+import {
+  calculateExperience,
+  getRequiredExperienceCumulative,
+  levelUp,
+} from "./experienceHelpers";
 
 export function addToStats(event: StatsEvent, context: BotContext): void {
   if (!context.isStatsEnabled || !context.stats) return;
@@ -70,11 +75,33 @@ export function addToStats(event: StatsEvent, context: BotContext): void {
       break;
   }
 
-  // updateScores
-  // saveStats
+  checkAllUserStats(context.stats, context);
 }
 
-// function orderStatsByRank ?
+function checkAllUserStats(stats: Stats, context: BotContext): void {
+  for (const [guildId, guildStats] of Object.entries(stats)) {
+    const users: { [userId: string]: UserStats } = guildStats.users;
+
+    for (const [userId, userStats] of Object.entries(users)) {
+      calculateExperience(userStats, context);
+
+      if (
+        userStats.totalXP >=
+        getRequiredExperienceCumulative(userStats.level, context.config)
+      ) {
+        levelUp(guildId, userId, context);
+      }
+    }
+  }
+}
+
+function orderStatsByRank(guildStats: GuildStats): [string, number][] {
+  const users = guildStats.users;
+  const userXPPairs: [string, number][] = Object.entries(users).map(
+    ([userId, userStats]) => [userId, userStats.totalXP]
+  );
+  return userXPPairs.sort(([, first], [, second]) => second - first);
+}
 
 function getDateNowInSeconds(): number {
   return Math.floor(Date.now() / 1000);

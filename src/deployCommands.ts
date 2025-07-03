@@ -1,11 +1,11 @@
 import { REST, Routes } from "discord.js";
 import path from "node:path";
-import configJson from "../resources/config.json";
+import configJSON from "../resources/config.json";
 import { getCommandFiles } from "./util/getCommandFiles";
 import { keys } from "./keys";
 import { Config } from "./types/Config";
 
-const config: Config = configJson;
+const config: Config = configJSON;
 
 async function deployCommands() {
   const commands: any[] = [];
