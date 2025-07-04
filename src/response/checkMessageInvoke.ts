@@ -8,7 +8,11 @@ import {
 } from "../consts/constants";
 import responsesJson from "../../resources/responses.json";
 import { sendSteamDirectLink, swapTwitterLinks } from "./messageReplacements";
-import { replyWithHypeMessage, sendCustomResponse } from "./messageResponders";
+import {
+  checkMessageReactions,
+  replyWithHypeMessage,
+  sendCustomResponse,
+} from "./messageResponders";
 
 const responses: { [key: string]: string } = responsesJson as {
   [key: string]: string;
@@ -19,7 +23,7 @@ export async function checkMessageInvoke(
   context: BotContext
 ): Promise<void> {
   if (context.config.bot.allowResponses) {
-    await checkMessageReactions();
+    await checkMessageReactions(message, context);
   }
 
   if (REGEX_STEAM_LINK.test(message.content)) {

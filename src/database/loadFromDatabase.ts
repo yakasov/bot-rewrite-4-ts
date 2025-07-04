@@ -15,7 +15,7 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
     const stats: Stats = {};
 
     for (const guild of guilds) {
-      stats[guild.guild_id] = {
+      stats[guild.guild_id].guild = {
         allowResponses: guild.allow_responses,
         rankUpChannel: guild.rank_up_channel,
       };
@@ -25,13 +25,13 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
 
     for (const userStat of userStats) {
       if (!stats[userStat.guild_id]) {
-        stats[userStat.guild_id] = {
+        stats[userStat.guild_id].guild = {
           allowResponses: true,
           rankUpChannel: "",
         };
       }
 
-      stats[userStat.guild_id][userStat.user_id] = {
+      stats[userStat.guild_id].users[userStat.user_id] = {
         joinTime: userStat.join_time,
         lastGainTime: userStat.last_gain_time,
         level: userStat.level_value,

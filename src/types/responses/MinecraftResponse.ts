@@ -45,3 +45,18 @@ interface MinecraftPluginMod {
   name: string;
   version: string | null;
 }
+
+export interface NeatMinecraftResponse {
+  host: string;
+  ip: string | null;
+  port: number;
+  motd: string;
+  players: {
+    count: string;
+    online: string;
+  };
+  software: string | null;
+  version: string;
+  plugins: number;
+  mods: number;
+}

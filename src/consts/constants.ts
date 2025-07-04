@@ -43,4 +43,12 @@ export const TWITTER_LINKS: string[] = [
 export const STATS_BACKUP_DIR: string = "./backups/";
 export const STATS_TOP_SCORES_N: number = 10;
 
+export const URL_FORTNITE_API: string = "https://fortnite-api.com/v2/shop";
+export const URL_MINECRAFT_STATUS: string =
+  "https://api.mcstatus.io/v2/status/java";
+export const URL_SCRYFALL_ORACLE: string =
+  "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A<<ORACLE_ID>>&unique=prints";
+export const URL_TTS_API: string =
+  "https://tiktok-tts.weilnet.workers.dev/api/generation";
+
 export const YT_MAX_AUDIO_SIZE: number = 33554432;

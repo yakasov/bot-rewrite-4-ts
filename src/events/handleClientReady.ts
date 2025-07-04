@@ -4,6 +4,8 @@ import { checkBirthdays } from "../tasks/checkBirthdays";
 import { checkMinecraftServer } from "../tasks/checkMinecraftServer";
 import { checkFortnite } from "../tasks/checkFortnite";
 import { getRandomSplash, getTime } from "../tasks/taskHelpers";
+import { checkVoiceChannels } from "../stats/addStatEvent";
+import { checkAllUserStats } from "../stats/statsHelpers";
 
 export async function handleClientReady(
   client: Client,
@@ -15,7 +17,7 @@ export async function handleClientReady(
       "Connected and ready to go!\n"
   );
 
-  checkVoiceChannels();
+  checkVoiceChannels(context);
   await checkBirthdays(client, context, true);
   await checkMinecraftServer(client, context);
 
@@ -31,8 +33,8 @@ export async function handleClientReady(
   setInterval(() => {
     context.splash = getRandomSplash();
   }, getTime({ minutes: 30 }));
-  setInterval(checkVoiceChannels, getTime({ seconds: 15 }));
+  setInterval(() => checkVoiceChannels(context), getTime({ seconds: 15 }));
   // setInterval(saveStats, getTime({ minutes: 3 }));
   // setInterval(backupStats, getTime({ minutes: 15 }));
-  setInterval(updateScores, getTime({ seconds: 30 }));
+  setInterval(() => checkAllUserStats(context), getTime({ seconds: 30 }));
 }

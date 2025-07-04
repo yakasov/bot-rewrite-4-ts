@@ -1,20 +1,16 @@
 import { ActivityType, Client } from "discord.js";
-import configJSON from "../../resources/config.json";
 import { BotContext } from "../types/BotContext";
-import { Config } from "../types/Config";
 import { MinecraftQueryStates } from "../types/RunState";
 import {
   MinecraftResponse,
   MinecraftUser,
 } from "../types/responses/MinecraftResponse";
+import { URL_MINECRAFT_STATUS } from "../consts/constants";
 
-const config: Config = configJSON;
-const statusURL: string = `https://api.mcstatus.io/v2/status/java/${config.minecraft.serverIp}`;
-
-async function getMCStatus(
+export async function getMCStatus(
   context: BotContext
 ): Promise<MinecraftResponse | null> {
-  return fetch(statusURL)
+  return fetch(`${URL_MINECRAFT_STATUS}/${context.config.minecraft.serverIp}`)
     .then((response: Response) => response.json())
     .then((response: MinecraftResponse | null) => response)
     .catch((err) => {
@@ -44,7 +40,9 @@ export async function checkMinecraftServer(
     return;
   }
 
-  if (!(config.minecraft.serverIp && config.minecraft.serverPort)) {
+  if (
+    !(context.config.minecraft.serverIp && context.config.minecraft.serverPort)
+  ) {
     console.error("\nNo IP and/or Port for Minecraft server query!\n");
     context.runState.minecraft = MinecraftQueryStates.ERROR_STOP;
     return;

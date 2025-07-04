@@ -6,7 +6,11 @@ import {
   GenericObject,
   GenericStringObject,
 } from "../types/Generic";
-import { FortniteResponse, FortniteResponseData } from "../types/responses/FortniteResponse";
+import {
+  FortniteResponse,
+  FortniteResponseData,
+} from "../types/responses/FortniteResponse";
+import { URL_FORTNITE_API } from "../consts/constants";
 
 const config: Config = configJSON;
 
@@ -22,7 +26,7 @@ const emoteMessages: GenericStringObject = {
 
 async function getFortniteShop(): Promise<FortniteResponseData | undefined> {
   try {
-    const response: Response = await fetch("https://fortnite-api.com/v2/shop");
+    const response: Response = await fetch(URL_FORTNITE_API);
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       return undefined;

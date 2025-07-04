@@ -77,10 +77,13 @@ export function addToStats(event: StatsEvent, context: BotContext): void {
       break;
   }
 
-  checkAllUserStats(context.stats, context);
+  checkAllUserStats(context);
 }
 
-function checkAllUserStats(stats: Stats, context: BotContext): void {
+export function checkAllUserStats(context: BotContext): void {
+  const stats: Stats | undefined = context.stats;
+  if (!stats) return;
+
   for (const [guildId, guildStats] of Object.entries(stats)) {
     const users: { [userId: string]: UserStats } = guildStats.users;
 
@@ -100,9 +103,9 @@ function checkAllUserStats(stats: Stats, context: BotContext): void {
 export function orderStatsByRank(
   guildStats: GuildStats
 ): [string, UserStats, number][] {
-  return Object.entries(guildStats.users).sort(
-    ([, first], [, second]) => second.totalXP - first.totalXP
-  ).map((array: [string, UserStats], index: number) => [...array, index]);
+  return Object.entries(guildStats.users)
+    .sort(([, first], [, second]) => second.totalXP - first.totalXP)
+    .map((array: [string, UserStats], index: number) => [...array, index]);
 }
 
 function getDateNowInSeconds(): number {

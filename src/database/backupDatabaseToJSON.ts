@@ -6,7 +6,11 @@ import { STATS_BACKUP_DIR } from "../consts/constants";
 
 export async function backupStatsFromDatabaseToJSON(): Promise<void> {
   try {
-    const stats: Stats = await loadStatsFromDatabase();
+    const stats: Stats | undefined = await loadStatsFromDatabase();
+    if (!stats) {
+      console.warn("No stats found to backup.");
+      return;
+    }
 
     if (!fs.existsSync(STATS_BACKUP_DIR)) {
       fs.mkdirSync(STATS_BACKUP_DIR, { recursive: true });

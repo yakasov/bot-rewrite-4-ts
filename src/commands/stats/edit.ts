@@ -5,7 +5,6 @@ import {
   SlashCommandStringOption,
   SlashCommandBooleanOption,
   Interaction,
-  PrimaryEntryPointCommandInteraction,
   ChatInputCommandInteraction,
 } from "discord.js";
 import { BotContext } from "../../types/BotContext";
@@ -34,12 +33,15 @@ export default {
       opt.setName("add").setDescription("If the value should be set or added")
     ),
   async execute(interaction: Interaction, context: BotContext): Promise<void> {
-    if (!(interaction instanceof ChatInputCommandInteraction) || !context.stats) return;
+    if (!(interaction instanceof ChatInputCommandInteraction) || !context.stats)
+      return;
+
     const userId: string = interaction.options.getUser("user")?.id!;
     const attribute: string = interaction.options.getString("attribute")!;
     const value: string = interaction.options.getString("value")!;
     const add: boolean = interaction.options.getBoolean("add") ?? false;
-    const userStats: UserStats = context.stats[interaction.guild?.id!].users[userId];
+    const userStats: UserStats =
+      context.stats[interaction.guild?.id!].users[userId];
 
     await interaction.client.application.fetch();
     if (

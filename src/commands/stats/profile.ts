@@ -3,7 +3,6 @@ import {
   MessageFlags,
   ChatInputCommandInteraction,
   Interaction,
-  User,
   SlashCommandUserOption,
   SlashCommandBooleanOption,
 } from "discord.js";

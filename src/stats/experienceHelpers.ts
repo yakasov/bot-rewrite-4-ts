@@ -74,7 +74,10 @@ function updateStatsOnLevelUp(
   userStats: UserStats,
   config: BotContext["config"]
 ): void {
-  // We do it this way so a user can level up multiple times in one go
+  /*
+   * We do it this way so a user can level up multiple times in one go
+   * (as opposed to levelXP = 0)
+   */
   userStats.levelXP =
     userStats.totalXP -
     getRequiredExperienceCumulative(userStats.level, config);

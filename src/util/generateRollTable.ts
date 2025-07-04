@@ -1,21 +1,34 @@
-import responsesJSON from "../../resources/responses.json"
 import { RollTableEntry } from "../types/RollTableEntry";
+import chanceResponsesJSON from "../../resources/chanceResponses.json";
+import { ChanceResponse } from "../types/JSON";
 
-const responses = Object.values(responsesJSON);
+const chanceResponses: { [key: string]: ChanceResponse } =
+  chanceResponsesJSON as { [key: string]: ChanceResponse };
 
-export function generateRollTable(): RollTableEntry[] {
+export function generateRollTable(newResponses?: {
+  [key: string]: ChanceResponse;
+}): RollTableEntry[] {
+  const responses: {
+    [key: string]: ChanceResponse;
+  } = newResponses ?? chanceResponses;
+
   let cumChance: number = 0;
-  const totalChance: number = responses.reduce((sum, r) => sum + r.chance, 0);
-  const rollTable: RollTableEntry[] = responses.map((response) => {
-    const normalizedChance = response.chance * (100 / totalChance);
-    const entry = {
-      ...response,
-      chance: normalizedChance + cumChance,
-      type: response.type as "message" | "reaction"
-    };
-    cumChance += normalizedChance;
-    return entry;
-  });
+  const totalChance: number = Object.values(responses).reduce(
+    (sum, r) => sum + r.chance,
+    0
+  );
+  const rollTable: RollTableEntry[] = Object.values(responses).map(
+    (response) => {
+      const normalizedChance = response.chance * (100 / totalChance);
+      const entry = {
+        ...response,
+        chance: normalizedChance + cumChance,
+        type: response.type as "message" | "reaction",
+      };
+      cumChance += normalizedChance;
+      return entry;
+    }
+  );
 
   return rollTable;
 }

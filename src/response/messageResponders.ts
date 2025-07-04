@@ -2,6 +2,7 @@ import { Message, StickerResolvable } from "discord.js";
 import chanceResponsesJson from "../../resources/chanceResponses.json";
 import { ChanceResponse } from "../types/JSON";
 import { getNicknameFromMessage } from "./responseHelpers";
+import { BotContext } from "../types/BotContext";
 
 const chanceResponses: { [key: string]: ChanceResponse } =
   chanceResponsesJson as {
@@ -71,4 +72,44 @@ export async function sendCustomResponse(
   }
 
   message.channel.send(response);
+}
+
+export async function checkMessageReactions(
+  message: Message,
+  context: BotContext
+): Promise<void> {
+  // Fix for deleted message - return if message fetch fails
+  try {
+    await message.channel.messages.fetch(message.id);
+  } catch {
+    return;
+  }
+
+  const roll: number = Math.random() * 100;
+  const initialRoll: number = Math.random() * 100;
+
+  if (initialRoll < (context.config.bot.responseChance ?? 0)) {
+    Object.values(context.rollTable).some((response) => {
+      if (roll < response.chance) {
+        try {
+          switch (response.type) {
+            case "message":
+              message.reply(response.string);
+              break;
+            case "reaction":
+              message.react(response.string);
+              break;
+            default:
+              break;
+          }
+
+          return true;
+        } catch (err) {
+          console.error(err);
+          return false;
+        }
+      }
+      return false;
+    });
+  }
 }
