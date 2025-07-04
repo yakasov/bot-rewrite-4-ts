@@ -1,6 +1,5 @@
 import {
   ChatInputCommandInteraction,
-  Interaction,
   MessageFlags,
   SlashCommandBuilder,
   SlashCommandStringOption,
@@ -21,8 +20,7 @@ export default {
         .setName("key")
         .setDescription("The response to view. Leave blank to see all keys")
     ),
-  async execute(interaction: Interaction): Promise<void> {
-    if (!(interaction instanceof ChatInputCommandInteraction)) return;
+  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const key: string = interaction.options.getString("key") ?? "";

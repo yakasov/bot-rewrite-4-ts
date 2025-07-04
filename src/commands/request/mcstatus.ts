@@ -1,6 +1,5 @@
 import {
   ChatInputCommandInteraction,
-  Interaction,
   SlashCommandBuilder,
 } from "discord.js";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
@@ -15,10 +14,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("mcstatus")
     .setDescription("Get information about the current Minecraft server"),
-  async execute(interaction: Interaction, context: BotContext): Promise<void> {
-    if (!(interaction instanceof ChatInputCommandInteraction) || !context.stats)
-      return;
-
+  async execute(interaction: ChatInputCommandInteraction, context: BotContext): Promise<void> {
     if (
       !(
         context.config.minecraft.serverIp && context.config.minecraft.serverPort

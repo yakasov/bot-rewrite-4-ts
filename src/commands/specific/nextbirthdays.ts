@@ -1,7 +1,6 @@
 import moment from "moment-timezone";
 import {
   SlashCommandBuilder,
-  Interaction,
   ChatInputCommandInteraction,
 } from "discord.js";
 import { BotContext } from "../../types/BotContext";
@@ -14,8 +13,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("nextbirthdays")
     .setDescription("See when the next five birthdays are."),
-  execute(interaction: Interaction, context: BotContext): void {
-    if (!(interaction instanceof ChatInputCommandInteraction)) return;
+  execute(interaction: ChatInputCommandInteraction, context: BotContext): void {
     let output: string = getNextBirthdays(context.currentDate, 5);
 
     const year: number = context.currentDate.getFullYear();

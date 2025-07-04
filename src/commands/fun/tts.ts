@@ -26,9 +26,8 @@ export default {
         .setDescription("The prompt for TTS to say")
         .setRequired(true)
     ),
-  async execute(interaction: Interaction): Promise<void> {
+  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
     if (
-      !(interaction instanceof ChatInputCommandInteraction) ||
       !(interaction.member instanceof GuildMember)
     )
       return;

@@ -1,7 +1,6 @@
 import fs from "fs";
 import {
   SlashCommandBuilder,
-  Interaction,
   ChatInputCommandInteraction,
   MessageFlags,
   SlashCommandStringOption,
@@ -36,9 +35,7 @@ export default {
     .addStringOption((opt: SlashCommandStringOption) =>
       opt.setName("type").setDescription("Message or react")
     ),
-  async execute(interaction: Interaction, context: BotContext): Promise<void> {
-    if (!(interaction instanceof ChatInputCommandInteraction)) return;
-
+  async execute(interaction: ChatInputCommandInteraction, context: BotContext): Promise<void> {
     const key: string = interaction.options.getString("key")!;
     const string: string | null = interaction.options.getString("string");
     const chance: number | null = interaction.options.getNumber("chance");
