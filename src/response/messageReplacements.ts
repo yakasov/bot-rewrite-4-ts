@@ -1,5 +1,9 @@
 import { Message } from "discord.js";
-import { REGEX_STEAM_LINK, STEAM_URL_LINK } from "../consts/constants";
+import {
+  REGEX_STEAM_LINK,
+  STEAM_URL_LINK,
+  TWITTER_LINKS,
+} from "../consts/constants";
 import { getNicknameFromMessage } from "./responseHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 
@@ -17,11 +21,13 @@ export async function sendSteamDirectLink(message: Message): Promise<void> {
 export async function swapTwitterLinks(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
+  let replacedContent: string = message.content;
+  for (const [replacement, regex] of Object.entries(TWITTER_LINKS)) {
+    replacedContent = replacedContent.replace(regex, replacement);
+  }
   const content: string = `${getNicknameFromMessage(
     message
-  )} sent:\n${message.content
-    .replace("https://x.com/", "https://fixupx.com/")
-    .replace("https://twitter.com/", "https://fxtwitter.com/")}`;
+  )} sent:\n${replacedContent}`;
 
   if (message.reference && message.reference.channelId === message.channel.id) {
     // messageId is a snowflake? so hopefully enforcing it as not-null works

@@ -32,7 +32,7 @@ export async function checkMessageInvoke(
   }
 
   if (
-    TWITTER_LINKS.some((link) => message.content.includes(link)) &&
+    Object.values(TWITTER_LINKS).some((regex) => regex.test(message.content)) &&
     message.content.includes("status")
   ) {
     await swapTwitterLinks(message);

@@ -35,10 +35,10 @@ export const STEAM_URL_LINK: string =
 
 export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF: string = "135410033524604928";
 
-export const TWITTER_LINKS: string[] = [
-  "https://x.com/",
-  "https://twitter.com/",
-];
+export const TWITTER_LINKS: { [key: string]: RegExp } = {
+  "https://fixupx.com/": /https:\/\/x\.com\//g,
+  "https://fxtwitter.com/": /https:\/\/twitter\.com\//g,
+};
 
 export const STATS_BACKUP_DIR: string = "./backups/";
 export const STATS_TOP_SCORES_N: number = 10;
