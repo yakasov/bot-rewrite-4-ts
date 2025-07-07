@@ -32,7 +32,7 @@ export async function getMCStatus(
 export async function checkMinecraftServer(
   client: Client,
   context: BotContext
-) {
+): Promise<void> {
   if (context.runState.minecraft === MinecraftQueryStates.ERROR_STOP) return;
 
   if (context.runState.minecraft === MinecraftQueryStates.ERROR_RETRY) {

@@ -1,7 +1,7 @@
 import { Client, Collection, Command } from "discord.js";
 import { getCommandFiles } from "../util/getCommandFiles";
 
-export async function loadCommands(client: Client) {
+export async function loadCommands(client: Client): Promise<void> {
   if (!client.commands) client.commands = new Collection<string, Command>();
 
   const commandsDir: string = __dirname;

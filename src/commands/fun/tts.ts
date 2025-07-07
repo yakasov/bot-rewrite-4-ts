@@ -27,10 +27,7 @@ export default {
         .setRequired(true)
     ),
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    if (
-      !(interaction.member instanceof GuildMember)
-    )
-      return;
+    if (!(interaction.member instanceof GuildMember)) return;
     await interaction.deferReply();
 
     const prompt: string = interaction.options.getString("prompt")!;

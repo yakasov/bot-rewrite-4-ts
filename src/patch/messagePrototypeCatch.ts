@@ -1,4 +1,9 @@
-import { Message, MessagePayload, MessageReplyOptions } from "discord.js";
+import {
+  Message,
+  MessagePayload,
+  MessageReplyOptions,
+  OmitPartialGroupDMChannel,
+} from "discord.js";
 
 export function messagePrototypeCatch() {
   const superReply = Message.prototype.reply;
@@ -7,7 +12,7 @@ export function messagePrototypeCatch() {
   Message.prototype.reply = function (
     this: Message,
     options: string | MessagePayload | MessageReplyOptions
-  ) {
+  ): Promise<OmitPartialGroupDMChannel<Message<any>>> {
     try {
       if (typeof options === "string") {
         return superReply.call(this, {
@@ -30,12 +35,14 @@ export function messagePrototypeCatch() {
     }
   };
 
-  Message.prototype.delete = function (this: Message) {
+  Message.prototype.delete = function (
+    this: Message
+  ): Promise<OmitPartialGroupDMChannel<Message<any>>> {
     try {
       return superDelete.call(this);
     } catch (err: any) {
       console.error(err?.message);
       return Promise.reject(err);
     }
-  }
+  };
 }

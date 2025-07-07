@@ -2,7 +2,7 @@ import { Pool, PoolConnection } from "mariadb";
 import { getDatabasePool } from "./initialiseDatabase";
 import { BotContext } from "../types/BotContext";
 import { UserStats } from "../types/Stats";
-import { guildInsertQuery, userInsertQuery } from "./queries";
+import { GUILD_INSERT_QUERY, USER_INSERT_QUERY } from "./queries";
 
 function isUserStats(obj: any): obj is UserStats {
   return (
@@ -21,7 +21,7 @@ export async function saveStatsToDatabase(context: BotContext): Promise<void> {
     await conn.beginTransaction();
 
     for (const [guildId, guildData] of Object.entries(context.stats)) {
-      await conn.query(guildInsertQuery, [
+      await conn.query(GUILD_INSERT_QUERY, [
         guildId,
         guildData.guild.allowResponses,
         guildData.guild.rankUpChannel || "",
@@ -30,7 +30,7 @@ export async function saveStatsToDatabase(context: BotContext): Promise<void> {
       for (const [userId, userData] of Object.entries(guildData).filter(
         ([, value]) => isUserStats(value)
       ) as [string, UserStats][]) {
-        await conn.query(userInsertQuery, [
+        await conn.query(USER_INSERT_QUERY, [
           guildId,
           userId,
           userData.messages || 0,

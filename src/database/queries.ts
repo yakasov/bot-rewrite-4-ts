@@ -1,4 +1,4 @@
-export const guildCreateQuery = `
+export const GUILD_CREATE_QUERY = `
   CREATE TABLE IF NOT EXISTS guilds (
     guild_id VARCHAR(20) PRIMARY KEY,
     allow_responses BOOLEAN DEFAULT TRUE,
@@ -6,7 +6,7 @@ export const guildCreateQuery = `
   )
 `;
 
-export const userCreateQuery = `
+export const USER_CREATE_QUERY = `
   CREATE TABLE IF NOT EXISTS user_stats (
     id INT AUTO_INCREMENT PRIMARY KEY,
     guild_id VARCHAR(20) NOT NULL,
@@ -27,10 +27,10 @@ export const userCreateQuery = `
   )
 `;
 
-export const guildSelectQuery = "SELECT * FROM guilds";
-export const userSelectQuery = "SELECT * FROM user_stats";
+export const GUILD_SELECT_QUERY = "SELECT * FROM guilds";
+export const USER_SELECT_QUERY = "SELECT * FROM user_stats";
 
-export const guildInsertQuery = `INSERT INTO guilds 
+export const GUILD_INSERT_QUERY = `INSERT INTO guilds 
   (guild_id, allow_responses, rank_up_channel) 
   VALUES (?, ?, ?) 
   ON DUPLICATE KEY UPDATE 
@@ -38,7 +38,7 @@ export const guildInsertQuery = `INSERT INTO guilds
     rank_up_channel = VALUES(rank_up_channel)
 `;
 
-export const userInsertQuery = `INSERT INTO user_stats 
+export const USER_INSERT_QUERY = `INSERT INTO user_stats 
   (guild_id, user_id, messages, voice_time, join_time, 
     last_gain_time, total_experience, level_experience, 
     level_value, score, custom_set_name, name, previous_messages, 

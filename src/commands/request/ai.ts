@@ -1,5 +1,11 @@
 import fs from "fs";
-import { ChatInputCommandInteraction, Interaction, SlashCommandBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  Interaction,
+  SlashCommandBuilder,
+  SlashCommandNumberOption,
+  SlashCommandStringOption,
+} from "discord.js";
 import {
   AI_DEFAULT_TEMP,
   AI_REQUEST_ATTEMPTS,
@@ -33,13 +39,13 @@ export default {
   data: new SlashCommandBuilder()
     .setName("ai")
     .setDescription("Uses OpenAI API to generate an AI response")
-    .addStringOption((opt) =>
+    .addStringOption((opt: SlashCommandStringOption) =>
       opt
         .setName("prompt")
         .setDescription("The prompt to give ChatGPT")
         .setRequired(true)
     )
-    .addNumberOption((opt) =>
+    .addNumberOption((opt: SlashCommandNumberOption) =>
       opt
         .setName("temperature")
         .setDescription("Optional temperature parameter")
@@ -114,7 +120,12 @@ export default {
   },
 };
 
-function handleAIError(err: any, interaction: Interaction, attempts: number, timestamp: number): void {
+function handleAIError(
+  err: any,
+  interaction: Interaction,
+  attempts: number,
+  timestamp: number
+): void {
   fs.writeFile(
     `./logs/ai-${interaction.user.id}-${timestamp}-${attempts}.txt`,
     formatMessages(err, conversation),

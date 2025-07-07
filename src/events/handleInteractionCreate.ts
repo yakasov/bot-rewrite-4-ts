@@ -1,14 +1,23 @@
-import { Command, Interaction, InteractionReplyOptions, MessageFlags } from "discord.js";
+import {
+  Command,
+  Interaction,
+  InteractionReplyOptions,
+  MessageFlags,
+} from "discord.js";
 
 const reply: InteractionReplyOptions = {
   content: "There was an error while executing this command!",
-  flags: MessageFlags.Ephemeral
+  flags: MessageFlags.Ephemeral,
 };
 
-export async function handleInteractionCreate(interaction: Interaction) {
+export async function handleInteractionCreate(
+  interaction: Interaction
+): Promise<void> {
   if (!interaction.isChatInputCommand()) return;
 
-  const command: Command | undefined = interaction.client.commands.get(interaction.commandName);
+  const command: Command | undefined = interaction.client.commands.get(
+    interaction.commandName
+  );
 
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);

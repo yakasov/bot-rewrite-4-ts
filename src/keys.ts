@@ -10,11 +10,11 @@ const {
   DATABASE_DB,
   DISCORD_TOKEN,
   DISCORD_CLIENT_ID,
-  OPENAI_TOKEN
+  OPENAI_TOKEN,
 } = process.env;
 
 if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
-  throw new Error("Missing required keys");
+  throw new Error("Missing required Discord keys");
 }
 
 if (
@@ -32,7 +32,7 @@ if (
 export const keys = {
   DISCORD_TOKEN,
   DISCORD_CLIENT_ID,
-  OPENAI_TOKEN
+  OPENAI_TOKEN,
 };
 
 export const database = {

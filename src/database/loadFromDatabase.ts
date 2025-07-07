@@ -1,6 +1,6 @@
 import { Pool, PoolConnection } from "mariadb";
 import { getDatabasePool } from "./initialiseDatabase";
-import { guildSelectQuery, userSelectQuery } from "./queries";
+import { GUILD_SELECT_QUERY, USER_SELECT_QUERY } from "./queries";
 import { Stats } from "../types/Stats";
 import { GuildsStructure, UserStatsStructure } from "../types/Database";
 
@@ -11,7 +11,7 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
   try {
     conn = await pool.getConnection();
 
-    const guilds: GuildsStructure[] = await conn.query(guildSelectQuery);
+    const guilds: GuildsStructure[] = await conn.query(GUILD_SELECT_QUERY);
     const stats: Stats = {};
 
     for (const guild of guilds) {
@@ -21,7 +21,7 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
       };
     }
 
-    const userStats: UserStatsStructure[] = await conn.query(userSelectQuery);
+    const userStats: UserStatsStructure[] = await conn.query(USER_SELECT_QUERY);
 
     for (const userStat of userStats) {
       if (!stats[userStat.guild_id]) {

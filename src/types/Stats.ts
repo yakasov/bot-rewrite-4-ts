@@ -23,7 +23,7 @@ export interface UserStats {
   name: string;
   totalXP: number;
   voiceTime: number;
-  [key: string]: number | string | undefined; 
+  [key: string]: number | string | undefined;
 }
 
 export interface StatsEvent {
@@ -32,7 +32,8 @@ export interface StatsEvent {
     | "message"
     | "joinedVoiceChannel"
     | "inVoiceChannel"
-    | "leftVoiceChannel";
+    | "leftVoiceChannel"
+    | "guildInit";
   userId: string;
 }
 

@@ -23,6 +23,8 @@ export function addToStats(event: StatsEvent, context: BotContext): void {
     context.stats[event.guildId] = guildStats;
   }
 
+  if (event.type === "guildInit") return;
+
   let userStats: UserStats | undefined =
     context.stats[event.guildId].users[event.userId];
   if (!userStats) {
