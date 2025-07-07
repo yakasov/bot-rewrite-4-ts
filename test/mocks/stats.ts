@@ -1,0 +1,53 @@
+import { Stats, GuildStats, UserStats } from "../../src/types/Stats";
+
+export const mockUserStats1: UserStats = {
+  messages: 10,
+  voiceTime: 120,
+  joinTime: 1620000000,
+  lastGainTime: 1620003600,
+  totalXP: 500,
+  levelXP: 100,
+  level: 5,
+  name: "TestUser1",
+  previousMessages: 5,
+  previousVoiceTime: 60,
+  uuid: "user-1-uuid",
+};
+
+export const mockUserStats2: UserStats = {
+  messages: 20,
+  voiceTime: 240,
+  joinTime: 1620000001,
+  lastGainTime: 1620007200,
+  totalXP: 1500,
+  levelXP: 300,
+  level: 10,
+  name: "TestUser2",
+  previousMessages: 10,
+  previousVoiceTime: 120,
+  uuid: "user-2-uuid",
+};
+
+export const mockGuildStatsNoUsers: GuildStats = {
+  guild: {
+    allowResponses: true,
+    rankUpChannel: "rankup-channel-id-1",
+  },
+  users: {},
+};
+
+export const mockGuildStatsWithUsers: GuildStats = {
+  guild: {
+    allowResponses: false,
+    rankUpChannel: "rankup-channel-id-2",
+  },
+  users: {
+    "user-1": mockUserStats1,
+    "user-2": mockUserStats2,
+  },
+};
+
+export const mockStats: Stats = {
+  "guild-1": mockGuildStatsNoUsers,
+  "guild-2": mockGuildStatsWithUsers,
+};

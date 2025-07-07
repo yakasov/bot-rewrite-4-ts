@@ -21,13 +21,37 @@ export async function sendSteamDirectLink(message: Message): Promise<void> {
 export async function swapTwitterLinks(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  let replacedContent: string = message.content;
-  for (const [replacement, regex] of Object.entries(TWITTER_LINKS)) {
-    replacedContent = replacedContent.replace(regex, replacement);
+  /*
+   * Kind of messy but here's the reasoning:
+   *
+   * We want to replace Twitter links that contain 'status' in them
+   * using the regex from TWITTER_LINKS.
+   * This therefore works for X and Twitter.
+   *
+   * A valid tweet will have 'status' in it, hence the requirement.
+   * Otherwise, we don't want to do any replacement.
+   *
+   * So we split the message content, check each entry for 'status',
+   * and if true, we can apply the regex replacement, but only
+   * for the matching regex (since 'for of TWITTER_LINKS' will try it twice).
+   */
+  let contentArray: string[] = message.content.split(" ");
+  let replacedContentArray: string[] = [];
+  for (let word of contentArray) {
+    if (word.includes("status")) {
+      for (const [replacement, regex] of Object.entries(TWITTER_LINKS)) {
+        if (regex.test(word)) {
+          replacedContentArray.push(word.replace(regex, replacement));
+        }
+      }
+    } else {
+      replacedContentArray.push(word);
+    }
   }
+
   const content: string = `${getNicknameFromMessage(
     message
-  )} sent:\n${replacedContent}`;
+  )} sent:\n${replacedContentArray.join(" ")}`;
 
   if (message.reference && message.reference.channelId === message.channel.id) {
     // messageId is a snowflake? so hopefully enforcing it as not-null works
