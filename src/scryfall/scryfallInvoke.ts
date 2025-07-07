@@ -4,6 +4,7 @@ import { Cards } from "scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
 import { scryfallShowCardList } from "./scryfallShowCardList";
+import { isSendableChannel } from "../util/typeGuards";
 
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
@@ -16,7 +17,7 @@ export async function scryfallInvoke(message: Message): Promise<void> {
    * typing exclusion passed down to other functions (eg scryfallNoCardFound)
    * so this check is needed in every function that uses channel.send.
    */
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
 
   const promises: Promise<void>[] = [];
   let match: RegExpMatchArray | null = null;
@@ -63,5 +64,3 @@ export async function scryfallGetCard(
     await scryfallShowCardList(message, cardName, results);
   }
 }
-
-

@@ -1,18 +1,15 @@
 import { ActivityType, Client } from "discord.js";
 import { BotContext } from "../types/BotContext";
 import { MinecraftQueryStates } from "../types/RunState";
-import {
-  MinecraftResponse,
-  MinecraftUser,
-} from "../types/responses/MinecraftResponse";
+import { MinecraftTypes } from "../types/responses/MinecraftResponse";
 import { URL_MINECRAFT_STATUS } from "../consts/constants";
 
 export async function getMCStatus(
   context: BotContext
-): Promise<MinecraftResponse | null> {
+): Promise<MinecraftTypes.Response | null> {
   return fetch(`${URL_MINECRAFT_STATUS}/${context.config.minecraft.serverIp}`)
     .then((response: Response) => response.json())
-    .then((response: MinecraftResponse | null) => response)
+    .then((response: MinecraftTypes.Response | null) => response)
     .catch((err) => {
       console.error(`\n${err}`);
 
@@ -48,7 +45,7 @@ export async function checkMinecraftServer(
     return;
   }
 
-  const response: MinecraftResponse | null = await getMCStatus(context);
+  const response: MinecraftTypes.Response | null = await getMCStatus(context);
 
   if (response === null) return;
 
@@ -65,7 +62,7 @@ export async function checkMinecraftServer(
 
   if (online) {
     const players: string[] = response.players.list.map(
-      (player: MinecraftUser) => player.name_raw
+      (player: MinecraftTypes.User) => player.name_raw
     );
     activityString = `(${players.length}) ${players.join(", ")}`;
   } else {

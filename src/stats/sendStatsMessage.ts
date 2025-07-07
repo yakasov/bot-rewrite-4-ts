@@ -26,7 +26,7 @@ export async function sendMessage(
   if (channel && guildStats.guild.rankUpChannel) {
     if (!channel.isTextBased() || channel.isDMBased()) return;
 
-    channel.send(
+    await channel.send(
       `## ${messageEvent.subject}!\n\`\`\`ansi\n${user.displayName} has reached ${messageEvent.accolade} (${messageEvent.title})!\`\`\``
     );
   }

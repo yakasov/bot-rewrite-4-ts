@@ -1,208 +1,210 @@
-export interface FortniteResponse {
-  status: number;
-  data: FortniteResponseData;
-}
+export namespace FortniteTypes {
+  export interface Response {
+    status: number;
+    data: ResponseData;
+  }
 
-export interface FortniteResponseData {
+  export interface ResponseData {
     hash: string;
     date: string;
     vbuckIcon: string;
-    entries: FortniteEntry[];
-  };
+    entries: Entry[];
+  }
 
-interface FortniteEntry {
-  regularPrice: number;
-  finalPrice: number;
-  devName: string;
-  offerId: string;
-  inDate: string;
-  outDate: string;
-  bundle?: {
-    name: string;
-    info: string;
-    image: string;
-  };
-  banner?: {
-    value: string;
-    intensity: string;
-    backendValue: string;
-  };
-  offerTag?: {
-    id: string;
-    text: string;
-  };
-  giftable: boolean;
-  refundable: boolean;
-  sortPriority: number;
-  layoutId: string;
-  layout: FortniteLayout;
-  colors?: {
-    color1: string;
-    color2?: string;
-    color3?: string;
-    textBackgroundColor: string;
-  };
-  tileBackgroundMaterial?: string;
-  tileSize?: string;
-  displayAssetPath?: string;
-  newDisplayAssetPath?: string;
-  newDisplayAsset?: FortniteNewDisplayAsset;
-  brItems?: FortniteBRItem[];
-  tracks?: FortniteTrack[];
-  instruments?: FortniteGenericItem[];
-  cars?: FortniteCar[];
-  legoKits?: Omit<FortniteGenericItem, "showcaseVideo">;
-}
-
-interface FortniteLayout {
-  id: string;
-  name: string;
-  category?: string;
-  index: number;
-  rank: number;
-  showIneligibleOffers: string;
-  background?: string;
-  useWidePreview: boolean;
-  displayType: string;
-  textureMetadata?: FortniteMetadata[];
-  stringMetadata?: FortniteMetadata[];
-  textMetadata?: FortniteMetadata[];
-}
-
-interface FortniteMetadata {
-  key: string;
-  value: string;
-}
-
-interface FortniteNewDisplayAsset {
-  id: string;
-  cosmeticId?: string;
-  materialInstances: FortniteMaterialInstance[];
-  renderImages: {
-    productTag: string;
-    fileName: string;
-    image: string;
-  }[];
-}
-
-interface FortniteMaterialInstance {
-  id: string;
-  primaryMode: string;
-  productTag: string;
-  Images: { [key: string]: string };
-  Colors: { [key: string]: string };
-  Scalings: { [key: string]: number };
-  Flags: { [key: string]: boolean };
-}
-
-interface FortniteGenericItem {
-  id: string;
-  name: string;
-  description: string;
-  type: FortniteValues;
-  rarity: FortniteValues;
-  images: {
-    small: string;
-    large: string;
-  };
-  series?: FortniteItemSeries;
-  gameplayTags?: string[];
-  path?: string;
-  showcaseVideo?: string;
-  added: string;
-  shopHistory?: Date[];
-}
-
-interface FortniteBRItem extends Omit<FortniteGenericItem, "images"> {
-  exclusiveDescription?: string;
-  unlockRequirements?: string;
-  customExclusiveCallout?: string;
-  set?: {
-    value: string;
-    text: string;
-    backendValue: string;
-  };
-  introduction?: {
-    chapter: string;
-    season: string;
-    text: string;
-    backendValue: number;
-  };
-  images: FortniteImages;
-  variants?: {
-    channel: string;
-    type: string;
-    options: {
-      tag: string;
+  interface Entry {
+    regularPrice: number;
+    finalPrice: number;
+    devName: string;
+    offerId: string;
+    inDate: string;
+    outDate: string;
+    bundle?: {
       name: string;
-      unlockRequirements?: string;
+      info: string;
+      image: string;
+    };
+    banner?: {
+      value: string;
+      intensity: string;
+      backendValue: string;
+    };
+    offerTag?: {
+      id: string;
+      text: string;
+    };
+    giftable: boolean;
+    refundable: boolean;
+    sortPriority: number;
+    layoutId: string;
+    layout: Layout;
+    colors?: {
+      color1: string;
+      color2?: string;
+      color3?: string;
+      textBackgroundColor: string;
+    };
+    tileBackgroundMaterial?: string;
+    tileSize?: string;
+    displayAssetPath?: string;
+    newDisplayAssetPath?: string;
+    newDisplayAsset?: NewDisplayAsset;
+    brItems?: BRItem[];
+    tracks?: Track[];
+    instruments?: GenericItem[];
+    cars?: Car[];
+    legoKits?: Omit<GenericItem, "showcaseVideo">;
+  }
+
+  interface Layout {
+    id: string;
+    name: string;
+    category?: string;
+    index: number;
+    rank: number;
+    showIneligibleOffers: string;
+    background?: string;
+    useWidePreview: boolean;
+    displayType: string;
+    textureMetadata?: Metadata[];
+    stringMetadata?: Metadata[];
+    textMetadata?: Metadata[];
+  }
+
+  interface Metadata {
+    key: string;
+    value: string;
+  }
+
+  interface NewDisplayAsset {
+    id: string;
+    cosmeticId?: string;
+    materialInstances: MaterialInstance[];
+    renderImages: {
+      productTag: string;
+      fileName: string;
       image: string;
     }[];
-  }[];
-  builtInEmoteIds?: string[];
-  searchTags?: string[];
-  metaTags?: string[];
-  dynamicPakId?: string;
-  itemPreviewHeroPath?: string;
-  displayAssetPath?: string;
-  definitionPath?: string;
-}
+  }
 
-interface FortniteValues {
-  value: string;
-  displayValue: string;
-  backendValue: string;
-}
+  interface MaterialInstance {
+    id: string;
+    primaryMode: string;
+    productTag: string;
+    Images: { [key: string]: string };
+    Colors: { [key: string]: string };
+    Scalings: { [key: string]: number };
+    Flags: { [key: string]: boolean };
+  }
 
-interface FortniteItemSeries {
-  value: string;
-  image?: string;
-  colors: string[];
-  backendValue: string;
-}
+  interface GenericItem {
+    id: string;
+    name: string;
+    description: string;
+    type: Values;
+    rarity: Values;
+    images: {
+      small: string;
+      large: string;
+    };
+    series?: ItemSeries;
+    gameplayTags?: string[];
+    path?: string;
+    showcaseVideo?: string;
+    added: string;
+    shopHistory?: Date[];
+  }
 
-interface FortniteImages {
-  smallIcon: string;
-  icon: string;
-  featured?: string;
-  lego?: {
-    small: string;
-    large: string;
-    wide?: string;
-  };
-  bean?: {
-    small: string;
-    large: string;
-  };
-  other?: { [key: string]: string };
-}
+  interface BRItem extends Omit<GenericItem, "images"> {
+    exclusiveDescription?: string;
+    unlockRequirements?: string;
+    customExclusiveCallout?: string;
+    set?: {
+      value: string;
+      text: string;
+      backendValue: string;
+    };
+    introduction?: {
+      chapter: string;
+      season: string;
+      text: string;
+      backendValue: number;
+    };
+    images: Images;
+    variants?: {
+      channel: string;
+      type: string;
+      options: {
+        tag: string;
+        name: string;
+        unlockRequirements?: string;
+        image: string;
+      }[];
+    }[];
+    builtInEmoteIds?: string[];
+    searchTags?: string[];
+    metaTags?: string[];
+    dynamicPakId?: string;
+    itemPreviewHeroPath?: string;
+    displayAssetPath?: string;
+    definitionPath?: string;
+  }
 
-interface FortniteTrack {
-  id: string;
-  devName: string;
-  title: string;
-  artist: string;
-  album?: string;
-  releaseYear: number;
-  bpm: number;
-  duration: number;
-  difficulty: FortniteTrackDifficulty;
-  gameplayTags?: string[];
-  genres?: string[];
-  albumArt: string;
-  added: string;
-  shopHistory?: string[];
-}
+  interface Values {
+    value: string;
+    displayValue: string;
+    backendValue: string;
+  }
 
-interface FortniteTrackDifficulty {
-  vocals: number;
-  guitar: number;
-  bass: number;
-  plasticBass: number;
-  drums: number;
-  plasticDrums: number;
-}
+  interface ItemSeries {
+    value: string;
+    image?: string;
+    colors: string[];
+    backendValue: string;
+  }
 
-interface FortniteCar extends FortniteGenericItem {
-  vehicleId: string;
+  interface Images {
+    smallIcon: string;
+    icon: string;
+    featured?: string;
+    lego?: {
+      small: string;
+      large: string;
+      wide?: string;
+    };
+    bean?: {
+      small: string;
+      large: string;
+    };
+    other?: { [key: string]: string };
+  }
+
+  interface Track {
+    id: string;
+    devName: string;
+    title: string;
+    artist: string;
+    album?: string;
+    releaseYear: number;
+    bpm: number;
+    duration: number;
+    difficulty: TrackDifficulty;
+    gameplayTags?: string[];
+    genres?: string[];
+    albumArt: string;
+    added: string;
+    shopHistory?: string[];
+  }
+
+  interface TrackDifficulty {
+    vocals: number;
+    guitar: number;
+    bass: number;
+    plasticBass: number;
+    drums: number;
+    plasticDrums: number;
+  }
+
+  interface Car extends GenericItem {
+    vehicleId: string;
+  }
 }

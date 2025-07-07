@@ -31,9 +31,11 @@ export default {
     .addBooleanOption((opt: SlashCommandBooleanOption) =>
       opt.setName("add").setDescription("If the value should be set or added")
     ),
-  async execute(interaction: ChatInputCommandInteraction, context: BotContext): Promise<void> {
-    if (!context.stats)
-      return;
+  async execute(
+    interaction: ChatInputCommandInteraction,
+    context: BotContext
+  ): Promise<void> {
+    if (!context.stats) return;
 
     const userId: string = interaction.options.getUser("user")?.id!;
     const attribute: string = interaction.options.getString("attribute")!;
@@ -49,7 +51,7 @@ export default {
     ) {
       try {
         if (value === null) {
-          interaction.reply({
+          await interaction.reply({
             content: `No value provided for attribute "${attribute}".`,
             flags: MessageFlags.Ephemeral,
           });
@@ -61,7 +63,7 @@ export default {
             typeof userStats[attribute] !== "number" ||
             typeof newValue !== "number"
           ) {
-            interaction.reply({
+            await interaction.reply({
               content: `Cannot add non-numeric values to attribute "${attribute}".`,
               flags: MessageFlags.Ephemeral,
             });
@@ -72,17 +74,17 @@ export default {
           userStats[attribute] = newValue;
         }
 
-        interaction.reply(
+        await interaction.reply(
           `Set user ${userId} attribute ${attribute} to value ${userStats[attribute]}`
         );
         return;
       } catch (err: any) {
-        interaction.reply(err.message);
+        await interaction.reply(err.message);
         return;
       }
     }
 
-    interaction.reply({
+    await interaction.reply({
       content: "You are not an admin user!",
       flags: MessageFlags.Ephemeral,
     });

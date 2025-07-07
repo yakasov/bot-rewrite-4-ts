@@ -1,20 +1,21 @@
-import { Message, MessageReference } from "discord.js";
+import { Message } from "discord.js";
 import { REGEX_STEAM_LINK, STEAM_URL_LINK } from "../consts/constants";
 import { getNicknameFromMessage } from "./responseHelpers";
+import { isSendableChannel } from "../util/typeGuards";
 
-export function sendSteamDirectLink(message: Message): void {
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+export async function sendSteamDirectLink(message: Message): Promise<void> {
+  if (!isSendableChannel(message.channel)) return;
 
   const steamLink: string =
     message.content.split(" ").find((word) => REGEX_STEAM_LINK.test(word)) ??
     message.content;
-  message.channel.send(
+  await message.channel.send(
     `Embedded link: ${STEAM_URL_LINK}${encodeURIComponent(steamLink)}`
   );
 }
 
 export async function swapTwitterLinks(message: Message): Promise<void> {
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
 
   const content: string = `${getNicknameFromMessage(
     message
@@ -27,9 +28,9 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
     const replyMessage: Message = await message.channel.messages.fetch(
       message.reference.messageId!
     );
-    replyMessage.reply(content);
+    await replyMessage.reply(content);
   } else {
-    message.channel.send(content);
+    await message.channel.send(content);
   }
 
   // TODO: if fixupx fails, don't delete original message

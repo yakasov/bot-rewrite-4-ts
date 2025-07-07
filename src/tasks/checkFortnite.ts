@@ -1,18 +1,12 @@
 import { Client, Guild, TextChannel } from "discord.js";
-import configJSON from "../../resources/config.json";
-import { Config } from "../types/Config";
 import {
   GenericBooleanObject,
   GenericObject,
   GenericStringObject,
 } from "../types/Generic";
-import {
-  FortniteResponse,
-  FortniteResponseData,
-} from "../types/responses/FortniteResponse";
+import { FortniteTypes } from "../types/responses/FortniteResponse";
 import { URL_FORTNITE_API } from "../consts/constants";
-
-const config: Config = configJSON;
+import { BotContext } from "../types/BotContext";
 
 let currentSongs: string[] = [];
 const emoteFlags: GenericBooleanObject = {
@@ -24,7 +18,9 @@ const emoteMessages: GenericStringObject = {
   "Get Griddy": "**Get Griddy is now in the Fortnite shop!**",
 };
 
-async function getFortniteShop(): Promise<FortniteResponseData | undefined> {
+async function getFortniteShop(): Promise<
+  FortniteTypes.ResponseData | undefined
+> {
   try {
     const response: Response = await fetch(URL_FORTNITE_API);
     if (!response.ok) {
@@ -32,7 +28,7 @@ async function getFortniteShop(): Promise<FortniteResponseData | undefined> {
       return undefined;
     }
 
-    const data: FortniteResponse | undefined = await response.json();
+    const data: FortniteTypes.Response | undefined = await response.json();
     return data?.data;
   } catch (err: any) {
     console.error("Error fetching Fortnite shop:", err);
@@ -44,8 +40,11 @@ function sortSongArray(songA: string, songB: string): number {
   return songA.split(" - ")[1].localeCompare(songB.split(" - ")[1]);
 }
 
-export async function checkFortnite(client: Client): Promise<void> {
-  const data: FortniteResponseData | undefined = await getFortniteShop();
+export async function checkFortnite(
+  client: Client,
+  context: BotContext
+): Promise<void> {
+  const data: FortniteTypes.ResponseData | undefined = await getFortniteShop();
   if (!data) return;
 
   const songs: string[] = data.entries
@@ -61,15 +60,15 @@ export async function checkFortnite(client: Client): Promise<void> {
     )
     .map((entry: GenericObject) => entry.brItems[0].name);
 
-  const guild: Guild = await client.guilds.fetch(config.ids.mainGuild);
+  const guild: Guild = await client.guilds.fetch(context.config.ids.mainGuild);
   const fortniteChannel: TextChannel | null = (await guild.channels.fetch(
-    config.ids.fortniteChannel
+    context.config.ids.fortniteChannel
   )) as TextChannel | null;
 
   for (const emote in emoteFlags) {
     if (emotes.includes(emote) && !emoteFlags[emote]) {
       emoteFlags[emote] = true;
-      fortniteChannel?.send(emoteMessages[emote]);
+      await fortniteChannel?.send(emoteMessages[emote]);
     } else if (!emotes.includes(emote)) {
       emoteFlags[emote] = false;
     }
@@ -93,13 +92,13 @@ export async function checkFortnite(client: Client): Promise<void> {
   if (newSongs.length > 0 || oldSongs.length > 0) {
     currentSongs = songs;
     if (oldSongs.length > 0) {
-      fortniteChannel?.send(
+      await fortniteChannel?.send(
         `# Removed Fortnite Jam Tracks\n${oldSongs.join("\n")}`
       );
     }
 
     if (newSongs.length > 0) {
-      fortniteChannel?.send(
+      await fortniteChannel?.send(
         `# New Fortnite Jam Tracks\n${newSongs.join("\n")}`
       );
     }

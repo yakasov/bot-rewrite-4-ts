@@ -3,13 +3,14 @@ import { Card, Cards } from "scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
 import { getLowestHighestData } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
+import { isSendableChannel } from "../util/typeGuards";
 
 export async function scryfallCardFound(
   message: Message,
   cardName: string,
   set: string | undefined
 ): Promise<void> {
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
 
   const cardDetails: Card | undefined = await Cards.byName(
     cardName,
@@ -18,7 +19,7 @@ export async function scryfallCardFound(
   );
 
   if (!cardDetails) {
-    message.channel.send(
+    await message.channel.send(
       `Ran into an error fetching ${cardName} for set ${set}!`
     );
     return;
@@ -67,7 +68,7 @@ $${lowestHighestData.highestPrice}](${lowestHighestData.highestUrl})
     );
   }
 
-  message.channel.send({
+  await message.channel.send({
     content: cardDetails.scryfall_uri.replace("?utm_source=api", ""),
     embeds: [embed],
     files: attachment ? [attachment] : [],

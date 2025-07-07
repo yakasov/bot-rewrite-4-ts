@@ -35,7 +35,10 @@ export default {
     .addStringOption((opt: SlashCommandStringOption) =>
       opt.setName("type").setDescription("Message or react")
     ),
-  async execute(interaction: ChatInputCommandInteraction, context: BotContext): Promise<void> {
+  async execute(
+    interaction: ChatInputCommandInteraction,
+    context: BotContext
+  ): Promise<void> {
     const key: string = interaction.options.getString("key")!;
     const string: string | null = interaction.options.getString("string");
     const chance: number | null = interaction.options.getNumber("chance");
@@ -48,7 +51,7 @@ export default {
     ) {
       try {
         if (!chanceResponses[key] && !(string && chance && type)) {
-          interaction.reply({
+          await interaction.reply({
             content: "Key does not exist and not enough values provided.",
             flags: MessageFlags.Ephemeral,
           });
@@ -56,7 +59,7 @@ export default {
         }
 
         if (type && !["message", "reaction"].includes(type)) {
-          interaction.reply({
+          await interaction.reply({
             content: 'Type must be either "message" or "reaction"!',
             flags: MessageFlags.Ephemeral,
           });
@@ -76,15 +79,15 @@ export default {
           JSON.stringify(chanceResponses)
         );
 
-        interaction.reply(`Updated ${key}.`);
+        await interaction.reply(`Updated ${key}.`);
         return;
       } catch (err: any) {
-        interaction.reply(err.message);
+        await interaction.reply(err.message);
         return;
       }
     }
 
-    interaction.reply({
+    await interaction.reply({
       content: "You are not an admin user!",
       flags: MessageFlags.Ephemeral,
     });

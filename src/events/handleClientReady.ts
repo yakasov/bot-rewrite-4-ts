@@ -27,7 +27,7 @@ export async function handleClientReady(
     context.uptime = context.uptime + 10;
   }, getTime({ seconds: 10 }));
   setInterval(() => checkBirthdays(client, context), getTime({ minutes: 15 }));
-  setInterval(() => checkFortnite(client)), getTime({ minutes: 15 });
+  setInterval(() => checkFortnite(client, context)), getTime({ minutes: 15 });
   setInterval(() => checkMinecraftServer(client, context)),
     getTime({ seconds: 5 });
   setInterval(() => {

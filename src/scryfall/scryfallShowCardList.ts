@@ -7,13 +7,15 @@ import {
   StringSelectMenuInteraction,
 } from "discord.js";
 import { scryfallGetCard } from "./scryfallInvoke";
+import { isSendableChannel } from "../util/typeGuards";
 
 export async function scryfallShowCardList(
   message: Message,
   cardName: string,
   results: string[]
 ): Promise<void> {
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
+
   const selectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
     .setCustomId("scryfall_list_select")
     .setPlaceholder("Choose a card")
