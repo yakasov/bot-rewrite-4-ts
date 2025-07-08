@@ -5,6 +5,34 @@ export function mockClient() {
     intents: [],
   });
   Client.prototype.login = jest.fn().mockResolvedValue("mocked_token");
+  client.guilds = {
+    fetch: jest.fn().mockResolvedValue(mockGuild()),
+    cache: new Collection([["guild-id", mockGuild()]]),
+    create: jest.fn(),
+    fetchSoundboardSounds: jest.fn(),
+    setIncidentActions: jest.fn(),
+    widgetImageURL: jest.fn(),
+    resolve: jest.fn(),
+    resolveId: jest.fn(),
+    valueOf: jest.fn(),
+    toJSON: jest.fn(),
+    [Symbol.iterator]: jest.fn(),
+  } as any;
+  client.users = {
+    fetch: jest.fn().mockResolvedValue(mockUser()),
+    cache: new Collection([["user-id", mockUser()]]),
+    createDM: jest.fn(),
+    dmChannel: jest.fn(),
+    deleteDM: jest.fn(),
+    fetchFlags: jest.fn(),
+    send: jest.fn(),
+    resolve: jest.fn(),
+    resolveId: jest.fn(),
+    valueOf: jest.fn(),
+    toJSON: jest.fn(),
+    [Symbol.iterator]: jest.fn(),
+  } as any;
+  client.user = mockUser();
   return client;
 }
 
@@ -60,6 +88,7 @@ export function mockBaseMessage(content: string = "Test message content") {
     author: mockUser(),
     content,
     delete: jest.fn().mockResolvedValue(undefined),
+    react: jest.fn(),
     reply: jest.fn(),
     id: "message-id",
   } as any;
@@ -79,6 +108,16 @@ export function mockUser() {
     username: "testuser",
     displayName: "Test User",
     tag: "testuser#1234",
+    presence: {
+      activities: [
+        {
+          name: "Test Splash!",
+          type: "PLAYING",
+        },
+      ],
+      status: "online",
+    },
+    setPresence: jest.fn(),
   } as any;
 }
 
@@ -113,6 +152,23 @@ export function mockGuild() {
     channels: {
       fetch: jest.fn().mockResolvedValue(mockTextChannel()),
     },
+    stickers: {
+      cache: new Collection([
+        [
+          "1087661495552315462",
+          {
+            id: "1087661495552315462",
+            name: "Test Sticker",
+          },
+        ],
+      ]),
+    },
+    roles: {
+      cache: new Collection([["role-id", mockRole()]]),
+      fetch: jest.fn().mockResolvedValue({
+        id: "role-id",
+      }),
+    },
   } as any;
 }
 
@@ -126,5 +182,13 @@ export function mockGuildMember() {
       add: jest.fn(),
       remove: jest.fn(),
     },
+  } as any;
+}
+
+export function mockRole() {
+  return {
+    id: "role-id",
+    name: "Test Role",
+    members: new Collection([["member-id", mockGuildMember()]]),
   } as any;
 }

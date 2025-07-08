@@ -6,9 +6,9 @@ describe("responseHelpers", () => {
     expect(getNicknameFromMessage(mockMessage())).toBe("Test Member");
   });
 
-  it("has a default value if displayName could not be found", () => {
+  it("uses author displayName if member.displayName is not available", () => {
     const message = mockMessage();
     message.guild.members.cache.clear();
-    expect(getNicknameFromMessage(message)).toBe("???");
+    expect(getNicknameFromMessage(message)).toBe("Test User");
   });
 });

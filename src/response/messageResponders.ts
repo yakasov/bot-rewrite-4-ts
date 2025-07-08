@@ -90,7 +90,7 @@ export async function checkMessageReactions(
   const initialRoll: number = Math.random() * 100;
 
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
-    Object.values(context.rollTable).some(async (response) => {
+    context.rollTable.some(async (response) => {
       if (roll < response.chance) {
         try {
           switch (response.type) {

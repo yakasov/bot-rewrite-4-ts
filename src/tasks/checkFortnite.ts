@@ -8,17 +8,17 @@ import { FortniteTypes } from "../types/responses/FortniteResponse";
 import { URL_FORTNITE_API } from "../consts/constants";
 import { BotContext } from "../types/BotContext";
 
-let currentSongs: string[] = [];
-const emoteFlags: GenericBooleanObject = {
+export let currentSongs: string[] = [];
+export const emoteFlags: GenericBooleanObject = {
   "Bring It Around": false,
   "Get Griddy": false,
 };
-const emoteMessages: GenericStringObject = {
+export const emoteMessages: GenericStringObject = {
   "Bring It Around": "**The Homer Simpson dance is now in the Fortnite shop!**",
   "Get Griddy": "**Get Griddy is now in the Fortnite shop!**",
 };
 
-async function getFortniteShop(): Promise<
+export async function getFortniteShop(): Promise<
   FortniteTypes.ResponseData | undefined
 > {
   try {
@@ -36,8 +36,12 @@ async function getFortniteShop(): Promise<
   }
 }
 
-function sortSongArray(songA: string, songB: string): number {
-  return songA.split(" - ")[1].localeCompare(songB.split(" - ")[1]);
+export function sortSongArray(songA: string, songB: string): number {
+  const [titleA, artistA] = songA.split(" - ");
+  const [titleB, artistB] = songB.split(" - ");
+  const artistCompare = artistA.localeCompare(artistB);
+  if (artistCompare !== 0) return artistCompare;
+  return titleA.localeCompare(titleB);
 }
 
 export async function checkFortnite(
@@ -61,9 +65,22 @@ export async function checkFortnite(
     .map((entry: GenericObject) => entry.brItems[0].name);
 
   const guild: Guild = await client.guilds.fetch(context.config.ids.mainGuild);
+
+  if (!guild) {
+    console.error(`Guild not found with ID: ${context.config.ids.mainGuild}`);
+    return;
+  }
+
   const fortniteChannel: TextChannel | null = (await guild.channels.fetch(
     context.config.ids.fortniteChannel
   )) as TextChannel | null;
+
+  if (!fortniteChannel || !fortniteChannel.isTextBased()) {
+    console.error(
+      `Fortnite channel not found or not text-based in guild ${guild.id} (${guild.name})`
+    );
+    return;
+  }
 
   for (const emote in emoteFlags) {
     if (emotes.includes(emote) && !emoteFlags[emote]) {

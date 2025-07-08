@@ -12,7 +12,6 @@ import moment from "moment-timezone";
 import { BotContext } from "../types/BotContext";
 import { BirthdayStates } from "../types/RunState";
 import { Birthdays } from "../types/Birthdays";
-import { Config } from "../types/Config";
 
 const birthdays: Birthdays = birthdaysJSON;
 
@@ -29,9 +28,24 @@ export async function checkBirthdays(
     const guild: Guild = await client.guilds.fetch(
       context.config.ids.mainGuild
     );
+
+    if (!guild) {
+      console.error(`Guild not found with ID: ${context.config.ids.mainGuild}`);
+      context.runState.birthdays = BirthdayStates.ERROR_STOP;
+      return;
+    }
+
     const birthdayChannel: TextChannel | null = (await guild.channels.fetch(
       context.config.ids.birthdayChannel
     )) as TextChannel | null;
+
+    if (!birthdayChannel || !birthdayChannel.isTextBased()) {
+      console.error(
+        `Birthday channel not found or not text-based in guild ${guild.id} (${guild.name})`
+      );
+      context.runState.birthdays = BirthdayStates.ERROR_STOP;
+      return;
+    }
 
     const roleMembers: Collection<string, GuildMember> =
       guild.roles.cache.find(
