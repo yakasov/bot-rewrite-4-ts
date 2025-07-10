@@ -3,5 +3,5 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  (console.error as jest.Mock).mockRestore?.();
+  jest.restoreAllMocks();
 });

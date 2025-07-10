@@ -1,12 +1,15 @@
 import { Guild, GuildBasedChannel, User } from "discord.js";
 import { BotContext } from "../types/BotContext";
 import { GuildStats, StatsMessage } from "../types/Stats";
+import { isSendableChannel } from "../util/typeGuards";
 
 export async function sendMessage(
   messageEvent: StatsMessage,
   context: BotContext
 ): Promise<void> {
+  debugger;
   const guild: Guild = await context.client.guilds.fetch(messageEvent.guildId);
+  const test = guild.members.cache.get(messageEvent.userId);
   const user: User | undefined = guild.members.cache.get(
     messageEvent.userId
   )?.user;
@@ -23,8 +26,8 @@ export async function sendMessage(
     guildStats.guild.rankUpChannel
   );
 
-  if (channel && guildStats.guild.rankUpChannel) {
-    if (!channel.isTextBased() || channel.isDMBased()) return;
+  if (channel) {
+    if (!isSendableChannel(channel)) return;
 
     await channel.send(
       `## ${messageEvent.subject}!\n\`\`\`ansi\n${user.displayName} has reached ${messageEvent.accolade} (${messageEvent.title})!\`\`\``

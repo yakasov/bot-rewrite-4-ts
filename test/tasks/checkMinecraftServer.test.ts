@@ -1,8 +1,4 @@
-import {
-  checkMinecraftServer,
-  getMCStatus,
-} from "../../src/tasks/checkMinecraftServer";
-import { MinecraftTypes } from "../../src/types/responses/MinecraftResponse";
+import * as TestModule from "../../src/tasks/checkMinecraftServer";
 import { MinecraftQueryStates } from "../../src/types/RunState";
 import { mockBotContext } from "../mocks/context";
 import { mockClient } from "../mocks/discord";
@@ -16,7 +12,7 @@ describe("getMCStatus", () => {
     console.error = jest.fn();
     console.warn = jest.fn();
 
-    await getMCStatus(context);
+    await TestModule.getMCStatus(context);
     expect(console.error).toHaveBeenCalledTimes(1);
     expect(context.runState.minecraft).toBe(MinecraftQueryStates.ERROR_STOP);
     expect(console.warn).toHaveBeenCalledWith(
@@ -30,7 +26,7 @@ describe("getMCStatus", () => {
     (global as any).fetch = jest.fn().mockResolvedValue(null);
     console.error = jest.fn();
 
-    await getMCStatus(context);
+    await TestModule.getMCStatus(context);
     expect(console.error).toHaveBeenCalledTimes(1);
     expect(context.runState.minecraft).toBe(MinecraftQueryStates.ERROR_RETRY);
   });
@@ -42,7 +38,7 @@ describe("checkMinecraftServer", () => {
     const context = mockBotContext();
     context.runState.minecraft = MinecraftQueryStates.ERROR_STOP;
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(context.runState.minecraft).toBe(MinecraftQueryStates.ERROR_STOP);
   });
 
@@ -51,7 +47,7 @@ describe("checkMinecraftServer", () => {
     const context = mockBotContext();
     context.runState.minecraft = MinecraftQueryStates.ERROR_RETRY;
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(context.runState.minecraft).toBe(MinecraftQueryStates.NORMAL);
   });
 
@@ -60,7 +56,7 @@ describe("checkMinecraftServer", () => {
     const context = mockBotContext();
     context.config.minecraft.serverIp = "";
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(context.runState.minecraft).toBe(MinecraftQueryStates.ERROR_STOP);
   });
 
@@ -69,7 +65,7 @@ describe("checkMinecraftServer", () => {
     const context = mockBotContext();
     (global as any).fetch = jest.fn().mockResolvedValue(null);
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(client.user!.setPresence).not.toHaveBeenCalled();
   });
 
@@ -82,7 +78,7 @@ describe("checkMinecraftServer", () => {
       .mockResolvedValue(mockResponse("minecraft"));
     console.log = jest.fn();
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(console.log).toHaveBeenCalledWith(
       `\nFound Minecraft server at mock.minecraft.server:25565!`
     );
@@ -103,7 +99,7 @@ describe("checkMinecraftServer", () => {
     mockResponseWrapped.text = jest.fn().mockResolvedValue(mockResponseData);
     (global as any).fetch = jest.fn().mockResolvedValue(mockResponseWrapped);
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(client.user!.setPresence).not.toHaveBeenCalled();
   });
 
@@ -115,7 +111,7 @@ describe("checkMinecraftServer", () => {
       .fn()
       .mockResolvedValue(mockResponse("minecraft"));
 
-    await checkMinecraftServer(client, context);
+    await TestModule.checkMinecraftServer(client, context);
     expect(client.user!.setPresence).toHaveBeenCalledWith({
       activities: [
         {

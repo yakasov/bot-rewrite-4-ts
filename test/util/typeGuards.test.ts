@@ -1,14 +1,16 @@
-import { isSendableChannel } from "../../src/util/typeGuards";
+import * as TestModule from "../../src/util/typeGuards";
 import { mockChannel } from "../mocks/discord";
 
 describe("isSendableChannel", () => {
   it("returns true for a text channel", () => {
-    expect(isSendableChannel(mockChannel())).toBe(true);
+    expect(TestModule.isSendableChannel(mockChannel())).toBe(true);
   });
   it("returns false for a PartialGroupDMChannel", () => {
-    expect(isSendableChannel(mockChannel("partialGroupDM"))).toBe(false);
+    expect(TestModule.isSendableChannel(mockChannel("partialGroupDM"))).toBe(
+      false
+    );
   });
   it("returns false for a DM-based channel", () => {
-    expect(isSendableChannel(mockChannel("dm"))).toBe(false);
+    expect(TestModule.isSendableChannel(mockChannel("dm"))).toBe(false);
   });
 });

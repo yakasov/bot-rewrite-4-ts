@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import { mockBotContext } from "../mocks/context";
 import { mockClient } from "../mocks/discord";
-import { checkBirthdays } from "../../src/tasks/checkBirthdays";
+import * as TestModule from "../../src/tasks/checkBirthdays";
 import birthdays from "../../resources/birthdays.json";
 import { BirthdayStates } from "../../src/types/RunState";
 
@@ -11,7 +11,7 @@ describe("checkBirthdays", () => {
     const context = mockBotContext();
     context.currentDate = moment().tz("Europe/London").toDate();
 
-    await checkBirthdays(client, context);
+    await TestModule.checkBirthdays(client, context);
     expect(client.guilds.fetch).not.toHaveBeenCalled();
   });
 
@@ -21,7 +21,7 @@ describe("checkBirthdays", () => {
     context.currentDate = moment("1970-01-31").tz("Europe/London").toDate();
     client.guilds.fetch = jest.fn().mockReturnValue(null);
 
-    await checkBirthdays(client, context);
+    await TestModule.checkBirthdays(client, context);
     expect(
       moment().tz("Europe/London").isSame(context.currentDate, "day")
     ).toBe(true);
@@ -38,7 +38,7 @@ describe("checkBirthdays", () => {
       },
     });
 
-    await checkBirthdays(client, context);
+    await TestModule.checkBirthdays(client, context);
     expect(
       moment().tz("Europe/London").isSame(context.currentDate, "day")
     ).toBe(true);
@@ -52,7 +52,7 @@ describe("checkBirthdays", () => {
     context.runState.birthdays = BirthdayStates.FIRST_RUN;
     console.log = jest.fn();
 
-    await checkBirthdays(client, context);
+    await TestModule.checkBirthdays(client, context);
     expect(
       moment().tz("Europe/London").isSame(context.currentDate, "day")
     ).toBe(true);
@@ -76,7 +76,7 @@ describe("checkBirthdays", () => {
       date: moment().tz("Europe/London").format("DD/MM"),
     };
 
-    await checkBirthdays(client, context);
+    await TestModule.checkBirthdays(client, context);
     expect(
       moment().tz("Europe/London").isSame(context.currentDate, "day")
     ).toBe(true);

@@ -1,18 +1,11 @@
-import {
-  checkFortnite,
-  currentSongs,
-  emoteFlags,
-  emoteMessages,
-  getFortniteShop,
-  sortSongArray,
-} from "../../src/tasks/checkFortnite";
+import * as TestModule from "../../src/tasks/checkFortnite";
 import { mockBotContext } from "../mocks/context";
 import { mockClient } from "../mocks/discord";
 import { mockResponse } from "../mocks/responses";
 
 describe("getFortniteShop", () => {
   it("should return valid data", async () => {
-    const data = await getFortniteShop();
+    const data = await TestModule.getFortniteShop();
     expect(data).toBeDefined();
   });
 
@@ -23,7 +16,7 @@ describe("getFortniteShop", () => {
     });
     console.error = jest.fn();
 
-    const data = await getFortniteShop();
+    const data = await TestModule.getFortniteShop();
     expect(data).toBeUndefined();
     expect(console.error).toHaveBeenCalledWith("HTTP error! status: 999");
   });
@@ -32,7 +25,7 @@ describe("getFortniteShop", () => {
     (global as any).fetch = jest.fn();
     console.error = jest.fn();
 
-    const data = await getFortniteShop();
+    const data = await TestModule.getFortniteShop();
     expect(data).toBeUndefined();
     expect(console.error).toHaveBeenCalledWith(
       "Error fetching Fortnite shop:",
@@ -49,7 +42,7 @@ describe("sortSongArray", () => {
       "Song A - Artist B",
       "Song C - Artist A",
     ];
-    const sorted = songs.sort(sortSongArray);
+    const sorted = songs.sort(TestModule.sortSongArray);
     expect(sorted).toEqual([
       "Song A - Artist A",
       "Song C - Artist A",
@@ -60,7 +53,7 @@ describe("sortSongArray", () => {
 
   it("should handle empty arrays", () => {
     const songs: string[] = [];
-    const sorted = songs.sort(sortSongArray);
+    const sorted = songs.sort(TestModule.sortSongArray);
     expect(sorted).toEqual([]);
   });
 });
@@ -68,9 +61,9 @@ describe("sortSongArray", () => {
 describe("checkFortnite", () => {
   beforeEach(() => {
     // Reset the array in-place to avoid breaking references
-    currentSongs.length = 0;
-    emoteFlags["Bring It Around"] = false;
-    emoteFlags["Get Griddy"] = false;
+    TestModule.currentSongs.length = 0;
+    TestModule.emoteFlags["Bring It Around"] = false;
+    TestModule.emoteFlags["Get Griddy"] = false;
   });
 
   it("should handle mainGuild ID missing", async () => {
@@ -82,7 +75,7 @@ describe("checkFortnite", () => {
       .mockResolvedValue(mockResponse("fortnite"));
     console.error = jest.fn();
 
-    await checkFortnite(client, context);
+    await TestModule.checkFortnite(client, context);
     expect(console.error).toHaveBeenCalledWith(
       `Guild not found with ID: guild-id`
     );
@@ -99,7 +92,7 @@ describe("checkFortnite", () => {
     const guild: any = await client.guilds.fetch();
     guild.channels.fetch = jest.fn().mockResolvedValue(null);
 
-    await checkFortnite(client, context);
+    await TestModule.checkFortnite(client, context);
     expect(console.error).toHaveBeenCalledWith(
       `Fortnite channel not found or not text-based in guild guild-id (Test Guild)`
     );
@@ -116,15 +109,15 @@ describe("checkFortnite", () => {
     const guild: any = await client.guilds.fetch();
     const fortniteChannel = await guild.channels.fetch();
 
-    await checkFortnite(client, context);
-    expect(emoteFlags["Get Griddy"]).toBe(true);
+    await TestModule.checkFortnite(client, context);
+    expect(TestModule.emoteFlags["Get Griddy"]).toBe(true);
     expect(fortniteChannel.send).toHaveBeenCalledWith(
-      emoteMessages["Get Griddy"]
+      TestModule.emoteMessages["Get Griddy"]
     );
 
-    expect(emoteFlags["Bring It Around"]).toBe(false);
+    expect(TestModule.emoteFlags["Bring It Around"]).toBe(false);
     expect(fortniteChannel.send).not.toHaveBeenCalledWith(
-      emoteMessages["Bring It Around"]
+      TestModule.emoteMessages["Bring It Around"]
     );
   });
 
@@ -136,15 +129,10 @@ describe("checkFortnite", () => {
       .mockResolvedValue(mockResponse("fortnite"));
     console.error = jest.fn();
 
-    const sortSongArraySpy = jest.spyOn(
-      require("../../src/tasks/checkFortnite"),
-      "sortSongArray"
-    );
+    const sortSongArraySpy = jest.spyOn(TestModule, "sortSongArray");
 
-    await checkFortnite(client, context);
+    await TestModule.checkFortnite(client, context);
     expect(sortSongArraySpy).not.toHaveBeenCalled();
-
-    sortSongArraySpy.mockRestore();
   });
 
   it("should send song info if currentSongs is different to new songs", async () => {
@@ -154,12 +142,12 @@ describe("checkFortnite", () => {
       .fn()
       .mockResolvedValue(mockResponse("fortnite"));
     console.error = jest.fn();
-    currentSongs.push("Song A - Artist A", "Song B - Artist B");
+    TestModule.currentSongs.push("Song A - Artist A", "Song B - Artist B");
 
     const guild: any = await client.guilds.fetch();
     const fortniteChannel = await guild.channels.fetch();
 
-    await checkFortnite(client, context);
+    await TestModule.checkFortnite(client, context);
     expect(fortniteChannel.send).toHaveBeenCalledWith(
       "# Removed Fortnite Jam Tracks\nSong A - Artist A\nSong B - Artist B"
     );

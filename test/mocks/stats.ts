@@ -1,4 +1,10 @@
-import { Stats, GuildStats, UserStats } from "../../src/types/Stats";
+import {
+  Stats,
+  GuildStats,
+  UserStats,
+  StatsMessage,
+  StatsEvent,
+} from "../../src/types/Stats";
 
 export const mockUserStats1: UserStats = {
   messages: 10,
@@ -15,12 +21,12 @@ export const mockUserStats1: UserStats = {
 };
 
 export const mockUserStats2: UserStats = {
-  messages: 20,
-  voiceTime: 240,
+  messages: 1000,
+  voiceTime: 10000,
   joinTime: 1620000001,
   lastGainTime: 1620007200,
   totalXP: 1500,
-  levelXP: 300,
+  levelXP: 5,
   level: 10,
   name: "TestUser2",
   previousMessages: 10,
@@ -50,4 +56,18 @@ export const mockGuildStatsWithUsers: GuildStats = {
 export const mockStats: Stats = {
   "guild-1": mockGuildStatsNoUsers,
   "guild-2": mockGuildStatsWithUsers,
+};
+
+export const mockStatsMessage: StatsMessage = {
+  guildId: "guild-1",
+  userId: "member-id",
+  subject: "Level Up!",
+  accolade: "Test Accolade",
+  title: "Test Title",
+};
+
+export const mockStatsEvent: StatsEvent = {
+  userId: "user-1",
+  type: "message",
+  guildId: "guild-2",
 };

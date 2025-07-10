@@ -1,9 +1,9 @@
 import { BotContext } from "../../src/types/BotContext";
-import { Client } from "discord.js";
+import { mockClient } from "./discord";
 
-export function mockBotContext(partial?: Partial<BotContext>): BotContext {
+export function mockBotContext(): BotContext {
   return {
-    client: new Client({ intents: [] }),
+    client: mockClient(),
     config: {
       bot: {
         aiChannels: [],
@@ -35,6 +35,5 @@ export function mockBotContext(partial?: Partial<BotContext>): BotContext {
     splash: "Test Splash!",
     stats: {},
     uptime: 0,
-    ...partial,
   };
 }
