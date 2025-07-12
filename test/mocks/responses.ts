@@ -1,25 +1,14 @@
 import { FortniteTypes } from "../../src/types/responses/FortniteResponse";
 import { MinecraftTypes } from "../../src/types/responses/MinecraftResponse";
 
-export function mockResponse(
-  type: "fortnite" | "minecraft" | "custom"
-): Response {
-  let response = null;
-  if (type === "fortnite") {
-    response = mockFortniteResponse();
-  } else if (type === "minecraft") {
-    response = mockMinecraftResponse();
-  } else if (type === "custom") {
-    response = {};
-  }
-
+export function mockResponse(responseData: any): Response {
   return {
     ok: true,
     status: 200,
     statusText: "OK",
-    url: `https://mockapi.com/${type}`,
-    json: async () => response,
-    text: async () => JSON.stringify(response),
+    url: "https://mockapi.com/",
+    json: async () => responseData,
+    text: async () => JSON.stringify(responseData),
     headers: new Headers(),
   } as Response;
 }

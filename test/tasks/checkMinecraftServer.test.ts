@@ -75,7 +75,7 @@ describe("checkMinecraftServer", () => {
     context.runState.minecraft = MinecraftQueryStates.FIRST_RUN;
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("minecraft"));
+      .mockResolvedValue(mockResponse(mockMinecraftResponse()));
     console.log = jest.fn();
 
     await TestModule.checkMinecraftServer(client, context);
@@ -109,7 +109,7 @@ describe("checkMinecraftServer", () => {
     context.runState.minecraft = MinecraftQueryStates.NORMAL;
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("minecraft"));
+      .mockResolvedValue(mockResponse(mockMinecraftResponse()));
 
     await TestModule.checkMinecraftServer(client, context);
     expect(client.user!.setPresence).toHaveBeenCalledWith({

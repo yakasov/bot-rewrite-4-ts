@@ -4,6 +4,7 @@ import {
   UserStats,
   StatsMessage,
   StatsEvent,
+  TableData
 } from "../../src/types/Stats";
 
 export const mockUserStats1: UserStats = {
@@ -71,3 +72,30 @@ export const mockStatsEvent: StatsEvent = {
   type: "message",
   guildId: "guild-2",
 };
+
+export const mockTableData: TableData[] = [
+  {
+    "#": 2,
+    Name: "user-1",
+    Level: "100 (0/1 XP)",
+    Msgs: 1000,
+    "Voice Time": "30m 01s",
+    Title: "Test Title"
+  },
+  {
+    "#": 1,
+    Name: "user-2",
+    Level: "125 (0/1 XP)",
+    Msgs: 0,
+    "Voice Time": "30d 23h 59m 59s",
+    Title: "Test Title 2"
+  },
+  {
+    "#": 3,
+    Name: "user-3",
+    Level: "1 (0/1 XP)",
+    Msgs: 500,
+    "Voice Time": "99h 99m 99s",
+    Title: "Test Title 3"
+  },
+]

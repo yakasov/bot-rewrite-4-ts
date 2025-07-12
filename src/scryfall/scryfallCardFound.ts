@@ -44,24 +44,31 @@ export async function scryfallCardFound(
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(cardDetails.name)
     .setURL(cardDetails.scryfall_uri)
-    .setFooter({ text: footer })
-    .setImage(
+    .setFooter({ text: footer });
+
+  if (imageUrl) {
+    // EmbedBuilder.setImage actually checks that this is a valid URI!!!
+    embed.setImage(
       isImageLocal ? `attachment://${imageUrl.split("/").pop()}.jpg` : imageUrl
     );
+  }
 
   const oracleId: string =
     cardDetails.oracle_id ?? cardDetails.card_faces?.[0].oracle_id ?? "";
   if (oracleId.length) {
-    const lowestHighestData: PricingData = await getLowestHighestData(oracleId);
-    embed.addFields({
-      name: "Prices",
-      value: `
+    const lowestHighestData: PricingData | undefined =
+      await getLowestHighestData(oracleId);
+    if (lowestHighestData) {
+      embed.addFields({
+        name: "Prices",
+        value: `
 Lowest: [${lowestHighestData.lowestSet} @\
 $${lowestHighestData.lowestPrice}](${lowestHighestData.lowestUrl})
 Highest: [${lowestHighestData.highestSet} @\
 $${lowestHighestData.highestPrice}](${lowestHighestData.highestUrl})
 `,
-    });
+      });
+    }
   } else {
     console.error(
       `Couldn't find an Oracle ID for card named ${cardDetails.name}, ID ${cardDetails.id}!`

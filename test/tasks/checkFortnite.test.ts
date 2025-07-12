@@ -1,7 +1,7 @@
 import * as TestModule from "../../src/tasks/checkFortnite";
 import { mockBotContext } from "../mocks/context";
 import { mockClient } from "../mocks/discord";
-import { mockResponse } from "../mocks/responses";
+import { mockFortniteResponse, mockResponse } from "../mocks/responses";
 
 describe("getFortniteShop", () => {
   it("should return valid data", async () => {
@@ -72,7 +72,7 @@ describe("checkFortnite", () => {
     client.guilds.fetch = jest.fn().mockResolvedValue(null);
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("fortnite"));
+      .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
     await TestModule.checkFortnite(client, context);
@@ -86,7 +86,7 @@ describe("checkFortnite", () => {
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("fortnite"));
+      .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
     const guild: any = await client.guilds.fetch();
@@ -103,7 +103,7 @@ describe("checkFortnite", () => {
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("fortnite"));
+      .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
     const guild: any = await client.guilds.fetch();
@@ -126,7 +126,7 @@ describe("checkFortnite", () => {
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("fortnite"));
+      .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
     const sortSongArraySpy = jest.spyOn(TestModule, "sortSongArray");
@@ -140,7 +140,7 @@ describe("checkFortnite", () => {
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse("fortnite"));
+      .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
     TestModule.currentSongs.push("Song A - Artist A", "Song B - Artist B");
 
