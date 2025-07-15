@@ -54,7 +54,10 @@ export function mockTextChannel(): any {
     id: "channel-id",
     isTextBased: () => true,
     isDMBased: () => false,
-    send: jest.fn(),
+    send: jest.fn().mockReturnValue({
+      awaitMessageComponent: jest.fn(),
+      edit: jest.fn(),
+    }),
     messages: {
       fetch: jest.fn().mockResolvedValue(
         new Collection([

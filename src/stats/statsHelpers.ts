@@ -136,7 +136,7 @@ export function getNicknameFromInteraction(
 }
 
 export function formatTime(seconds: number): string {
-  const date: Date = new Date();
+  const date: Date = new Date(0);
   date.setSeconds(seconds);
   const unitArray: string[] = date.toISOString().substr(8, 11).split(/:|T/u);
   const days: number = parseInt(unitArray[0], 10) - 1;

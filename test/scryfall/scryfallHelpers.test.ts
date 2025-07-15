@@ -1,6 +1,6 @@
 import * as TestModule from "../../src/scryfall/scryfallHelpers";
 import { mockResponse } from "../mocks/responses";
-import { mockByNameResponse } from "../mocks/scryfall";
+import { mockCard } from "../mocks/scryfall";
 
 describe("scryfallHelpers", () => {
   it("should handle a bad fetch", async () => {
@@ -19,9 +19,9 @@ describe("scryfallHelpers", () => {
       mockResponse({
         status: 200,
         data: [
-          mockByNameResponse,
+          mockCard,
           {
-            ...mockByNameResponse,
+            ...mockCard,
             prices: {
               eur: "12.50",
               usd: "1.50",

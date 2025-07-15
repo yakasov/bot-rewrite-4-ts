@@ -1,5 +1,6 @@
 import * as TestModule from "../../src/stats/statsHelpers";
 import { mockBotContext } from "../mocks/context";
+import { mockGuild, mockInteractionCommand } from "../mocks/discord";
 import {
   mockGuildStatsWithUsers,
   mockStats,
@@ -216,6 +217,55 @@ describe("getDateNowInSeconds", () => {
   });
 });
 
-// TODO: getNicknameFromInteraction
+describe("getNicknameFromInteraction", () => {
+  it("returns if no member", () => {
+    const interaction = mockInteractionCommand();
+    const id = "unknown-id";
 
-// TODO: formatTime
+    const nickname = TestModule.getNicknameFromInteraction(interaction, id);
+    expect(nickname).toBe(undefined);
+  });
+
+  it("returns an unsanitized display name", () => {
+    const interaction = mockInteractionCommand();
+    interaction.guild = mockGuild();
+    interaction.guild.members.cache.get("member-id").displayName =
+      "\x30My \x50Name";
+
+    const nickname = TestModule.getNicknameFromInteraction(interaction);
+    expect(nickname).toEqual("\x30My \x50Name");
+  });
+
+  it("returns a sanitized display name", () => {
+    const interaction = mockInteractionCommand();
+    interaction.guild = mockGuild();
+    interaction.guild.members.cache.get("member-id").displayName =
+      "\x30My \x50Name";
+    const id = "";
+    const sanitize = true;
+
+    const nickname = TestModule.getNicknameFromInteraction(
+      interaction,
+      id,
+      sanitize
+    );
+    expect(nickname).toEqual("0My PName");
+  });
+});
+
+describe("formatTime", () => {
+  it("formats seconds into days, hours, minutes, and seconds", () => {
+    const formatted = TestModule.formatTime(90061);
+    expect(formatted).toMatch(/1d 01h 01m 01s/);
+  });
+
+  it("formats zero seconds as 0d 00h 00m 00s", () => {
+    const formatted = TestModule.formatTime(0);
+    expect(formatted).toBe(" 0d 00h 00m 00s");
+  });
+
+  it("pads single-digit days with a space", () => {
+    const formatted = TestModule.formatTime(86400); // 1 day
+    expect(formatted.startsWith(" 1d")).toBe(true);
+  });
+});

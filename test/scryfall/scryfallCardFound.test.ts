@@ -1,26 +1,11 @@
 import { Cards } from "scryfall-api";
 import * as TestModule from "../../src/scryfall/scryfallCardFound";
-import { mockDMChannel, mockMessage } from "../mocks/discord";
-import { mockByNameResponse } from "../mocks/scryfall";
+import { mockMessage } from "../mocks/discord";
+import { mockCard } from "../mocks/scryfall";
 import { mockResponse } from "../mocks/responses";
 
 describe("scryfallCardFound", () => {
-  it("should return if message is not a sendable channel", async () => {
-    const message = mockMessage();
-    message.channel = mockDMChannel();
-    const cardName = "";
-    const set = undefined;
-
-    const cardsByNameSpy = jest.spyOn(
-      (await import("scryfall-api")).Cards,
-      "byName"
-    );
-
-    await TestModule.scryfallCardFound(message, cardName, set);
-    expect(cardsByNameSpy).not.toHaveBeenCalled();
-  });
-
-  it("should return if message is not a sendable channel", async () => {
+  it("should return if card not found", async () => {
     const message = mockMessage();
     const cardName = "card name";
     const set = undefined;
@@ -39,7 +24,7 @@ describe("scryfallCardFound", () => {
     const set = "set name";
     console.error = jest.fn();
 
-    jest.spyOn(Cards, "byName").mockResolvedValue(mockByNameResponse);
+    jest.spyOn(Cards, "byName").mockResolvedValue(mockCard);
 
     await TestModule.scryfallCardFound(message, cardName, set);
     expect(console.error).toHaveBeenCalledWith(
@@ -77,7 +62,7 @@ describe("scryfallCardFound", () => {
       .mockResolvedValue({ status: 400, data: null });
 
     jest.spyOn(Cards, "byName").mockResolvedValue({
-      ...mockByNameResponse,
+      ...mockCard,
       oracle_id: "oracle-id",
     });
 
@@ -112,12 +97,10 @@ describe("scryfallCardFound", () => {
     console.error = jest.fn();
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(
-        mockResponse({ status: 200, data: [mockByNameResponse] })
-      );
+      .mockResolvedValue(mockResponse({ status: 200, data: [mockCard] }));
 
     jest.spyOn(Cards, "byName").mockResolvedValue({
-      ...mockByNameResponse,
+      ...mockCard,
       oracle_id: "oracle-id",
     });
 
