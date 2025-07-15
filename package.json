@@ -2,7 +2,7 @@
   "name": "bot-rewrite-4-ts",
   "version": "1.0.0",
   "description": "bot-rewrite-3-js... but in TypeScript!",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",

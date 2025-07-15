@@ -103,7 +103,7 @@ describe("checkMinecraftServer", () => {
     expect(client.user!.setPresence).not.toHaveBeenCalled();
   });
 
-  it("should not update presence if presence is already updated", async () => {
+  it("should update presence if update is allowed", async () => {
     const client = mockClient();
     const context = mockBotContext();
     context.runState.minecraft = MinecraftQueryStates.NORMAL;

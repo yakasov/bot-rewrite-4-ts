@@ -39,3 +39,5 @@ botContext.client.on(
   (oldState: VoiceState, newState: VoiceState) =>
     handleVoiceStateUpdate(oldState, newState, botContext)
 );
+
+botContext.client.login();
