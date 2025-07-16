@@ -84,6 +84,7 @@ describe("scryfallShowCardList", () => {
       message,
       "collected-values",
       "",
+      true,
       true
     );
   });

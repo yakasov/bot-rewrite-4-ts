@@ -207,4 +207,30 @@ export namespace FortniteTypes {
   interface Car extends GenericItem {
     vehicleId: string;
   }
+
+  export interface FestivalItems {
+    [key: string]: FestivalItem;
+  }
+
+  export interface FestivalItem {
+    title: string;
+    artist: string;
+    releaseYear: number;
+    cover: string;
+    bpm: number;
+    duration: string;
+    difficulties: {
+      vocals: number;
+      guitar: number;
+      bass: number;
+      drums: number;
+      "plastic-bass": number;
+      "plastic-drums": number;
+      "plastic-guitar": number;
+    };
+    createdAt: string;
+    lastFeatured: string;
+    previewUrl: string;
+    featured?: boolean;
+  }
 }

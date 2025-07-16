@@ -44,6 +44,8 @@ export const STATS_BACKUP_DIR: string = "./backups/";
 export const STATS_TOP_SCORES_N: number = 10;
 
 export const URL_FORTNITE_API: string = "https://fortnite-api.com/v2/shop";
+export const URL_FORTNITE_SONGS: string =
+  "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/jam_tracks.json";
 export const URL_MINECRAFT_STATUS: string =
   "https://api.mcstatus.io/v2/status/java";
 export const URL_SCRYFALL_ORACLE: string =

@@ -1,10 +1,17 @@
 import * as TestModule from "../../src/tasks/checkFortnite";
 import { mockBotContext } from "../mocks/context";
 import { mockClient } from "../mocks/discord";
-import { mockFortniteResponse, mockResponse } from "../mocks/responses";
+import {
+  mockFortniteFestivalResponse,
+  mockFortniteResponse,
+  mockResponse,
+} from "../mocks/responses";
 
 describe("getFortniteShop", () => {
   it("should return valid data", async () => {
+    (global as any).fetch = jest
+      .fn()
+      .mockResolvedValue(mockResponse(mockFortniteResponse()));
     const data = await TestModule.getFortniteShop();
     expect(data).toBeDefined();
   });
@@ -29,6 +36,40 @@ describe("getFortniteShop", () => {
     expect(data).toBeUndefined();
     expect(console.error).toHaveBeenCalledWith(
       "Error fetching Fortnite shop:",
+      expect.any(Error)
+    );
+  });
+});
+
+describe("getFestivalData", () => {
+  it("should return valid data", async () => {
+    (global as any).fetch = jest
+      .fn()
+      .mockResolvedValue(mockResponse(mockFortniteFestivalResponse()));
+    const data = await TestModule.getFestivalData();
+    expect(data).toBeDefined();
+  });
+
+  it("should handle no data returned (HTTP error)", async () => {
+    (global as any).fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 999,
+    });
+    console.error = jest.fn();
+
+    const data = await TestModule.getFestivalData();
+    expect(data).toBeUndefined();
+    expect(console.error).toHaveBeenCalledWith("HTTP error! status: 999");
+  });
+
+  it("should handle no data returned (general error)", async () => {
+    (global as any).fetch = jest.fn();
+    console.error = jest.fn();
+
+    const data = await TestModule.getFestivalData();
+    expect(data).toBeUndefined();
+    expect(console.error).toHaveBeenCalledWith(
+      "Error fetching Fortnite Festival data:",
       expect.any(Error)
     );
   });
@@ -140,7 +181,7 @@ describe("checkFortnite", () => {
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
-      .mockResolvedValue(mockResponse(mockFortniteResponse()));
+      .mockResolvedValue(mockResponse(mockFortniteFestivalResponse()));
     console.error = jest.fn();
     TestModule.currentSongs.push("Song A - Artist A", "Song B - Artist B");
 
@@ -152,8 +193,8 @@ describe("checkFortnite", () => {
       "# Removed Fortnite Jam Tracks\nSong A - Artist A\nSong B - Artist B"
     );
     expect(fortniteChannel.send).toHaveBeenCalledWith(
-      "# New Fortnite Jam Tracks\nSong C - Artist C"
+      "# New Fortnite Jam Tracks\nIt Takes Two - Rob Base & DJ EZ Rock"
     );
-    expect(fortniteChannel.send).toHaveBeenCalledTimes(3);
+    expect(fortniteChannel.send).toHaveBeenCalledTimes(2);
   });
 });

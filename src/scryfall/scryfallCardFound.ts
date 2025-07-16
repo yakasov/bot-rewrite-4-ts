@@ -5,6 +5,15 @@ import { getLowestHighestData } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 
+export function toGBP(price: string | number): string {
+  if (price === "???") return price;
+
+  const GBPPrice = parseFloat(price.toString()) * 0.75;
+  return GBPPrice > 100
+    ? GBPPrice.toString()
+    : (Math.round(GBPPrice * 100) / 100).toFixed(2);
+}
+
 export async function scryfallCardFound(
   message: Message,
   cardName: string,
@@ -35,9 +44,9 @@ export async function scryfallCardFound(
     cardDetails.prices.usd === null && cardDetails.prices.usd_foil !== null;
   const footer: string = `${
     cardDetails.legalities.commander === "legal" ? "Legal" : "Non-legal"
-  } // $${cardDetails.prices.usd ?? cardDetails.prices.usd_foil ?? "???"}${
-    foilOnly ? " (F)" : ""
-  } // ${
+  } // £${toGBP(
+    cardDetails.prices.usd ?? cardDetails.prices.usd_foil ?? "???"
+  )}${foilOnly ? " (F)" : ""} // ${
     cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1)
   }`;
 
@@ -63,9 +72,9 @@ export async function scryfallCardFound(
         name: "Prices",
         value: `
 Lowest: [${lowestHighestData.lowestSet} @\
-$${lowestHighestData.lowestPrice}](${lowestHighestData.lowestUrl})
+£${toGBP(lowestHighestData.lowestPrice)}](${lowestHighestData.lowestUrl})
 Highest: [${lowestHighestData.highestSet} @\
-$${lowestHighestData.highestPrice}](${lowestHighestData.highestUrl})
+£${toGBP(lowestHighestData.highestPrice)}](${lowestHighestData.highestUrl})
 `,
       });
     }
