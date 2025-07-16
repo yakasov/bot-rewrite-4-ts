@@ -14,7 +14,7 @@ export function generateRollTable(newResponses?: {
 
   let cumChance: number = 0;
   const totalChance: number = Object.values(responses).reduce(
-    (sum, r) => sum + r.chance,
+    (sum, response) => sum + response.chance,
     0
   );
   const rollTable: RollTableEntry[] = Object.values(responses).map(

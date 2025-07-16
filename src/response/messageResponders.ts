@@ -3,6 +3,7 @@ import chanceResponsesJson from "../../resources/chanceResponses.json";
 import { ChanceResponse } from "../types/JSON";
 import { getNicknameFromMessage } from "./responseHelpers";
 import { BotContext } from "../types/BotContext";
+import { isSendableChannel } from "../util/typeGuards";
 
 const chanceResponses: { [key: string]: ChanceResponse } =
   chanceResponsesJson as {
@@ -10,14 +11,14 @@ const chanceResponses: { [key: string]: ChanceResponse } =
   };
 
 export async function replyWithHypeMessage(message: Message): Promise<void> {
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
 
   const hypeEntries: [string, ChanceResponse][] = Object.entries(
     chanceResponses
   ).filter(([key]) => key.startsWith("hype"));
   const randomEntry: string =
     hypeEntries[Math.floor(Math.random() * hypeEntries.length)][1].string;
-  message.channel.send(randomEntry);
+  await message.channel.send(randomEntry);
 }
 
 export async function sendCustomResponse(
@@ -25,7 +26,7 @@ export async function sendCustomResponse(
   key: string,
   value: string
 ): Promise<void> {
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
 
   let response: string = value;
   if (response.includes("{AUTHOR}")) {
@@ -66,12 +67,12 @@ export async function sendCustomResponse(
       stickerId
     ) as StickerResolvable;
     if (sticker) {
-      message.channel.send({ stickers: [sticker] });
+      await message.channel.send({ stickers: [sticker] });
     }
     return;
   }
 
-  message.channel.send(response);
+  await message.channel.send(response);
 }
 
 export async function checkMessageReactions(
@@ -89,15 +90,15 @@ export async function checkMessageReactions(
   const initialRoll: number = Math.random() * 100;
 
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
-    Object.values(context.rollTable).some((response) => {
+    context.rollTable.some(async (response) => {
       if (roll < response.chance) {
         try {
           switch (response.type) {
             case "message":
-              message.reply(response.string);
+              await message.reply(response.string);
               break;
             case "reaction":
-              message.react(response.string);
+              await message.react(response.string);
               break;
             default:
               break;

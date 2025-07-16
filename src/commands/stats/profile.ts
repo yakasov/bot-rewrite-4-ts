@@ -43,13 +43,13 @@ export default {
     const guildStats: GuildStats | undefined =
       context.stats?.[interaction.guild?.id!];
     if (!guildStats) {
-      interaction.reply("This server has no statistics yet!");
+      await interaction.reply("This server has no statistics yet!");
       return;
     }
 
     const userId: string = user ?? interaction.user.id;
     if (!guildStats.users[userId]) {
-      interaction.reply("This user has no statistics yet!");
+      await interaction.reply("This user has no statistics yet!");
       return;
     }
 
@@ -58,7 +58,7 @@ export default {
       userStats: UserStats;
     } | null = findUserStatsAndRank(guildStats, userId);
     if (!foundRankAndStats) {
-      interaction.reply("Could not find user stats.");
+      await interaction.reply("Could not find user stats.");
       return;
     }
 

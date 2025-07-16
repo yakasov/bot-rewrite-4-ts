@@ -27,21 +27,24 @@ export async function checkMessageInvoke(
   }
 
   if (REGEX_STEAM_LINK.test(message.content)) {
-    return sendSteamDirectLink(message);
+    await sendSteamDirectLink(message);
+    return;
   }
 
   if (
-    TWITTER_LINKS.some((link) => message.content.includes(link)) &&
+    Object.values(TWITTER_LINKS).some((regex) => regex.test(message.content)) &&
     message.content.includes("status")
   ) {
-    return await swapTwitterLinks(message);
+    await swapTwitterLinks(message);
+    return;
   }
 
   if (
     message.author.id === THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF &&
     message.content.match(REGEX_TIME_MATCH)
   ) {
-    return replyWithHypeMessage(message);
+    replyWithHypeMessage(message);
+    return;
   }
 
   for (const [key, value] of Object.entries(responses)) {

@@ -60,12 +60,15 @@ export function addToStats(event: StatsEvent, context: BotContext): void {
       break;
 
     case "inVoiceChannel":
+      debugger;
       if (context.uptime < 10) {
         userStats.joinTime = getDateNowInSeconds();
       }
 
       const joinTime: number =
-        userStats.joinTime === 0 ? getDateNowInSeconds() : userStats.joinTime;
+        userStats.joinTime === 0
+          ? (userStats.joinTime = getDateNowInSeconds())
+          : userStats.joinTime;
       userStats.voiceTime += Math.floor(getDateNowInSeconds() - joinTime);
       break;
 
@@ -110,7 +113,7 @@ export function orderStatsByRank(
     .map((array: [string, UserStats], index: number) => [...array, index]);
 }
 
-function getDateNowInSeconds(): number {
+export function getDateNowInSeconds(): number {
   return Math.floor(Date.now() / 1000);
 }
 
@@ -133,7 +136,7 @@ export function getNicknameFromInteraction(
 }
 
 export function formatTime(seconds: number): string {
-  const date: Date = new Date();
+  const date: Date = new Date(0);
   date.setSeconds(seconds);
   const unitArray: string[] = date.toISOString().substr(8, 11).split(/:|T/u);
   const days: number = parseInt(unitArray[0], 10) - 1;

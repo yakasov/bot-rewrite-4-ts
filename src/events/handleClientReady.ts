@@ -6,6 +6,8 @@ import { checkFortnite } from "../tasks/checkFortnite";
 import { getRandomSplash, getTime } from "../tasks/taskHelpers";
 import { checkVoiceChannels } from "../stats/addStatEvent";
 import { checkAllUserStats } from "../stats/statsHelpers";
+import { saveStatsToDatabase } from "../database/saveToDatabase";
+import { backupStatsFromDatabaseToJSON } from "../database/backupDatabaseToJSON";
 
 export async function handleClientReady(
   client: Client,
@@ -27,14 +29,14 @@ export async function handleClientReady(
     context.uptime = context.uptime + 10;
   }, getTime({ seconds: 10 }));
   setInterval(() => checkBirthdays(client, context), getTime({ minutes: 15 }));
-  setInterval(() => checkFortnite(client)), getTime({ minutes: 15 });
+  setInterval(() => checkFortnite(client, context)), getTime({ minutes: 15 });
   setInterval(() => checkMinecraftServer(client, context)),
     getTime({ seconds: 5 });
   setInterval(() => {
     context.splash = getRandomSplash();
   }, getTime({ minutes: 30 }));
   setInterval(() => checkVoiceChannels(context), getTime({ seconds: 15 }));
-  // setInterval(saveStats, getTime({ minutes: 3 }));
-  // setInterval(backupStats, getTime({ minutes: 15 }));
+  setInterval(() => saveStatsToDatabase(context), getTime({ minutes: 3 }));
+  setInterval(backupStatsFromDatabaseToJSON, getTime({ minutes: 15 }));
   setInterval(() => checkAllUserStats(context), getTime({ seconds: 30 }));
 }

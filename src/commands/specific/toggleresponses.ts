@@ -33,13 +33,13 @@ export default {
       const guildStats: GuildStats = context.stats?.[interaction.guild?.id!]!;
       guildStats.guild.allowResponses = !guildStats.guild.allowResponses;
 
-      interaction.reply(
+      await interaction.reply(
         `Toggled responses for guild ${interaction.guild?.name} (responses is now ${guildStats.guild.allowResponses}).`
       );
       return;
     }
 
-    interaction.reply({
+    await interaction.reply({
       content: "You are not an admin user!",
       flags: MessageFlags.Ephemeral,
     });

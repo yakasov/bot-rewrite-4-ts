@@ -4,6 +4,7 @@ import { Cards } from "scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
 import { scryfallShowCardList } from "./scryfallShowCardList";
+import { isSendableChannel } from "../util/typeGuards";
 
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
@@ -16,20 +17,20 @@ export async function scryfallInvoke(message: Message): Promise<void> {
    * typing exclusion passed down to other functions (eg scryfallNoCardFound)
    * so this check is needed in every function that uses channel.send.
    */
-  if (!message.channel.isTextBased() || message.channel.isDMBased()) return;
+  if (!isSendableChannel(message.channel)) return;
 
   const promises: Promise<void>[] = [];
   let match: RegExpMatchArray | null = null;
 
   while ((match = REGEX_SCRYFALL_PATTERN.exec(message.content)) !== null) {
-    const isImage: boolean = match.groups?.card[0] === "!";
+    const isExact: boolean = match.groups?.card[0] !== "?";
     const cardName: string | undefined = match.groups?.card
-      .substring(Number(isImage))
+      .substring(Number(isExact))
       .trim();
     const isSpecificSet: string = match.groups?.set?.trim() ?? "";
     if (!cardName) return;
 
-    promises.push(scryfallGetCard(message, cardName, isSpecificSet));
+    promises.push(scryfallGetCard(message, cardName, isSpecificSet, isExact));
   }
 
   await Promise.all(promises);
@@ -39,6 +40,7 @@ export async function scryfallGetCard(
   message: Message,
   cardName: string,
   isSpecificSet: string | undefined = undefined,
+  isExact: boolean = true,
   fromSelectMenu: boolean = false
 ): Promise<void> {
   const results: string[] = await Cards.autoCompleteName(cardName);
@@ -57,11 +59,14 @@ export async function scryfallGetCard(
    */
   if (!results.length) {
     scryfallNoCardFound(message, cardName);
-  } else if (results.length === 1 || fromSelectMenu) {
+  } else if (
+    results.length === 1 ||
+    (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
+      isExact) ||
+    fromSelectMenu
+  ) {
     await scryfallCardFound(message, results[0], isSpecificSet);
   } else {
     await scryfallShowCardList(message, cardName, results);
   }
 }
-
-

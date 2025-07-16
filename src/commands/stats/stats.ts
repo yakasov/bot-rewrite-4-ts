@@ -22,12 +22,15 @@ export default {
   data: new SlashCommandBuilder()
     .setName("stats")
     .setDescription("Show server statistics"),
-  execute(interaction: ChatInputCommandInteraction, context: BotContext): void {
+  async execute(
+    interaction: ChatInputCommandInteraction,
+    context: BotContext
+  ): Promise<void> {
     if (!context.stats) return;
 
     const guildStats = context.stats?.[interaction.guild?.id!];
     if (!guildStats) {
-      interaction.reply("This server has no statistics yet!");
+      await interaction.reply("This server has no statistics yet!");
       return;
     }
 
@@ -44,7 +47,7 @@ export default {
     let outputMessage: string = generateTable(data);
     outputMessage += formatUserRankingLine(topScores, guildStats, interaction);
 
-    interaction.reply(wrapCodeBlockString(outputMessage, "ansi"));
+    await interaction.reply(wrapCodeBlockString(outputMessage, "ansi"));
     return;
   },
 };

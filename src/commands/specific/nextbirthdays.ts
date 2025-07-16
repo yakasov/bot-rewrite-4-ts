@@ -1,8 +1,5 @@
 import moment from "moment-timezone";
-import {
-  SlashCommandBuilder,
-  ChatInputCommandInteraction,
-} from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { BotContext } from "../../types/BotContext";
 import birthdaysJSON from "../../../resources/birthdays.json";
 import { Birthdays } from "../../types/Birthdays";
@@ -13,7 +10,10 @@ export default {
   data: new SlashCommandBuilder()
     .setName("nextbirthdays")
     .setDescription("See when the next five birthdays are."),
-  execute(interaction: ChatInputCommandInteraction, context: BotContext): void {
+  async execute(
+    interaction: ChatInputCommandInteraction,
+    context: BotContext
+  ): Promise<void> {
     let output: string = getNextBirthdays(context.currentDate, 5);
 
     const year: number = context.currentDate.getFullYear();
@@ -25,7 +25,7 @@ export default {
       output += "\nYou do not have a birthday set!";
     }
 
-    interaction.reply(output);
+    await interaction.reply(output);
   },
 };
 

@@ -8,6 +8,7 @@ import { Sharp } from "sharp";
 export async function getImageUrl(
   cardDetails: Card
 ): Promise<[boolean, string]> {
+  debugger;
   if (
     cardDetails.card_faces?.length === 2 &&
     cardDetails.card_faces[0].image_uris
@@ -18,7 +19,7 @@ export async function getImageUrl(
   return [false, cardDetails.image_uris?.large ?? ""];
 }
 
-async function combineImages(card: Card): Promise<string> {
+export async function combineImages(card: Card): Promise<string> {
   const baseFilePath: string = `../../resources/scryfall/images/${card.id}`;
 
   const filePaths: string[] = await Promise.all([
@@ -32,7 +33,7 @@ async function combineImages(card: Card): Promise<string> {
   return baseFilePath;
 }
 
-function downloadImage(
+export function downloadImage(
   card: Card,
   i: number,
   baseFilePath: string
@@ -64,7 +65,7 @@ function downloadImage(
   });
 }
 
-async function deleteFiles(filePaths: string[]): Promise<void> {
+export async function deleteFiles(filePaths: string[]): Promise<void> {
   await Promise.all(
     filePaths.map(
       (filePath: string) =>

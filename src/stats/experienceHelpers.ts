@@ -70,7 +70,7 @@ export function getRequiredExperienceCumulative(
   return (level * ((level + 1) * config.stats.XPPerLevel)) / 2;
 }
 
-function updateStatsOnLevelUp(
+export function updateStatsOnLevelUp(
   userStats: UserStats,
   config: BotContext["config"]
 ): void {

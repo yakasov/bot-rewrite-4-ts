@@ -5,12 +5,25 @@ import { URL_SCRYFALL_ORACLE } from "../consts/constants";
 
 export async function getLowestHighestData(
   oracleId: string
-): Promise<PricingData> {
+): Promise<PricingData | undefined> {
   const oracleCards: Card[] = await fetch(
     URL_SCRYFALL_ORACLE.replace("<<ORACLE_ID>>", oracleId)
   )
     .then((response: Response) => response.json())
-    .then((response: OracleResponse) => response.data);
+    .then((response: OracleResponse) => response.data)
+    .catch((err: Error) => {
+      console.warn(
+        `Oracle fetch failed for ${URL_SCRYFALL_ORACLE.replace(
+          "<<ORACLE_ID>>",
+          oracleId
+        )}, error message: ${err.message}`
+      );
+      return [];
+    });
+  if (!oracleCards.length) {
+    return undefined;
+  }
+
   const lowestHighestData: PricingData = {
     highestPrice: 0,
     highestSet: "",

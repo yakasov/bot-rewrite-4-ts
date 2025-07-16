@@ -1,33 +1,30 @@
-import {
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
-} from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
 import { BotContext } from "../../types/BotContext";
 import { getMCStatus } from "../../tasks/checkMinecraftServer";
-import {
-  MinecraftResponse,
-  NeatMinecraftResponse,
-} from "../../types/responses/MinecraftResponse";
+import { MinecraftTypes } from "../../types/responses/MinecraftResponse";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("mcstatus")
     .setDescription("Get information about the current Minecraft server"),
-  async execute(interaction: ChatInputCommandInteraction, context: BotContext): Promise<void> {
+  async execute(
+    interaction: ChatInputCommandInteraction,
+    context: BotContext
+  ): Promise<void> {
     if (
       !(
         context.config.minecraft.serverIp && context.config.minecraft.serverPort
       )
     ) {
-      interaction.reply("There is no current Minecraft server set up!");
+      await interaction.reply("There is no current Minecraft server set up!");
       return;
     }
 
-    const response: MinecraftResponse | null = await getMCStatus(context);
+    const response: MinecraftTypes.Response | null = await getMCStatus(context);
     if (response === null) return;
 
-    const mappedResponse: NeatMinecraftResponse = {
+    const mappedResponse: MinecraftTypes.NeatResponse = {
       host: response.host,
       ip: response.ip_address,
       port: response.port,
