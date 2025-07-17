@@ -15,9 +15,12 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
     const stats: Stats = {};
 
     for (const guild of guilds) {
-      stats[guild.guild_id].guild = {
-        allowResponses: guild.allow_responses,
-        rankUpChannel: guild.rank_up_channel,
+      stats[guild.guild_id] = {
+        guild: {
+          allowResponses: guild.allow_responses,
+          rankUpChannel: guild.rank_up_channel,
+        },
+        users: {},
       };
     }
 
@@ -25,9 +28,12 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
 
     for (const userStat of userStats) {
       if (!stats[userStat.guild_id]) {
-        stats[userStat.guild_id].guild = {
-          allowResponses: true,
-          rankUpChannel: "",
+        stats[userStat.guild_id] = {
+          guild: {
+            allowResponses: true,
+            rankUpChannel: "",
+          },
+          users: {},
         };
       }
 
