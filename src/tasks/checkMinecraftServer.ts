@@ -1,4 +1,4 @@
-import { ActivityType, Client } from "discord.js";
+import { ActivityType } from "discord.js";
 import { BotContext } from "../types/BotContext";
 import { MinecraftQueryStates } from "../types/RunState";
 import { MinecraftTypes } from "../types/responses/MinecraftResponse";
@@ -27,7 +27,6 @@ export async function getMCStatus(
 }
 
 export async function checkMinecraftServer(
-  client: Client,
   context: BotContext
 ): Promise<void> {
   if (context.runState.minecraft === MinecraftQueryStates.ERROR_STOP) return;
@@ -66,14 +65,14 @@ export async function checkMinecraftServer(
     );
     activityString = `(${players.length}) ${players.join(", ")}`;
   } else {
-    if (client.user?.presence.activities[0]?.name === context.splash) {
+    if (context.client.user?.presence.activities[0]?.name === context.splash) {
       return;
     }
 
     activityString = context.splash;
   }
 
-  client.user?.setPresence({
+  context.client.user?.setPresence({
     activities: [{ name: activityString, type: ActivityType.Watching }],
   });
 }

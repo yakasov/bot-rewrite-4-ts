@@ -1,5 +1,4 @@
 import {
-  Client,
   Collection,
   Guild,
   GuildMember,
@@ -16,7 +15,6 @@ import { Birthdays } from "../types/Birthdays";
 const birthdays: Birthdays = birthdaysJSON;
 
 export async function checkBirthdays(
-  client: Client,
   context: BotContext,
   force: boolean = false
 ): Promise<void> {
@@ -25,7 +23,7 @@ export async function checkBirthdays(
   if (!today.isSame(context.currentDate, "day") || force) {
     context.currentDate = today.toDate();
 
-    const guild: Guild = await client.guilds.fetch(
+    const guild: Guild = await context.client.guilds.fetch(
       context.config.ids.mainGuild
     );
 
@@ -59,7 +57,7 @@ export async function checkBirthdays(
       for (const id of Object.keys(birthdays)) {
         if (!guildMembers.some((member: GuildMember) => member.id === id)) {
           promises.push(
-            client.users.fetch(id).then((user: User) => {
+            context.client.users.fetch(id).then((user: User) => {
               console.warn(`${id} (${user?.tag || "unknown user"})`);
             })
           );

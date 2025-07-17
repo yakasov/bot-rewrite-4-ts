@@ -1,4 +1,4 @@
-import { Client, Events, Message, VoiceState } from "discord.js";
+import { Client, Events, Interaction, Message, VoiceState } from "discord.js";
 import configJson from "../resources/config.json";
 import { BotContext } from "./types/BotContext";
 import { createBotContext } from "./context/createBotContext";
@@ -24,13 +24,15 @@ Promise.resolve(async () => {
 const config: Config = configJson;
 const botContext: BotContext = createBotContext(config, loadedStats);
 
-messagePrototypeCatch();
-Promise.resolve(async () => await loadCommands(botContext.client));
-
-botContext.client.once(Events.ClientReady, (client: Client) =>
-  handleClientReady(client, botContext)
+botContext.client.once(Events.ClientReady, async (client: Client) =>
+  {
+    await loadCommands(botContext.client)
+    handleClientReady(botContext);
+  }
 );
-botContext.client.on(Events.InteractionCreate, handleInteractionCreate);
+botContext.client.on(Events.InteractionCreate, (interaction: Interaction) =>
+  handleInteractionCreate(interaction, botContext)
+);
 botContext.client.on(Events.MessageCreate, (message: Message) =>
   handleMessageCreate(message, botContext)
 );
@@ -40,4 +42,5 @@ botContext.client.on(
     handleVoiceStateUpdate(oldState, newState, botContext)
 );
 
+messagePrototypeCatch();
 botContext.client.login();

@@ -4,6 +4,7 @@ import {
   InteractionReplyOptions,
   MessageFlags,
 } from "discord.js";
+import { BotContext } from "../types/BotContext";
 
 const reply: InteractionReplyOptions = {
   content: "There was an error while executing this command!",
@@ -11,11 +12,12 @@ const reply: InteractionReplyOptions = {
 };
 
 export async function handleInteractionCreate(
-  interaction: Interaction
+  interaction: Interaction,
+  context: BotContext
 ): Promise<void> {
   if (!interaction.isChatInputCommand()) return;
 
-  const command: Command | undefined = interaction.client.commands.get(
+  const command: Command | undefined = context.client.commands.get(
     interaction.commandName
   );
 
@@ -25,7 +27,7 @@ export async function handleInteractionCreate(
   }
 
   try {
-    await command.execute(interaction);
+    await command.execute(interaction, context);
   } catch (err: any) {
     console.error(err);
 

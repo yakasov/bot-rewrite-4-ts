@@ -23,9 +23,9 @@ import {
 } from "openai/resources/index";
 import { OpenAIConversation } from "../../types/OpenAI";
 
-const openai = new OpenAI({
+const openai: OpenAI | undefined = keys.OPENAI_TOKEN ? new OpenAI({
   apiKey: keys.OPENAI_TOKEN,
-});
+}) : undefined;
 const initialMessage: OpenAIConversation = {
   content: `You are a casual Discord chatting bot chatting in my personal 
   Discord server. Your name is 'outputbot'. Others may ask for you to act or 
@@ -54,7 +54,7 @@ export default {
     ),
   async execute(interaction: ChatInputCommandInteraction, context: BotContext) {
     if (
-      !openai.apiKey ||
+      !openai ||
       !context.config.bot.aiChannels.includes(`${interaction.channelId}`)
     ) {
       return;
