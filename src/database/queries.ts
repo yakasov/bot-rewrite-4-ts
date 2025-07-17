@@ -41,9 +41,9 @@ export const GUILD_INSERT_QUERY = `INSERT INTO guilds
 export const USER_INSERT_QUERY = `INSERT INTO user_stats 
   (guild_id, user_id, messages, voice_time, join_time, 
     last_gain_time, total_experience, level_experience, 
-    level_value, score, custom_set_name, name, previous_messages, 
-    previous_voice_time, achievements, achievement_tracking, unlocked_names) 
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+    level_value, name, previous_messages, 
+    previous_voice_time) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
   ON DUPLICATE KEY UPDATE 
     messages = VALUES(messages),
     voice_time = VALUES(voice_time),
