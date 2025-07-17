@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
-    "build": "tsup src/index.ts"
+    "build": "tsup src/index.ts",
+    "setup-db": "tsx src/scripts/setupDatabase.ts"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,6 @@
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
-    "@shoginn/discordjs-mock": "^1.0.11",
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.35.0",

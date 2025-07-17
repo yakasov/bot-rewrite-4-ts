@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import configJson from "../../resources/config.json";
 import { Pool } from "mariadb";
 import { BotContext } from "../types/BotContext";
 import {
@@ -7,8 +8,14 @@ import {
   initialiseDatabase,
 } from "./initialiseDatabase";
 import { Stats } from "../types/Stats";
+import { saveStatsToDatabase } from "./saveToDatabase";
+import { createBotContext } from "../context/createBotContext";
+import { Config } from "../types/Config";
 
-export async function setupDatabase(context: BotContext): Promise<void> {
+export async function setupDatabase(): Promise<void> {
+  const config: Config = configJson;
+  const context: BotContext = createBotContext(config);
+
   try {
     initialiseDatabase();
     await createTables();
@@ -19,6 +26,8 @@ export async function setupDatabase(context: BotContext): Promise<void> {
           fs.readFileSync("./resources/stats.json", "utf-8")
         );
         context.stats = statsData;
+
+        await saveStatsToDatabase(context);
       } catch (err: any) {
         console.error("Error migrating stats:", err);
       }
