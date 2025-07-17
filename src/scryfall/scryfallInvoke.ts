@@ -25,7 +25,7 @@ export async function scryfallInvoke(message: Message): Promise<void> {
   while ((match = REGEX_SCRYFALL_PATTERN.exec(message.content)) !== null) {
     const isExact: boolean = match.groups?.card[0] !== "?";
     const cardName: string | undefined = match.groups?.card
-      .substring(Number(isExact))
+      .substring(Number(!isExact))
       .trim();
     const isSpecificSet: string = match.groups?.set?.trim() ?? "";
     if (!cardName) return;

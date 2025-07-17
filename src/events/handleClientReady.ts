@@ -13,7 +13,7 @@ export async function handleClientReady(
   context: BotContext
 ): Promise<void> {
   console.log(
-    `Current date and time is ${context.currentDate}, ` +
+    `\nCurrent date and time is ${context.currentDate}, ` +
       `logged in as ${context.client.user?.tag}\n` +
       "Connected and ready to go!\n"
   );
