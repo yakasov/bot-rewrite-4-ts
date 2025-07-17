@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "build": "tsup src/index.ts",
     "setup-db": "tsx src/scripts/setupDatabase.ts",
-    "convert-stats": "tsx src/scripts/convertOldStats.ts"
+    "convert-stats": "tsx src/scripts/convertOldStats.ts",
+    "deploy": "tsx src/deployCommands.ts"
   },
   "repository": {
     "type": "git",
