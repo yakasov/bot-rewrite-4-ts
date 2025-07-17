@@ -52,12 +52,7 @@ export const USER_INSERT_QUERY = `INSERT INTO user_stats
     total_experience = VALUES(total_experience),
     level_experience = VALUES(level_experience),
     level_value = VALUES(level_value),
-    score = VALUES(score),
-    custom_set_name = VALUES(custom_set_name),
     name = VALUES(name),
     previous_messages = VALUES(previous_messages),
     previous_voice_time = VALUES(previous_voice_time),
-    achievements = VALUES(achievements),
-    achievement_tracking = VALUES(achievement_tracking),
-    unlocked_names = VALUES(unlocked_names)
 `;
