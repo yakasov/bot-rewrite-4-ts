@@ -27,7 +27,7 @@ export async function saveStatsToDatabase(context: BotContext): Promise<void> {
         guildData.guild.rankUpChannel || "",
       ]);
 
-      for (const [userId, userData] of Object.entries(guildData).filter(
+      for (const [userId, userData] of Object.entries(guildData.users).filter(
         ([, value]) => isUserStats(value)
       ) as [string, UserStats][]) {
         await conn.query(USER_INSERT_QUERY, [
