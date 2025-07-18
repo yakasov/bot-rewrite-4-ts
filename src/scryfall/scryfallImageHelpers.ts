@@ -8,7 +8,6 @@ import { Sharp } from "sharp";
 export async function getImageUrl(
   cardDetails: Card
 ): Promise<[boolean, string]> {
-  debugger;
   if (
     cardDetails.card_faces?.length === 2 &&
     cardDetails.card_faces[0].image_uris

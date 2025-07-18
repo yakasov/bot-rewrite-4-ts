@@ -83,8 +83,6 @@ export async function checkFortnite(
     return;
   }
 
-  debugger;
-
   const data: FortniteTypes.ResponseData | undefined = await getFortniteShop();
   const festivalData: FortniteTypes.FestivalItem[] | undefined =
     await getFestivalData();
