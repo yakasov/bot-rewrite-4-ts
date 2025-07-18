@@ -17,13 +17,14 @@ if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
   throw new Error("Missing required Discord keys");
 }
 
-if (
-  !DATABASE_HOST ||
-  !DATABASE_PORT ||
-  !DATABASE_USER ||
-  !DATABASE_PASSWORD ||
-  !DATABASE_DB
-) {
+export const databaseKeysPresent =
+  DATABASE_HOST &&
+  DATABASE_PORT &&
+  DATABASE_USER &&
+  DATABASE_PASSWORD &&
+  DATABASE_DB;
+
+if (!databaseKeysPresent) {
   console.error(
     "Missing database configuration keys, stats will not be active."
   );

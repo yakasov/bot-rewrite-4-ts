@@ -27,8 +27,8 @@ export const REGEX_SCRYFALL_PATTERN: RegExp =
 export const REGEX_STEAM_LINK: RegExp = /https:\/\/steamcommunity\.com\S*/gu;
 export const REGEX_TIME_MATCH: RegExp = /\b\d+\s*:\s*\d+\b/gu;
 export const REGEX_YOUTUBE_URL_FULL: RegExp =
-  /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=/gu;
-export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\//gu;
+  /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
+export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\/*/gu;
 
 export const STEAM_URL_LINK: string =
   "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
@@ -36,8 +36,8 @@ export const STEAM_URL_LINK: string =
 export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF: string = "135410033524604928";
 
 export const TWITTER_LINKS: { [key: string]: RegExp } = {
-  "https://fixupx.com/": /https:\/\/x\.com\//g,
-  "https://fxtwitter.com/": /https:\/\/twitter\.com\//g,
+  "https://fixupx.com/": /https:\/\/x\.com\//u,
+  "https://fxtwitter.com/": /https:\/\/twitter\.com\//u,
 };
 
 export const STATS_BACKUP_DIR: string = "./backups/";
