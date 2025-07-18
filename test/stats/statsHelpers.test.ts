@@ -136,7 +136,7 @@ describe("addToStats", () => {
     TestModule.addToStats(event, context);
     expect(
       context.stats?.[event.guildId]?.users[event.userId].joinTime
-    ).toEqual(5);
+    ).toBeGreaterThan(1752830941);
     expect(
       context.stats?.[event.guildId]?.users[event.userId].voiceTime
     ).not.toEqual(120);

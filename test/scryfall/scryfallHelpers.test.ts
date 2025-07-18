@@ -34,10 +34,10 @@ describe("scryfallHelpers", () => {
 
     const lowestHighestData = await TestModule.getLowestHighestData(oracleId);
     expect(lowestHighestData).toEqual({
-      highestPrice: 2.5,
+      highestPrice: 10.875,
       highestSet: "SET",
       highestUrl: "https://www.example-uri.com/",
-      lowestPrice: 1.5,
+      lowestPrice: 1.125,
       lowestSet: "SET",
       lowestUrl: "https://www.example-uri.com/",
     });

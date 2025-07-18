@@ -71,7 +71,7 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
   if (!lastMessage) return;
 
   if (
-    lastMessage.embeds[0]?.data?.description?.includes(
+    lastMessage.embeds?.[0]?.data?.description?.includes(
       "Sorry, that post doesn't exist :("
     )
   ) {

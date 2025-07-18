@@ -88,7 +88,7 @@ describe("scryfallGetCard", () => {
       )
       .mockResolvedValue(undefined);
 
-    await TestModule.scryfallGetCard(message, cardName);
+    await TestModule.scryfallGetCard(message, cardName, undefined, false);
     expect(scryfallShowCardListSpy).toHaveBeenCalled();
   });
 });
