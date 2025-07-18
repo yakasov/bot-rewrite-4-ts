@@ -38,7 +38,6 @@ export default {
 
     let user: string | null = interaction.options.getUser("user")?.id ?? null;
     const debug = interaction.options.getBoolean("debug") ?? false;
-    if (!user) return;
 
     const guildStats: GuildStats | undefined =
       context.stats?.[interaction.guild?.id!];

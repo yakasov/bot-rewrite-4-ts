@@ -63,7 +63,7 @@ function buildTableData(
     "#": i + 1,
     Name: getNicknameFromInteraction(interaction, userName, true),
     Level: `${guildStats.users[userName].level} (${
-      guildStats.users[userName].levelXP
+      guildStats.users[userName].levelXP.toFixed(0)
     }/${getRequiredExperience(
       guildStats.users[userName].level,
       context.config
@@ -91,5 +91,5 @@ function formatUserRankingLine(
     userRanking[0] as string
   )}): #${Number(userRanking[2]) + 1} (${getLevelName(
     guildStats.users[userRanking[0] as string].level
-  )}, ${guildStats.users[userRanking[0] as string].totalXP} XP)`;
+  )}, ${guildStats.users[userRanking[0] as string].totalXP.toFixed(0)} XP)`;
 }
