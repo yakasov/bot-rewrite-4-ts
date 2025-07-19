@@ -1,17 +1,25 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { Card, Cards } from "scryfall-api";
+import { Card, Cards, Prices } from "scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
-import { getLowestHighestData } from "./scryfallHelpers";
+import { convertPricesToGBP, getLowestHighestData } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 
-export function toGBP(price: string | number): string {
-  if (price === "???") return price;
+export function pricesToGBP(prices: Prices): string {
+  if (!(prices.usd || prices.usd_foil || prices.eur || prices.eur_foil)) {
+    return "???";
+  }
 
-  const GBPPrice = parseFloat(price.toString()) * 0.75;
-  return GBPPrice > 100
-    ? GBPPrice.toString()
-    : (Math.round(GBPPrice * 100) / 100).toFixed(2);
+  const conversionRate: number = prices.usd || prices.usd_foil ? 0.75 : 0.86;
+  const price: string =
+    prices.usd ?? prices.usd_foil ?? prices.eur ?? prices.eur_foil ?? "0";
+
+  const GBPPrice = parseFloat(price!) * conversionRate;
+  return GBPPrice > 100 ? GBPPrice.toString() : to2DP(GBPPrice);
+}
+
+export function to2DP(number: number): string {
+  return (Math.round(number * 100) / 100).toFixed(2);
 }
 
 export async function scryfallCardFound(
@@ -44,11 +52,11 @@ export async function scryfallCardFound(
     cardDetails.prices.usd === null && cardDetails.prices.usd_foil !== null;
   const footer: string = `${
     cardDetails.legalities.commander === "legal" ? "Legal" : "Non-legal"
-  } // £${toGBP(
-    cardDetails.prices.usd ?? cardDetails.prices.usd_foil ?? "???"
-  )}${foilOnly ? " (F)" : ""} // ${
+  } // £${to2DP(Math.min(...convertPricesToGBP(cardDetails.prices)))}${
+    foilOnly ? " (F)" : ""
+  } // ${
     cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1)
-  }`;
+  }\n${cardDetails.set_name} (${cardDetails.set})`;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(cardDetails.name)
@@ -67,14 +75,15 @@ export async function scryfallCardFound(
   if (oracleId.length) {
     const lowestHighestData: PricingData | undefined =
       await getLowestHighestData(oracleId);
+
     if (lowestHighestData) {
       embed.addFields({
         name: "Prices",
         value: `
-Lowest: [${lowestHighestData.lowestSet} @\
-£${toGBP(lowestHighestData.lowestPrice)}](${lowestHighestData.lowestUrl})
-Highest: [${lowestHighestData.highestSet} @\
-£${toGBP(lowestHighestData.highestPrice)}](${lowestHighestData.highestUrl})
+Lowest: [${lowestHighestData.lowestSet} @ \
+£${to2DP(lowestHighestData.lowestPrice)}](${lowestHighestData.lowestUrl})
+Highest: [${lowestHighestData.highestSet} @ \
+£${to2DP(lowestHighestData.highestPrice)}](${lowestHighestData.highestUrl})
 `,
       });
     }

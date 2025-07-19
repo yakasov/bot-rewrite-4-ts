@@ -1,7 +1,18 @@
 import { PricingData } from "../types/scryfall/PricingData";
 import { OracleResponse } from "../types/scryfall/OracleResponse";
-import { Card } from "scryfall-api";
+import { Card, Prices } from "scryfall-api";
 import { URL_SCRYFALL_ORACLE } from "../consts/constants";
+
+const acceptedPrices = ["usd", "usd_foil", "eur", "eur_foil"];
+
+export function convertPricesToGBP(prices: Prices): number[] {
+  return Object.entries(prices)
+      .filter(([key, value]) => acceptedPrices.includes(key) && value !== null)
+      .map(
+        ([key, value]) =>
+          parseFloat(value!) * (key.includes("usd") ? 0.75 : 0.87)
+      );
+}
 
 export async function getLowestHighestData(
   oracleId: string
@@ -25,22 +36,20 @@ export async function getLowestHighestData(
   }
 
   const lowestHighestData: PricingData = {
-    highestPrice: 0,
+    highestPrice: -Infinity,
     highestSet: "",
     highestUrl: "",
-    lowestPrice: 10000,
+    lowestPrice: Infinity,
     lowestSet: "",
     lowestUrl: "",
   };
-  Object.values(oracleCards).forEach((cardData) => {
-    const lowestPrice: number = Math.min(
-      parseFloat(cardData.prices.usd ?? "10000"),
-      parseFloat(cardData.prices.usd_foil ?? "10000")
-    );
-    const highestPrice: number = Math.max(
-      parseFloat(cardData.prices.usd ?? "0"),
-      parseFloat(cardData.prices.usd_foil ?? "0")
-    );
+  
+
+  Object.values(oracleCards).forEach((cardData: Card) => {
+    const convertedPrices = convertPricesToGBP(cardData.prices);
+    const lowestPrice: number = Math.min(...convertedPrices) ?? Infinity;
+    const highestPrice: number = Math.max(...convertedPrices) ?? -Infinity;
+
     if (lowestPrice < lowestHighestData.lowestPrice) {
       lowestHighestData.lowestPrice = lowestPrice;
       lowestHighestData.lowestSet = cardData.set;

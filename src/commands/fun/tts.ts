@@ -9,7 +9,6 @@ import {
 import {
   ChatInputCommandInteraction,
   GuildMember,
-  Interaction,
   SlashCommandBuilder,
   SlashCommandStringOption,
 } from "discord.js";

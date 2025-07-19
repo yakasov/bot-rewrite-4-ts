@@ -50,4 +50,6 @@ async function deployCommands() {
   }
 }
 
-(async () => await deployCommands())();
+if (require.main === module) {
+  deployCommands().catch(console.error);
+}

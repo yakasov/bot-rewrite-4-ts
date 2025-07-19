@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { ActivityType } from "discord.js";
 import { BotContext } from "../types/BotContext";
 import { checkBirthdays } from "../tasks/checkBirthdays";
 import { checkMinecraftServer } from "../tasks/checkMinecraftServer";
@@ -10,30 +10,35 @@ import { saveStatsToDatabase } from "../database/saveToDatabase";
 import { backupStatsFromDatabaseToJSON } from "../database/backupDatabaseToJSON";
 
 export async function handleClientReady(
-  client: Client,
   context: BotContext
 ): Promise<void> {
   console.log(
-    `Current date and time is ${context.currentDate}, ` +
-      `logged in as ${client.user?.tag}\n` +
+    `\nCurrent date and time is ${context.currentDate}, ` +
+      `logged in as ${context.client.user?.tag}\n` +
       "Connected and ready to go!\n"
   );
 
   checkVoiceChannels(context);
-  await checkBirthdays(client, context, true);
-  await checkMinecraftServer(client, context);
+  await checkBirthdays(context, true);
+  await checkMinecraftServer(context);
 
   context.splash = getRandomSplash();
+  context.client.user?.setPresence({
+    activities: [{ name: context.splash , type: ActivityType.Watching }]
+  });
 
   setInterval(() => {
     context.uptime = context.uptime + 10;
   }, getTime({ seconds: 10 }));
-  setInterval(() => checkBirthdays(client, context), getTime({ minutes: 15 }));
-  setInterval(() => checkFortnite(client, context)), getTime({ minutes: 15 });
-  setInterval(() => checkMinecraftServer(client, context)),
-    getTime({ seconds: 5 });
+  setInterval(() => checkBirthdays(context), getTime({ minutes: 15 }));
+  setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
+  setInterval(() => checkMinecraftServer(context),
+    getTime({ seconds: 5 }));
   setInterval(() => {
     context.splash = getRandomSplash();
+    context.client.user?.setPresence({
+      activities: [{ name: context.splash , type: ActivityType.Watching }]
+    });
   }, getTime({ minutes: 30 }));
   setInterval(() => checkVoiceChannels(context), getTime({ seconds: 15 }));
   setInterval(() => saveStatsToDatabase(context), getTime({ minutes: 3 }));

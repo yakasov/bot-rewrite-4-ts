@@ -1,4 +1,4 @@
-import { Client, Guild, TextChannel } from "discord.js";
+import { Guild, TextChannel } from "discord.js";
 import {
   GenericBooleanObject,
   GenericObject,
@@ -47,7 +47,7 @@ export async function getFestivalData(): Promise<
     }
 
     const data: FortniteTypes.FestivalItems | undefined = await response.json();
-    return data ? Object.values(data.data) : undefined;
+    return data && data.data ? Object.values(data.data) : undefined;
   } catch (err: any) {
     console.error("Error fetching Fortnite Festival data:", err);
     return undefined;
@@ -63,10 +63,9 @@ export function sortSongArray(songA: string, songB: string): number {
 }
 
 export async function checkFortnite(
-  client: Client,
   context: BotContext
 ): Promise<void> {
-  const guild: Guild = await client.guilds.fetch(context.config.ids.mainGuild);
+  const guild: Guild = await context.client.guilds.fetch(context.config.ids.mainGuild);
 
   if (!guild) {
     console.error(`Guild not found with ID: ${context.config.ids.mainGuild}`);
@@ -83,8 +82,6 @@ export async function checkFortnite(
     );
     return;
   }
-
-  debugger;
 
   const data: FortniteTypes.ResponseData | undefined = await getFortniteShop();
   const festivalData: FortniteTypes.FestivalItem[] | undefined =
