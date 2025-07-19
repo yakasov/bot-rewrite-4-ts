@@ -1,4 +1,4 @@
-# bot-rewrite-3-ts
+# bot-rewrite-4-ts
 
 Discord bot written in Typescript for use with Node.js.
 
