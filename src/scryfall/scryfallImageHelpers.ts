@@ -25,7 +25,8 @@ export async function combineImages(card: Card): Promise<string> {
     downloadImage(card, 0, baseFilePath),
     downloadImage(card, 1, baseFilePath),
   ]);
-  const image: Sharp = await joinImages(filePaths, { direction: "horizontal" });
+  const image: Sharp | undefined = await joinImages(filePaths, { direction: "horizontal" }).catch((err: any) => undefined);
+  if (!image) return "";
   await image.toFile(`${baseFilePath}.jpg`);
 
   await deleteFiles(filePaths);
