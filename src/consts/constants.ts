@@ -23,7 +23,7 @@ export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT: RegExp =
   /[\s\S]{1,1980}(?!\S)/gu;
 export const REGEX_SANITIZE_STRING: RegExp = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_PATTERN: RegExp =
-  /\[\[(?<card>[^|\]]+?)(?:\|{1,2}(?<set>[^\]]+))?\]\]/gu;
+  /\[\[(?<card>[^|\]]+?)(?:\s*\|\s*(?<set>[^|\]]+?)(?:\s*\|\s*(?<number>[^|\]]+?))?)?\]\]/gu;
 export const REGEX_STEAM_LINK: RegExp = /https:\/\/steamcommunity\.com\S*/gu;
 export const REGEX_TIME_MATCH: RegExp = /\b\d+\s*:\s*\d+\b/gu;
 export const REGEX_YOUTUBE_URL_FULL: RegExp =

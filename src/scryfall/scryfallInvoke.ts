@@ -28,9 +28,10 @@ export async function scryfallInvoke(message: Message): Promise<void> {
       .substring(Number(!isExact))
       .trim();
     const isSpecificSet: string = match.groups?.set?.trim() ?? "";
+    const isSpecificNumber: number = parseInt(match.groups?.number?.trim() ?? "0");
     if (!cardName) return;
 
-    promises.push(scryfallGetCard(message, cardName, isSpecificSet, isExact));
+    promises.push(scryfallGetCard(message, cardName, isSpecificSet, isSpecificNumber, isExact));
   }
 
   await Promise.all(promises);
@@ -40,6 +41,7 @@ export async function scryfallGetCard(
   message: Message,
   cardName: string,
   isSpecificSet: string | undefined = undefined,
+  isSpecificNumber: number | undefined = undefined,
   isExact: boolean = true,
   fromSelectMenu: boolean = false
 ): Promise<void> {
@@ -65,7 +67,7 @@ export async function scryfallGetCard(
       isExact) ||
     fromSelectMenu
   ) {
-    await scryfallCardFound(message, results[0], isSpecificSet);
+    await scryfallCardFound(message, results[0], isSpecificSet, isSpecificNumber);
   } else {
     await scryfallShowCardList(message, cardName, results);
   }
