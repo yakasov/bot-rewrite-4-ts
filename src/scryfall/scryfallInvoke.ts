@@ -1,5 +1,9 @@
-import { Message } from "discord.js";
-import { REGEX_SCRYFALL_PATTERN } from "../consts/constants";
+import { Channel, Message } from "discord.js";
+import {
+  REGEX_SCRYFALL_PATTERN,
+  SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES,
+  SCRYFALL_MINOR_SPELLING_MISTAKE_STRING,
+} from "../consts/constants";
 import { Cards } from "scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
@@ -19,6 +23,14 @@ export async function scryfallInvoke(message: Message): Promise<void> {
    */
   if (!isSendableChannel(message.channel)) return;
 
+  if (
+    message.content.toLocaleLowerCase() ===
+    SCRYFALL_MINOR_SPELLING_MISTAKE_STRING
+  ) {
+    await sendMinorSpellingMistakeGif(message.channel);
+    return;
+  }
+
   const promises: Promise<void>[] = [];
   let match: RegExpMatchArray | null = null;
 
@@ -28,10 +40,20 @@ export async function scryfallInvoke(message: Message): Promise<void> {
       .substring(Number(!isExact))
       .trim();
     const isSpecificSet: string = match.groups?.set?.trim() ?? "";
-    const isSpecificNumber: number = parseInt(match.groups?.number?.trim() ?? "0");
+    const isSpecificNumber: number = parseInt(
+      match.groups?.number?.trim() ?? "0"
+    );
     if (!cardName) return;
 
-    promises.push(scryfallGetCard(message, cardName, isSpecificSet, isSpecificNumber, isExact));
+    promises.push(
+      scryfallGetCard(
+        message,
+        cardName,
+        isSpecificSet,
+        isSpecificNumber,
+        isExact
+      )
+    );
   }
 
   await Promise.all(promises);
@@ -67,8 +89,34 @@ export async function scryfallGetCard(
       isExact) ||
     fromSelectMenu
   ) {
-    await scryfallCardFound(message, results[0], isSpecificSet, isSpecificNumber);
+    await scryfallCardFound(
+      message,
+      results[0],
+      isSpecificSet,
+      isSpecificNumber
+    );
   } else {
     await scryfallShowCardList(message, cardName, results);
+  }
+}
+
+export async function sendMinorSpellingMistakeGif(channel: Channel) {
+  // Obviously this will never, ever fail but TS will get upset without it
+  if (!isSendableChannel(channel)) return;
+
+  const randomGif: string =
+    SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES[
+      Math.floor(
+        Math.random() * SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES.length
+      )
+    ];
+  const lastMessage: Message | undefined = await channel.messages
+    .fetch({ limit: 2 })
+    .then((c) => [...c.values()].pop());
+
+  if (!lastMessage) {
+    await channel.send(randomGif);
+  } else {
+    await lastMessage.reply(randomGif);
   }
 }

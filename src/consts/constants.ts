@@ -30,6 +30,22 @@ export const REGEX_YOUTUBE_URL_FULL: RegExp =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\/*/gu;
 
+export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING: string = "[[minor spelling mistake]]";
+export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
+  "https://tenor.com/view/minor-spelling-mistake-dream-dream-youtuber-gif-13914252076385141995",
+  "https://tenor.com/view/minor-spelling-mistake-spelling-mistake-gif-4898195786185830013",
+  "https://tenor.com/view/minor-spelling-mistake-badlands-loaded-weapon-gif-9983525449026664198",
+  "https://tenor.com/view/minor-spelling-mistake-gojo-satoru-gojo-gojo-fortnite-jjk-gif-17042212247732787418",
+  "https://tenor.com/view/minor-spelling-mistake-skeleton-skeleton-dies-gif-22412591",
+  "https://tenor.com/view/ultra-instinct-goku-minor-spelling-mistake-aura-gif-535268994186034537",
+  "https://tenor.com/view/minor-spelling-mistake-minor-spelling-mistake-i-win-minor-spelling-mistake-i-win-meme-shadow-the-hedgehog-shadow-gif-26138585",
+  "https://tenor.com/view/goku-freeza-frieza-dbz-minor-spelling-mistake-gif-22504422",
+  "https://tenor.com/view/minor-spelling-mistake-thanos-thanos-snap-dust-gif-16037423944121739362",
+  "https://tenor.com/view/spelling-mistake-minor-spelling-mistake-meme-gif-23650588",
+  "https://tenor.com/view/patrick-star-minor-s-spongebob-spongebob-meme-spongebob-squarepants-gif-10940848928744248792",
+  "https://tenor.com/view/minor-spelling-mistake-gif-21179057"
+]
+
 export const STEAM_URL_LINK: string =
   "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
 
