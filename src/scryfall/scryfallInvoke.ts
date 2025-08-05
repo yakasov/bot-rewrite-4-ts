@@ -24,8 +24,9 @@ export async function scryfallInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
   if (
-    message.content.toLocaleLowerCase() ===
-    SCRYFALL_MINOR_SPELLING_MISTAKE_STRING
+    message.content
+      .toLocaleLowerCase()
+      .includes(SCRYFALL_MINOR_SPELLING_MISTAKE_STRING)
   ) {
     await sendMinorSpellingMistakeGif(message.channel);
     return;
