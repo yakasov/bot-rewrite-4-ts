@@ -92,6 +92,8 @@ export async function checkMessageReactions(
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
     context.rollTable.some(async (response) => {
       if (roll < response.chance) {
+        if (response.targetUserId && response.targetUserId != message.author.id) return;
+
         try {
           switch (response.type) {
             case "message":
