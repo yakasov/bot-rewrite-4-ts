@@ -64,14 +64,14 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
   }
 
   const lastMessage: Message | undefined = await message.channel.messages
-    .fetch({ limit: 2 })
+    .fetch({ limit: 1 })
     .then((c) => [...c.values()].pop());
 
   // If we can't check whether the replacement worked, don't delete any messages
   if (!lastMessage) return;
 
   if (
-    lastMessage.embeds[0]?.data?.description?.includes(
+    lastMessage.embeds?.[0]?.data?.description?.includes(
       "Sorry, that post doesn't exist :("
     )
   ) {

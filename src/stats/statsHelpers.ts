@@ -60,16 +60,17 @@ export function addToStats(event: StatsEvent, context: BotContext): void {
       break;
 
     case "inVoiceChannel":
-      debugger;
       if (context.uptime < 10) {
         userStats.joinTime = getDateNowInSeconds();
       }
 
-      const joinTime: number =
-        userStats.joinTime === 0
-          ? (userStats.joinTime = getDateNowInSeconds())
-          : userStats.joinTime;
-      userStats.voiceTime += Math.floor(getDateNowInSeconds() - joinTime);
+      userStats.voiceTime += Math.floor(
+        getDateNowInSeconds() -
+          (userStats.joinTime === 0
+            ? getDateNowInSeconds()
+            : userStats.joinTime)
+      );
+      userStats.joinTime = getDateNowInSeconds();
       break;
 
     case "leftVoiceChannel":

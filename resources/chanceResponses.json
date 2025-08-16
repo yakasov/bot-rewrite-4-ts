@@ -300,5 +300,11 @@
     "chance": 0.03,
     "string": "BRO DIDNT EVEN ENTER THE KITCHEN 😤😤😤",
     "type": "message"
+  },
+  "tom1": {
+    "chance": 0.1,
+    "string": "https://maps.app.goo.gl/tjbCZJ8ZL6YBh9eA7",
+    "type": "message",
+    "targetUserId": "203238971009007616"
   }
 }

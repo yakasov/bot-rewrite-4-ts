@@ -34,6 +34,9 @@ export default {
     )
     .addStringOption((opt: SlashCommandStringOption) =>
       opt.setName("type").setDescription("Message or react")
+    )
+    .addStringOption((opt: SlashCommandStringOption) =>
+      opt.setName("target").setDescription("Target user ID")
     ),
   async execute(
     interaction: ChatInputCommandInteraction,
@@ -43,6 +46,7 @@ export default {
     const string: string | null = interaction.options.getString("string");
     const chance: number | null = interaction.options.getNumber("chance");
     const type: string | null = interaction.options.getString("type");
+    const target: string | null = interaction.options.getString("target");
 
     await interaction.client.application.fetch();
     if (
@@ -71,6 +75,10 @@ export default {
           string: string ?? chanceResponses[key].string,
           type: (type ?? chanceResponses[key].type) as "message" | "reaction",
         };
+
+        if (target) {
+          chanceResponses[key].targetUserId = target;
+        }
 
         context.rollTable = generateRollTable(chanceResponses);
 

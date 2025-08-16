@@ -7,9 +7,7 @@ export async function sendMessage(
   messageEvent: StatsMessage,
   context: BotContext
 ): Promise<void> {
-  debugger;
   const guild: Guild = await context.client.guilds.fetch(messageEvent.guildId);
-  const test = guild.members.cache.get(messageEvent.userId);
   const user: User | undefined = guild.members.cache.get(
     messageEvent.userId
   )?.user;

@@ -1,6 +1,5 @@
 import * as TestModule from "../../src/tasks/checkFortnite";
 import { mockBotContext } from "../mocks/context";
-import { mockClient } from "../mocks/discord";
 import {
   mockFortniteFestivalResponse,
   mockFortniteResponse,
@@ -108,49 +107,46 @@ describe("checkFortnite", () => {
   });
 
   it("should handle mainGuild ID missing", async () => {
-    const client = mockClient();
     const context = mockBotContext();
-    client.guilds.fetch = jest.fn().mockResolvedValue(null);
+    context.client.guilds.fetch = jest.fn().mockResolvedValue(null);
     (global as any).fetch = jest
       .fn()
       .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
-    await TestModule.checkFortnite(client, context);
+    await TestModule.checkFortnite(context);
     expect(console.error).toHaveBeenCalledWith(
       `Guild not found with ID: guild-id`
     );
   });
 
   it("should handle fortniteChannel ID missing", async () => {
-    const client = mockClient();
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
       .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
-    const guild: any = await client.guilds.fetch();
+    const guild: any = await context.client.guilds.fetch();
     guild.channels.fetch = jest.fn().mockResolvedValue(null);
 
-    await TestModule.checkFortnite(client, context);
+    await TestModule.checkFortnite(context);
     expect(console.error).toHaveBeenCalledWith(
       `Fortnite channel not found or not text-based in guild guild-id (Test Guild)`
     );
   });
 
   it("should send appropriate emote messages if data is valid", async () => {
-    const client = mockClient();
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
       .mockResolvedValue(mockResponse(mockFortniteResponse()));
     console.error = jest.fn();
 
-    const guild: any = await client.guilds.fetch();
+    const guild: any = await context.client.guilds.fetch();
     const fortniteChannel = await guild.channels.fetch();
 
-    await TestModule.checkFortnite(client, context);
+    await TestModule.checkFortnite(context);
     expect(TestModule.emoteFlags["Get Griddy"]).toBe(true);
     expect(fortniteChannel.send).toHaveBeenCalledWith(
       TestModule.emoteMessages["Get Griddy"]
@@ -163,7 +159,6 @@ describe("checkFortnite", () => {
   });
 
   it("should not send song info if currentSongs is empty", async () => {
-    const client = mockClient();
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
@@ -172,12 +167,11 @@ describe("checkFortnite", () => {
 
     const sortSongArraySpy = jest.spyOn(TestModule, "sortSongArray");
 
-    await TestModule.checkFortnite(client, context);
+    await TestModule.checkFortnite(context);
     expect(sortSongArraySpy).not.toHaveBeenCalled();
   });
 
   it("should send song info if currentSongs is different to new songs", async () => {
-    const client = mockClient();
     const context = mockBotContext();
     (global as any).fetch = jest
       .fn()
@@ -185,10 +179,10 @@ describe("checkFortnite", () => {
     console.error = jest.fn();
     TestModule.currentSongs.push("Song A - Artist A", "Song B - Artist B");
 
-    const guild: any = await client.guilds.fetch();
+    const guild: any = await context.client.guilds.fetch();
     const fortniteChannel = await guild.channels.fetch();
 
-    await TestModule.checkFortnite(client, context);
+    await TestModule.checkFortnite(context);
     expect(fortniteChannel.send).toHaveBeenCalledWith(
       "# Removed Fortnite Jam Tracks\nSong A - Artist A\nSong B - Artist B"
     );

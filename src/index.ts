@@ -9,27 +9,24 @@ import { handleClientReady } from "./events/handleClientReady";
 import { handleInteractionCreate } from "./events/handleInteractionCreate";
 import { handleMessageCreate } from "./events/handleMessageCreate";
 import { handleVoiceStateUpdate } from "./events/handleVoiceStateUpdate";
-import { Stats } from "./types/Stats";
 import { loadStatsFromDatabase } from "./database/loadFromDatabase";
+import { databaseKeysPresent } from "./keys";
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled error:", error);
 });
 
-let loadedStats: Stats | undefined = undefined;
-Promise.resolve(async () => {
-  loadedStats = await loadStatsFromDatabase();
-});
-
 const config: Config = configJson;
-const botContext: BotContext = createBotContext(config, loadedStats);
+const botContext: BotContext = createBotContext(config);
 
-botContext.client.once(Events.ClientReady, async (client: Client) =>
-  {
-    await loadCommands(botContext.client)
-    handleClientReady(botContext);
-  }
-);
+botContext.client.once(Events.ClientReady, async (client: Client) => {
+  await loadCommands(botContext.client);
+
+  botContext.stats = databaseKeysPresent ? await loadStatsFromDatabase() : undefined;
+  if (!botContext.stats) botContext.isStatsEnabled = false;
+
+  handleClientReady(botContext);
+});
 botContext.client.on(Events.InteractionCreate, (interaction: Interaction) =>
   handleInteractionCreate(interaction, botContext)
 );

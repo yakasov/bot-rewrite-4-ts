@@ -6,8 +6,7 @@ import { BotContext } from "../types/BotContext";
 import { generateRollTable } from "../util/generateRollTable";
 
 export function createBotContext(
-  config: Config,
-  loadedStats?: Stats | undefined
+  config: Config
 ): BotContext {
   const client = new Client({
     allowedMentions: {
@@ -29,11 +28,11 @@ export function createBotContext(
     client,
     config,
     currentDate: moment().tz("Europe/London").toDate(),
-    isStatsEnabled: loadedStats !== undefined,
+    isStatsEnabled: true,
     runState: { birthdays: 1, minecraft: 1 },
     rollTable: generateRollTable(),
     splash: "",
-    stats: loadedStats,
+    stats: undefined,
     uptime: 0,
   };
 }

@@ -37,7 +37,7 @@ describe("scryfallCardFound", () => {
           data: {
             footer: {
               icon_url: undefined,
-              text: "Legal // $2.50 // Mythic",
+              text: "Legal // £1.88 // Mythic\nset-name (SET)",
             },
             image: {
               url: "https://www.example-uri.com/",
@@ -76,7 +76,7 @@ describe("scryfallCardFound", () => {
           data: {
             footer: {
               icon_url: undefined,
-              text: "Legal // $2.50 // Mythic",
+              text: "Legal // £1.88 // Mythic\nset-name (SET)",
             },
             image: {
               url: "https://www.example-uri.com/",
@@ -115,14 +115,14 @@ describe("scryfallCardFound", () => {
               {
                 name: "Prices",
                 value: `
-Lowest: [SET @$2.5](https://www.example-uri.com/)
-Highest: [SET @$2.5](https://www.example-uri.com/)
+Lowest: [SET @ £1.88](https://www.example-uri.com/)
+Highest: [SET @ £2.17](https://www.example-uri.com/)
 `,
               },
             ],
             footer: {
               icon_url: undefined,
-              text: "Legal // $2.50 // Mythic",
+              text: "Legal // £1.88 // Mythic\nset-name (SET)",
             },
             image: {
               url: "https://www.example-uri.com/",
