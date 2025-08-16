@@ -23,7 +23,7 @@ export const MTG_PACK_SIZE: number = 12;
 export const REGEX_DISCORD_MESSAGE_LENGTH: RegExp = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT: RegExp =
   /[\s\S]{1,1980}(?!\S)/gu;
-export const REGEX_GOOGLE_BOOKS_PATTERN: RegExp = /\{\{(.*?)\}\}/gu;
+export const REGEX_GOOGLE_BOOKS_PATTERN: RegExp = /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
 export const REGEX_SANITIZE_STRING: RegExp = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_PATTERN: RegExp =
   /\[\[(?<card>[^|\]]+?)(?:\s*\|\s*(?<set>[^|\]]+?)(?:\s*\|\s*(?<number>[^|\]]+?))?)?\]\]/gu;
