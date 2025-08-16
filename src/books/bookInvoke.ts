@@ -39,7 +39,9 @@ export async function googleBooksSearch(
     .then((response: Response) => response.json())
     .then((json: any) => {
       if (json.items) {
-        return json.items.filter((i: any) => i && i.volumeInfo)[0];
+        return json.items.filter(
+          (i: any) => i && i.volumeInfo
+        )[0];
       }
 
       return undefined;
@@ -71,14 +73,14 @@ export async function googleBooksFound(
 
   const info = book.volumeInfo;
   const description = `${info.authors?.join(", ") ?? "Unknown authors"}\n\n${
-    book.searchInfo?.textSnippet ?? info.description
+    book.searchInfo?.textSnippet ?? info.description ?? "No description"
   }`;
   const footer = `Published by ${info.publisher ?? "an unknown publisher"} ${
     (info.publishedDate ?? "-").includes("-") ? "on" : "in"
   } ${info.publishedDate ?? "an unknown date"}. ${info.pageCount ?? "?"} pages`;
   const embed: EmbedBuilder = new EmbedBuilder()
-    .setTitle(info.title)
-    .setURL(info.infoLink)
+    .setTitle(info.title ?? "Unknown title")
+    .setURL(info.infoLink ?? "https://www.google.com")
     .setDescription(description)
     .setFooter({ text: footer })
     .setImage(info.imageLinks?.thumbnail);
