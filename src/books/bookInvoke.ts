@@ -27,12 +27,18 @@ export async function googleBooksSearch(
     `${BOOKS_SEARCH_URL}intitle:${encodeURIComponent(query)}`
   )
     .then((response: Response) => response.json())
-    .then(
-      (json: any) =>
-        json.items.filter(
-          (i: any) => i.volumeInfo.description && i.volumeInfo.averageRating
-        )[0]
-    );
+    .then((json: any) => {
+      if (json.items) {
+        return json.items.filter(
+          (i: any) =>
+            i &&
+            i.volumeInfo &&
+            i.volumeInfo.description
+        )[0];
+      }
+
+      return undefined;
+    });
 
   await googleBooksFound(message, result);
 }
@@ -43,10 +49,13 @@ export async function googleBooksFound(
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
+  if (!book) {
+    message.channel.send("bookless");
+    return;
+  }
+
   const info = book.volumeInfo;
-  const description = `${info.authors.join(", ")}\nAverage rating ${
-    info.averageRating
-  }/5 (${info.ratingsCount} ratings)\n\n${
+  const description = `${info.authors.join(", ")}\n\n${
     book.searchInfo.textSnippet ?? info.description
   }`;
   const footer = `Published by ${info.publisher} in ${info.publishedDate}. ${info.pageCount} pages`;
