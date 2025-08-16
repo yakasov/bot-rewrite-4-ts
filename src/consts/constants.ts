@@ -13,6 +13,8 @@ export const BASIC_JSON_FILES: string[] = [
   "./resources/roles.json",
 ];
 
+export const BOOKS_SEARCH_URL: string = "https://www.googleapis.com/books/v1/volumes?q=";
+
 export const DISCORD_ID_LENGTH: number = 18;
 export const DISCORD_VOICE_CHANNEL_TYPE: number = 2;
 
@@ -21,6 +23,7 @@ export const MTG_PACK_SIZE: number = 12;
 export const REGEX_DISCORD_MESSAGE_LENGTH: RegExp = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT: RegExp =
   /[\s\S]{1,1980}(?!\S)/gu;
+export const REGEX_GOOGLE_BOOKS_PATTERN: RegExp = /\{\{(.*?)\}\}/gu;
 export const REGEX_SANITIZE_STRING: RegExp = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_PATTERN: RegExp =
   /\[\[(?<card>[^|\]]+?)(?:\|{1,2}(?<set>[^\]]+))?\]\]/gu;
