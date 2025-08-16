@@ -71,7 +71,7 @@ export async function googleBooksFound(
 
   const info = book.volumeInfo;
   const description = `${info.authors?.join(", ") ?? "Unknown authors"}\n\n${
-    book.searchInfo.textSnippet ?? info.description
+    book.searchInfo?.textSnippet ?? info.description
   }`;
   const footer = `Published by ${info.publisher ?? "an unknown publisher"} ${
     (info.publishedDate ?? "-").includes("-") ? "on" : "in"
