@@ -11,7 +11,9 @@ export async function googleBooksInvoke(message: Message): Promise<void> {
   const promises: Promise<void>[] = [];
   const matches = [...message.content.matchAll(REGEX_GOOGLE_BOOKS_PATTERN)];
   for (const m of matches) {
-    promises.push(googleBooksSearch(message, m[1].trim()));
+    if (m[1].trim().length > 2) {
+      promises.push(googleBooksSearch(message, m[1].trim()));
+    }
   }
 
   await Promise.all(promises);
