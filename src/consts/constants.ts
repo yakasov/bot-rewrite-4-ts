@@ -13,6 +13,7 @@ export const BASIC_JSON_FILES: string[] = [
   "./resources/roles.json",
 ];
 
+export const BOOKS_GOODREADS_SEARCH_URL: string = "https://www.goodreads.com/search?utf8=✓&query="
 export const BOOKS_SEARCH_URL: string = "https://www.googleapis.com/books/v1/volumes?q=";
 
 export const DISCORD_ID_LENGTH: number = 18;
