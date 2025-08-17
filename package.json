@@ -29,6 +29,7 @@
     "join-images": "^1.1.5",
     "mariadb": "^3.4.2",
     "moment-timezone": "^0.6.0",
+    "node-html-parser": "^7.0.1",
     "openai": "^5.8.2",
     "scryfall-api": "^4.0.3",
     "ytdl-core": "^4.11.5"

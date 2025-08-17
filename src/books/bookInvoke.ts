@@ -1,4 +1,5 @@
 import { EmbedBuilder, Message } from "discord.js";
+import HTMLParser from "node-html-parser";
 import { isSendableChannel } from "../util/typeGuards";
 import {
   BOOKS_GOODREADS_SEARCH_URL,
@@ -78,28 +79,30 @@ export async function googleBooksFound(
   const info = book.volumeInfo!;
 
   const authorString = info.authors?.join(", ") ?? "Unknown authors";
-  const descriptionString =
-    book.searchInfo?.textSnippet ?? info.description ?? "No description";
-  const description = `${authorString}\n\n${descriptionString}`;
+  const descriptionNode = HTMLParser.parse(
+    new HTMLParser.TextNode(
+      book.searchInfo?.textSnippet ?? info.description ?? "No description"
+    ).innerText
+  );
+  const descriptionString = descriptionNode.text;
+  const goodreadsString = `[Open in Goodreads](${BOOKS_GOODREADS_SEARCH_URL}${info.industryIdentifiers[0].identifier})`;
+  const description = `${descriptionString}\n\n${goodreadsString}`;
 
   const publisherString = `Published by ${
     info.publisher ?? "an unknown publisher"
   }`;
-  const publishedDateString = `
-    ${(info.publishedDate ?? "-").includes("-") ? "on" : "in"} ${
-    info.publishedDate ?? "an unknown date"
-  }`;
+  const publishedDateString = `${
+    (info.publishedDate ?? "-").includes("-") ? "on" : "in"
+  } ${info.publishedDate ?? "an unknown date"}`;
   const pageCountString = `${
     info.pageCount === 0 ? "?" : info.pageCount
   } pages`;
-  const information = `${publisherString} ${publishedDateString}\n${pageCountString}`;
-
-  const footer = `[Open in Goodreads](${BOOKS_GOODREADS_SEARCH_URL}${info.industryIdentifiers[0].identifier})`;
+  const information = `${publisherString} ${publishedDateString}\n${pageCountString}\n\n`;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(info.title ?? "Unknown title")
     .setURL(info.infoLink ?? "https://www.google.com")
-    .setDescription(description)
+    .setDescription(authorString)
     .setImage(info.imageLinks.large ?? info.imageLinks.thumbnail)
     .addFields([
       {
@@ -110,8 +113,7 @@ export async function googleBooksFound(
         name: "Description",
         value: description,
       },
-    ])
-    .setFooter({ text: footer });
+    ]);
 
   await message.channel.send({
     embeds: [embed],
