@@ -103,7 +103,11 @@ export async function googleBooksFound(
     .setTitle(info.title ?? "Unknown title")
     .setURL(info.infoLink ?? "https://www.google.com")
     .setDescription(authorString)
-    .setImage(info.imageLinks.large ?? info.imageLinks.thumbnail)
+    .setImage(
+      info.imageLinks
+        ? info.imageLinks.large ?? info.imageLinks.thumbnail
+        : "https://i.scdn.co/image/ab67616d0000b273d0fc337923634532f8319b10"
+    )
     .addFields([
       {
         name: "Publishing Information",
