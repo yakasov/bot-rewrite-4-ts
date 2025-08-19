@@ -5,9 +5,9 @@ import { isSendableChannel } from "../util/typeGuards";
 import {
   BOOKS_GOODREADS_SEARCH_URL,
   BOOKS_INVALID_IMAGE_URL,
-  BOOKS_SEARCH_URL,
+  BOOKS_SEARCH_GOOGLE_URL,
   REGEX_DISCORD_MESSAGE_LENGTH_SHORT,
-  REGEX_GOOGLE_BOOKS_PATTERN,
+  REGEX_BOOKS_PATTERN,
 } from "../consts/constants";
 import { wrapCodeBlockString } from "../util/commonFunctions";
 import { GoogleBooksTypes } from "../types/books/GoogleBooksResponse";
@@ -18,7 +18,7 @@ export async function googleBooksInvoke(message: Message): Promise<void> {
   const promises: Promise<void>[] = [];
   let match: RegExpMatchArray | null = null;
 
-  while ((match = REGEX_GOOGLE_BOOKS_PATTERN.exec(message.content)) !== null) {
+  while ((match = REGEX_BOOKS_PATTERN.exec(message.content)) !== null) {
     const bookName: string | undefined = match.groups?.name?.trim();
     const bookAuthor: string | undefined = match.groups?.author?.trim();
 
@@ -40,7 +40,7 @@ export async function googleBooksSearch(
   const isIsbn = ISBN.parse(input) !== null;
   const urlParam = isIsbn ? "isbn:" : "intitle:";
 
-  let url = `${BOOKS_SEARCH_URL}${urlParam}${encodeURIComponent(input)}`;
+  let url = `${BOOKS_SEARCH_GOOGLE_URL}${urlParam}${encodeURIComponent(input)}`;
   if (author) {
     url += `+inauthor:${author}`;
   }

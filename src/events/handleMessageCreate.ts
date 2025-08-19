@@ -3,7 +3,7 @@ import { BotContext } from "../types/BotContext";
 import { scryfallInvoke } from "../scryfall/scryfallInvoke";
 import { addToStats } from "../stats/statsHelpers";
 import { checkMessageInvoke } from "../response/checkMessageInvoke";
-import { googleBooksInvoke } from "../books/bookInvoke";
+import { openLibraryInvoke } from "../books/openLibraryInvoke";
 
 export async function handleMessageCreate(
   message: Message,
@@ -12,7 +12,7 @@ export async function handleMessageCreate(
   if (message.author.bot || !message.guild) return;
 
   await scryfallInvoke(message);
-  await googleBooksInvoke(message);
+  await openLibraryInvoke(message);
   await checkMessageInvoke(message, context);
 
   addToStats(
