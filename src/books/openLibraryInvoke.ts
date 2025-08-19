@@ -1,5 +1,4 @@
 import { EmbedBuilder, Message } from "discord.js";
-import ISBN from "isbn3";
 import { isSendableChannel } from "../util/typeGuards";
 import {
   BOOKS_SEARCH_OPENLIBRARY_URL,
@@ -83,6 +82,23 @@ export async function openBooksFound(
 
   const authorString = book.author_name.join(", ");
 
+  console.log(
+    [
+      workInfo.description
+        ? {
+            name: "Description",
+            value: workInfo.description,
+          }
+        : null,
+      workInfo.subjects
+        ? {
+            name: "Tags",
+            value: workInfo.subjects.slice(0, 5).join(", "),
+          }
+        : null,
+    ].filter((a) => a !== null)
+  );
+
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(book.title)
     .setURL(`https://openlibrary.org${book.key}`)
@@ -95,7 +111,7 @@ export async function openBooksFound(
         workInfo.description
           ? {
               name: "Description",
-              value: workInfo.description,
+              value: getDescription(workInfo.description),
             }
           : null,
         workInfo.subjects
@@ -110,4 +126,12 @@ export async function openBooksFound(
   await message.channel.send({
     embeds: [embed],
   });
+}
+
+function getDescription(description: OpenLibraryTypes.Work["description"]) {
+  return typeof description === "string"
+    ? description
+    : description!.value.length > 320
+      ? description!.value.slice(0, 320) + "..."
+      : description!.value;
 }

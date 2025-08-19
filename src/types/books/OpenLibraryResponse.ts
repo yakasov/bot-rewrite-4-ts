@@ -37,7 +37,10 @@ export namespace OpenLibraryTypes {
       type: { key: string };
     }[];
     type: { key: string };
-    description?: string;
+    description?: string | {
+      type: string;
+      value: string;
+    };
     covers?: number[];
     subjects?: string[];
     latest_revision: number;
