@@ -129,9 +129,9 @@ export async function openBooksFound(
 }
 
 function getDescription(description: OpenLibraryTypes.Work["description"]) {
-  return typeof description === "string"
-    ? description
-    : description!.value.length > 320
-      ? description!.value.slice(0, 320) + "..."
-      : description!.value;
+  const descriptionString =
+    typeof description === "string" ? description : description!.value;
+  return descriptionString.length > 320
+    ? descriptionString.slice(0, 320) + "..."
+    : descriptionString;
 }
