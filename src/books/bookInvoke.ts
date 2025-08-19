@@ -1,8 +1,10 @@
 import { EmbedBuilder, Message } from "discord.js";
 import HTMLParser from "node-html-parser";
+import ISBN from "isbn3";
 import { isSendableChannel } from "../util/typeGuards";
 import {
   BOOKS_GOODREADS_SEARCH_URL,
+  BOOKS_INVALID_IMAGE_URL,
   BOOKS_SEARCH_URL,
   REGEX_DISCORD_MESSAGE_LENGTH_SHORT,
   REGEX_GOOGLE_BOOKS_PATTERN,
@@ -30,12 +32,15 @@ export async function googleBooksInvoke(message: Message): Promise<void> {
 
 export async function googleBooksSearch(
   message: Message,
-  name: string,
+  input: string,
   author: string | undefined
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  let url = `${BOOKS_SEARCH_URL}intitle:${encodeURIComponent(name)}`;
+  const isIsbn = ISBN.parse(input) !== null;
+  const urlParam = isIsbn ? "isbn:" : "intitle:";
+
+  let url = `${BOOKS_SEARCH_URL}${urlParam}${encodeURIComponent(input)}`;
   if (author) {
     url += `+inauthor:${author}`;
   }
@@ -51,9 +56,10 @@ export async function googleBooksSearch(
     });
 
   if (!result) {
-    message.channel.send(
-      `Could not find book \`${name}\` by \`${author ?? "any author"}\``
-    );
+    const sendString = isIsbn
+      ? `Could not find book for ISBN-10 \`${input}\``
+      : `Could not find book \`${input}\` by \`${author ?? "any author"}\``;
+    message.channel.send(sendString);
     return;
   }
 
@@ -106,7 +112,7 @@ export async function googleBooksFound(
     .setImage(
       info.imageLinks
         ? info.imageLinks.large ?? info.imageLinks.thumbnail
-        : "https://i.scdn.co/image/ab67616d0000b273d0fc337923634532f8319b10"
+        : BOOKS_INVALID_IMAGE_URL
     )
     .addFields([
       {

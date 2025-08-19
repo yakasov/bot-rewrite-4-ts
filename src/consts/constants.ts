@@ -13,8 +13,12 @@ export const BASIC_JSON_FILES: string[] = [
   "./resources/roles.json",
 ];
 
-export const BOOKS_GOODREADS_SEARCH_URL: string = "https://www.goodreads.com/search?utf8=✓&query="
-export const BOOKS_SEARCH_URL: string = "https://www.googleapis.com/books/v1/volumes?q=";
+export const BOOKS_GOODREADS_SEARCH_URL: string =
+  "https://www.goodreads.com/search?utf8=✓&query=";
+export const BOOKS_INVALID_IMAGE_URL: string =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png?20250720084638";
+export const BOOKS_SEARCH_URL: string =
+  "https://www.googleapis.com/books/v1/volumes?q=";
 
 export const DISCORD_ID_LENGTH: number = 18;
 export const DISCORD_VOICE_CHANNEL_TYPE: number = 2;
@@ -24,7 +28,8 @@ export const MTG_PACK_SIZE: number = 12;
 export const REGEX_DISCORD_MESSAGE_LENGTH: RegExp = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT: RegExp =
   /[\s\S]{1,1980}(?!\S)/gu;
-export const REGEX_GOOGLE_BOOKS_PATTERN: RegExp = /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
+export const REGEX_GOOGLE_BOOKS_PATTERN: RegExp =
+  /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
 export const REGEX_SANITIZE_STRING: RegExp = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_PATTERN: RegExp =
   /\[\[(?<card>[^|\]]+?)(?:\s*\|\s*(?<set>[^|\]]+?)(?:\s*\|\s*(?<number>[^|\]]+?))?)?\]\]/gu;
@@ -34,7 +39,8 @@ export const REGEX_YOUTUBE_URL_FULL: RegExp =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\/*/gu;
 
-export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING: string = "[[minor spelling mistake]]";
+export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING: string =
+  "[[minor spelling mistake]]";
 export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
   "https://tenor.com/view/minor-spelling-mistake-dream-dream-youtuber-gif-13914252076385141995",
   "https://tenor.com/view/minor-spelling-mistake-spelling-mistake-gif-4898195786185830013",
@@ -47,8 +53,8 @@ export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
   "https://tenor.com/view/minor-spelling-mistake-thanos-thanos-snap-dust-gif-16037423944121739362",
   "https://tenor.com/view/spelling-mistake-minor-spelling-mistake-meme-gif-23650588",
   "https://tenor.com/view/patrick-star-minor-s-spongebob-spongebob-meme-spongebob-squarepants-gif-10940848928744248792",
-  "https://tenor.com/view/minor-spelling-mistake-gif-21179057"
-]
+  "https://tenor.com/view/minor-spelling-mistake-gif-21179057",
+];
 
 export const STEAM_URL_LINK: string =
   "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
