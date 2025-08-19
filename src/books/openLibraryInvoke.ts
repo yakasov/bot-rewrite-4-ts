@@ -81,24 +81,7 @@ export async function openBooksFound(
   ).then((response: Response) => response.json());
 
   const authorString = book.author_name.join(", ");
-
-  console.log(
-    [
-      workInfo.description
-        ? {
-            name: "Description",
-            value: workInfo.description,
-          }
-        : null,
-      workInfo.subjects
-        ? {
-            name: "Tags",
-            value: workInfo.subjects.slice(0, 5).join(", "),
-          }
-        : null,
-    ].filter((a) => a !== null)
-  );
-
+  
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(book.title)
     .setURL(`https://openlibrary.org${book.key}`)
