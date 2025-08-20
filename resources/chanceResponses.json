@@ -290,7 +290,7 @@
     "type": "message"
   },
   "lboozoo": { "string": "L boozoo", "chance": 0.05, "type": "message" },
-  "nerd": { "string": "🤓", "chance": 1, "type": "react" },
+  "nerd": { "string": "🤓", "chance": 1, "type": "reaction" },
   "dan14": {
     "chance": 0.03,
     "string": "Good argument however you are diddy",
