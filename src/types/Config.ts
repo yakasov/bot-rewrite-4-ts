@@ -6,6 +6,11 @@ export interface Config {
     responseChance: number;
   },
 
+  fortnite: {
+    checkEmotes: boolean;
+    checkSongs: boolean;
+  }
+
   ids: {
     mainGuild: string;
     birthdayChannel: string;
