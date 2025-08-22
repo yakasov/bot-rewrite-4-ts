@@ -7,6 +7,7 @@ import {
 } from "../consts/constants";
 import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
 import { wrapCodeBlockString } from "../util/commonFunctions";
+import { openLibraryShowBookList } from "./openLibraryShowBookList";
 
 export async function openLibraryInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
@@ -15,12 +16,17 @@ export async function openLibraryInvoke(message: Message): Promise<void> {
   let match: RegExpMatchArray | null = null;
 
   while ((match = REGEX_BOOKS_PATTERN.exec(message.content)) !== null) {
-    const bookName: string | undefined = match.groups?.name?.trim();
+    const searchMultiple: boolean = match.groups?.name[0] === "?";
+    const bookName: string | undefined = match.groups?.name
+      ?.substring(Number(searchMultiple))
+      .trim();
     const bookAuthor: string | undefined = match.groups?.author?.trim();
 
     if (!bookName) continue;
 
-    promises.push(openLibrarySearch(message, bookName, bookAuthor));
+    promises.push(
+      openLibrarySearch(message, bookName, bookAuthor, searchMultiple)
+    );
   }
 
   await Promise.all(promises);
@@ -29,7 +35,8 @@ export async function openLibraryInvoke(message: Message): Promise<void> {
 export async function openLibrarySearch(
   message: Message,
   input: string,
-  author: string | undefined
+  author: string | undefined,
+  searchMultiple: boolean = false
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -38,17 +45,11 @@ export async function openLibrarySearch(
     url += `&author:${encodeURIComponent(author)}`;
   }
 
-  const result = await fetch(url)
+  const results = await fetch(url)
     .then((response: Response) => response.json())
-    .then((json: OpenLibraryTypes.Response) => {
-      if (json.docs) {
-        return json.docs[0];
-      }
+    .then((json: OpenLibraryTypes.Response) => json.docs);
 
-      return undefined;
-    });
-
-  if (!result) {
+  if (!results || results.length === 0) {
     message.channel.send(
       `Could not find book from query \`${input}\` by \`${
         author ?? "any author"
@@ -57,7 +58,12 @@ export async function openLibrarySearch(
     return;
   }
 
-  await openBooksFound(message, result);
+  if (results.length > 1 && searchMultiple) {
+    await openLibraryShowBookList(message, results, input);
+    return;
+  }
+
+  await openBooksFound(message, results[0]);
 }
 
 export async function openBooksFound(
@@ -80,8 +86,8 @@ export async function openBooksFound(
     `https://openlibrary.org${book.key}.json`
   ).then((response: Response) => response.json());
 
-  const authorString = book.author_name.join(", ");
-  
+  const authorString = book.author_name?.join(", ") ?? "Unknown Authors";
+
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(book.title)
     .setURL(`https://openlibrary.org${book.key}`)

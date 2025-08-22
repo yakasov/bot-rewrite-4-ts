@@ -11,8 +11,8 @@ export namespace OpenLibraryTypes {
   }
 
   export interface Book {
-    author_key: string[];
-    author_name: string[];
+    author_key?: string[];
+    author_name?: string[];
     cover_edition_key: string;
     cover_i: number;
     ebook_access: "no_ebook" | "printdisabled" | "borrowable" | "public";
