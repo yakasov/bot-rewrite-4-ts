@@ -40,7 +40,7 @@ export async function openLibraryShowBookList(
               book.author_name?.length === 1
                 ? book.author_name[0]
                 : `${book.author_name?.length ?? "Unknown"} Authors`
-            }`
+            }`.substring(0, 100)
           )
           .setValue(book.key)
       )
