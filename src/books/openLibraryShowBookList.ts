@@ -8,10 +8,11 @@ import {
 } from "discord.js";
 import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
 import { isSendableChannel } from "../util/typeGuards";
-import { openBooksFound } from "./openLibraryInvoke";
+import { openBooksFound } from "./openLibraryBookFound";
 
 export async function openLibraryShowBookList(
   message: Message,
+  replyMessage: Message,
   results: OpenLibraryTypes.Book[],
   input: string
 ): Promise<void> {
@@ -76,6 +77,7 @@ export async function openLibraryShowBookList(
 
     await openBooksFound(
       message,
+      replyMessage,
       uniqueResults.find((result) => result.key === selectedValue)!
     );
     await multipleBooksMessage.delete().catch((err) => console.error(err));
