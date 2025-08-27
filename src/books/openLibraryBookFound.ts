@@ -85,13 +85,17 @@ async function getGoodreadsDescription(
     return getDescription(work.description);
   }
 
-  return description;
+  return shortenDescription(description);
+}
+
+function shortenDescription(description: string) {
+  return description.length > 1000
+    ? description.slice(0, 1000) + "..."
+    : description;
 }
 
 function getDescription(description: OpenLibraryTypes.Work["description"]) {
   const descriptionString =
     typeof description === "string" ? description : description!.value;
-  return descriptionString.length > 320
-    ? descriptionString.slice(0, 320) + "..."
-    : descriptionString;
+  return shortenDescription(descriptionString);
 }
