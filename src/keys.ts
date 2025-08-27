@@ -11,6 +11,7 @@ const {
   DISCORD_TOKEN,
   DISCORD_CLIENT_ID,
   OPENAI_TOKEN,
+  GOOGLE_BOOKS_TOKEN
 } = process.env;
 
 if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
@@ -34,6 +35,7 @@ export const keys = {
   DISCORD_TOKEN,
   DISCORD_CLIENT_ID,
   OPENAI_TOKEN,
+  GOOGLE_BOOKS_TOKEN
 };
 
 export const database = {

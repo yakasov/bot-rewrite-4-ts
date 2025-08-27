@@ -9,6 +9,7 @@ export async function loadCommands(client: Client): Promise<void> {
 
   for (const filePath of commandFiles) {
     const command: Command = (await import(filePath)).default as Command;
+    if (!command) continue;
 
     if (command && "data" in command && "execute" in command) {
       client.commands.set(command.data.name, command);

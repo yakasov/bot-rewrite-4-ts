@@ -15,6 +15,7 @@ async function deployCommands() {
   for (const filePath of commandFiles) {
     const commandModule: any = await import(filePath);
     const command: any = commandModule.default || commandModule;
+    if (!command) continue;
 
     if (command && "data" in command && "execute" in command) {
       commands.push(command.data.toJSON());

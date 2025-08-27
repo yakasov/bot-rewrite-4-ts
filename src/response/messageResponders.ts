@@ -90,8 +90,10 @@ export async function checkMessageReactions(
   const initialRoll: number = Math.random() * 100;
 
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
-    context.rollTable.some(async (response) => {
+    for (const response of context.rollTable) {
       if (roll < response.chance) {
+        if (response.targetUserId && response.targetUserId != message.author.id) continue;
+
         try {
           switch (response.type) {
             case "message":
@@ -104,13 +106,12 @@ export async function checkMessageReactions(
               break;
           }
 
-          return true;
+          return;
         } catch (err) {
           console.error(err);
-          return false;
+          return;
         }
       }
-      return false;
-    });
+    }
   }
 }

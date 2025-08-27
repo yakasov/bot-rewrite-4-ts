@@ -25,19 +25,18 @@ export function to2DP(number: number): string {
 export async function scryfallCardFound(
   message: Message,
   cardName: string,
-  set: string | undefined
+  set: string | undefined,
+  number: number | undefined
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  const cardDetails: Card | undefined = await Cards.byName(
-    cardName,
-    set,
-    false
-  );
+  const cardDetails: Card | undefined = number
+    ? await Cards.bySet(set!, number)
+    : await Cards.byName(cardName, set, false);
 
   if (!cardDetails) {
     await message.channel.send(
-      `Ran into an error fetching ${cardName} for set ${set}!`
+      `Ran into an error fetching ${cardName} for set ${set} and number ${number}!`
     );
     return;
   }

@@ -47,7 +47,7 @@ export async function getFestivalData(): Promise<
     }
 
     const data: FortniteTypes.FestivalItems | undefined = await response.json();
-    return data && data.data ? Object.values(data.data) : undefined;
+    return data ? Object.values(data) : undefined;
   } catch (err: any) {
     console.error("Error fetching Fortnite Festival data:", err);
     return undefined;
@@ -62,10 +62,10 @@ export function sortSongArray(songA: string, songB: string): number {
   return titleA.localeCompare(titleB);
 }
 
-export async function checkFortnite(
-  context: BotContext
-): Promise<void> {
-  const guild: Guild = await context.client.guilds.fetch(context.config.ids.mainGuild);
+export async function checkFortnite(context: BotContext): Promise<void> {
+  const guild: Guild = await context.client.guilds.fetch(
+    context.config.ids.mainGuild
+  );
 
   if (!guild) {
     console.error(`Guild not found with ID: ${context.config.ids.mainGuild}`);
@@ -87,7 +87,7 @@ export async function checkFortnite(
   const festivalData: FortniteTypes.FestivalItem[] | undefined =
     await getFestivalData();
 
-  if (data?.entries) {
+  if (data?.entries && context.config.fortnite.checkEmotes) {
     const emotes: string[] = data.entries
       .filter(
         (entry: GenericObject) =>
@@ -105,7 +105,7 @@ export async function checkFortnite(
     }
   }
 
-  if (festivalData) {
+  if (festivalData && context.config.fortnite.checkSongs) {
     const songs: string[] = festivalData
       .filter((entry: FortniteTypes.FestivalItem) => entry.featured)
       .map(

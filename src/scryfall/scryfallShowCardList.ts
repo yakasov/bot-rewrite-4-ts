@@ -55,7 +55,7 @@ export async function scryfallShowCardList(
       content: `Fetching ${selectedValue}...`,
     });
 
-    await scryfallGetCard(message, selectedValue, "", true, true);
+    await scryfallGetCard(message, selectedValue, "", undefined, true, true);
     await multipleCardsMessage.delete().catch((err) => console.error(err));
   } catch (err: any) {
     console.error(err);
