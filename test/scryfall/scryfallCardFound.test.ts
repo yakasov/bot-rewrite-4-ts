@@ -14,7 +14,7 @@ describe("scryfallCardFound", () => {
 
     await TestModule.scryfallCardFound(message, cardName, set);
     expect(message.channel.send).toHaveBeenCalledWith(
-      "Ran into an error fetching card name for set undefined!"
+      "Ran into an error fetching card name for set undefined and number undefined!"
     );
   });
 

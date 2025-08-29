@@ -62,15 +62,15 @@ function buildTableData(
   return topScores.slice(0, STATS_TOP_SCORES_N).map(([userName], i) => ({
     "#": i + 1,
     Name: getNicknameFromInteraction(interaction, userName, true),
-    Level: `${guildStats.users[userName].level} (${
-      guildStats.users[userName].levelXP.toFixed(0)
-    }/${getRequiredExperience(
+    Level: `${guildStats.users[userName].level} (${guildStats.users[
+      userName
+    ].levelXP.toFixed(0)}/${getRequiredExperience(
       guildStats.users[userName].level,
       context.config
     )} XP)`,
     Msgs: guildStats.users[userName].messages,
     "Voice Time": formatTime(guildStats.users[userName].voiceTime),
-    Title: guildStats.users[userName].name,
+    Rank: getLevelName(guildStats.users[userName].level),
   }));
   /* eslint-enable sort-keys */
 }

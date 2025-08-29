@@ -131,7 +131,7 @@ function formatProfileOutput(
   } (${userStats.levelXP}/${getRequiredExperience(
     userStats.level,
     context.config
-  )})\n    Title: ${userStats.name}\n    Ranking: ${getLevelName(
+  )})\n    Ranking: ${getLevelName(
     userStats.level
   )} (${userStats.totalXP} XP)`;
 }

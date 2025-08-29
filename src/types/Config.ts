@@ -6,9 +6,9 @@ export interface Config {
     responseChance: number;
   },
 
-  fortnite: {
-    checkEmotes: boolean;
-    checkSongs: boolean;
+  fortnite?: {
+    checkEmotes?: boolean;
+    checkSongs?: boolean;
   }
 
   ids: {

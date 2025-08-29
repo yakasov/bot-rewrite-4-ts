@@ -51,6 +51,6 @@ export interface TableData {
   Level: string;
   Msgs: number;
   "Voice Time": string;
-  Title: string;
+  Rank: string;
   [key: string]: string | number | undefined;
 }

@@ -87,7 +87,7 @@ export async function checkFortnite(context: BotContext): Promise<void> {
   const festivalData: FortniteTypes.FestivalItem[] | undefined =
     await getFestivalData();
 
-  if (data?.entries && context.config.fortnite.checkEmotes) {
+  if (data?.entries && context.config.fortnite?.checkEmotes) {
     const emotes: string[] = data.entries
       .filter(
         (entry: GenericObject) =>
@@ -105,7 +105,7 @@ export async function checkFortnite(context: BotContext): Promise<void> {
     }
   }
 
-  if (festivalData && context.config.fortnite.checkSongs) {
+  if (festivalData && context.config.fortnite?.checkSongs) {
     const songs: string[] = festivalData
       .filter((entry: FortniteTypes.FestivalItem) => entry.featured)
       .map(

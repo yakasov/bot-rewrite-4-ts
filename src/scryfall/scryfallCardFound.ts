@@ -26,7 +26,7 @@ export async function scryfallCardFound(
   message: Message,
   cardName: string,
   set: string | undefined,
-  number: number | undefined
+  number: number | undefined = undefined
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
