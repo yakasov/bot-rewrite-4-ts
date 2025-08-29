@@ -128,10 +128,10 @@ function formatProfileOutput(
     userStats.messages
   }\n    Voice Time: ${formatTime(userStats.voiceTime)}\n\n    Level: ${
     userStats.level
-  } (${userStats.levelXP}/${getRequiredExperience(
+  } (${userStats.levelXP.toFixed(0)}/${getRequiredExperience(
     userStats.level,
     context.config
   )})\n    Ranking: ${getLevelName(
     userStats.level
-  )} (${userStats.totalXP} XP)`;
+  )} (${userStats.totalXP.toFixed(0)} XP)`;
 }
