@@ -8,11 +8,13 @@ import {
 } from "discord.js";
 import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
+import { Modifiers } from "../types/scryfall/Invoke";
 
 export async function scryfallShowCardList(
   message: Message,
   cardName: string,
-  results: string[]
+  results: string[],
+  modifiers: Modifiers
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -49,13 +51,17 @@ export async function scryfallShowCardList(
         time: 30_000,
       })) as StringSelectMenuInteraction;
 
-    const [selectedValue]: string[] = collected.values;
+    let [selectedValue]: string[] = collected.values;
     await collected.update({
       components: [],
       content: `Fetching ${selectedValue}...`,
     });
 
-    await scryfallGetCard(message, selectedValue, "", undefined, true, true);
+    if (modifiers.isSyntax) {
+      selectedValue += ` ${selectedValue}`
+    }
+
+    await scryfallGetCard(message, selectedValue, modifiers, true);
     await multipleCardsMessage.delete().catch((err) => console.error(err));
   } catch (err: any) {
     console.error(err);

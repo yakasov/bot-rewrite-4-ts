@@ -4,11 +4,12 @@ import {
   SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES,
   SCRYFALL_MINOR_SPELLING_MISTAKE_STRING,
 } from "../consts/constants";
-import { Cards } from "scryfall-api";
+import { Card, Cards } from "scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
 import { scryfallShowCardList } from "./scryfallShowCardList";
 import { isSendableChannel } from "../util/typeGuards";
+import { Modifiers } from "../types/scryfall/Invoke";
 
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
@@ -36,25 +37,23 @@ export async function scryfallInvoke(message: Message): Promise<void> {
   let match: RegExpMatchArray | null = null;
 
   while ((match = REGEX_SCRYFALL_PATTERN.exec(message.content)) !== null) {
-    const isExact: boolean = match.groups?.card[0] !== "?";
-    const cardName: string | undefined = match.groups?.card
-      .substring(Number(!isExact))
-      .trim();
-    const isSpecificSet: string = match.groups?.set?.trim() ?? "";
-    const isSpecificNumber: number = parseInt(
-      match.groups?.number?.trim() ?? "0"
-    );
-    if (!cardName) return;
+    const firstString: string = match.groups?.card ?? "";
 
-    promises.push(
-      scryfallGetCard(
-        message,
-        cardName,
-        isSpecificSet,
-        isSpecificNumber,
-        isExact
-      )
-    );
+    const modifiers: Modifiers = {
+      isExact: firstString.trim()[0] !== "?",
+      isSyntax: firstString.trim()[0] === "*",
+      isSpecificSet: match.groups?.set?.trim() ?? "",
+      isSpecificNumber: parseInt(match.groups?.number?.trim() ?? "0"),
+    };
+    const cardName: string | undefined = firstString
+      .trim()
+      .substring(Number(!modifiers.isExact))
+      .substring(Number(modifiers.isSyntax));
+
+    if (!cardName && !modifiers.isSpecificSet && !modifiers.isSpecificNumber)
+      return;
+
+    promises.push(scryfallGetCard(message, cardName, modifiers));
   }
 
   await Promise.all(promises);
@@ -62,13 +61,19 @@ export async function scryfallInvoke(message: Message): Promise<void> {
 
 export async function scryfallGetCard(
   message: Message,
-  cardName: string,
-  isSpecificSet: string | undefined = undefined,
-  isSpecificNumber: number | undefined = undefined,
-  isExact: boolean = true,
+  cardName: string = "",
+  modifiers: Modifiers,
   fromSelectMenu: boolean = false
 ): Promise<void> {
-  const results: string[] = await Cards.autoCompleteName(cardName);
+  let results: string[] = [""];
+
+  if (modifiers.isSyntax) {
+    results = (await Cards.search(cardName).get(20)).map(
+      (card: Card) => card.name
+    );
+  } else if (cardName) {
+    results = await Cards.autoCompleteName(cardName);
+  }
 
   /*
    * An explanation for 'fromSelectMenu':
@@ -87,17 +92,17 @@ export async function scryfallGetCard(
   } else if (
     results.length === 1 ||
     (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
-      isExact) ||
+      modifiers.isExact) ||
     fromSelectMenu
   ) {
     await scryfallCardFound(
       message,
       results[0],
-      isSpecificSet,
-      isSpecificNumber
+      modifiers.isSpecificSet,
+      modifiers.isSpecificNumber
     );
   } else {
-    await scryfallShowCardList(message, cardName, results);
+    await scryfallShowCardList(message, cardName, results, modifiers);
   }
 }
 
