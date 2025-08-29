@@ -22,12 +22,12 @@ export function to2DP(number: number): string {
   return (Math.round(number * 100) / 100).toFixed(2);
 }
 
-export async function scryfallCardFound(
+export async function getCardMessageObject(
   message: Message,
   cardName: string,
-  set: string | undefined,
+  set: string | undefined = undefined,
   number: number | undefined = undefined
-): Promise<void> {
+): Promise<any> {
   if (!isSendableChannel(message.channel)) return;
 
   const cardDetails: Card | undefined = number
@@ -92,9 +92,22 @@ Highest: [${lowestHighestData.highestSet} @ \
     );
   }
 
-  await message.channel.send({
+  return {
     content: cardDetails.scryfall_uri.replace("?utm_source=api", ""),
     embeds: [embed],
     files: attachment ? [attachment] : [],
-  });
+  };
+}
+
+export async function scryfallCardFound(
+  message: Message,
+  cardName: string,
+  set: string | undefined,
+  number: number | undefined = undefined
+): Promise<void> {
+  if (!isSendableChannel(message.channel)) return;
+
+  await message.channel.send(
+    await getCardMessageObject(message, cardName, set, number)
+  );
 }

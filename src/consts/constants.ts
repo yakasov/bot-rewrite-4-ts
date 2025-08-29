@@ -57,6 +57,7 @@ export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
   "https://tenor.com/view/patrick-star-minor-s-spongebob-spongebob-meme-spongebob-squarepants-gif-10940848928744248792",
   "https://tenor.com/view/minor-spelling-mistake-gif-21179057",
 ];
+export const SCRYFALL_SYNTAX_PREFIX: string = "order:edhrec game:paper ";
 
 export const STEAM_URL_LINK: string =
   "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";

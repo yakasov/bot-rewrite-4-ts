@@ -3,6 +3,7 @@ import {
   REGEX_SCRYFALL_PATTERN,
   SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES,
   SCRYFALL_MINOR_SPELLING_MISTAKE_STRING,
+  SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
 import { Card, Cards } from "scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
@@ -45,13 +46,17 @@ export async function scryfallInvoke(message: Message): Promise<void> {
       isSpecificSet: match.groups?.set?.trim() ?? "",
       isSpecificNumber: parseInt(match.groups?.number?.trim() ?? "0"),
     };
-    const cardName: string | undefined = firstString
+    let cardName: string | undefined = firstString
       .trim()
       .substring(Number(!modifiers.isExact))
       .substring(Number(modifiers.isSyntax));
 
     if (!cardName && !modifiers.isSpecificSet && !modifiers.isSpecificNumber)
       return;
+
+    if (modifiers.isSyntax) {
+      cardName = SCRYFALL_SYNTAX_PREFIX + cardName
+    }
 
     promises.push(scryfallGetCard(message, cardName, modifiers));
   }

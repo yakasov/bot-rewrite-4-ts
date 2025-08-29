@@ -9,6 +9,7 @@ import {
 import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
 import { Modifiers } from "../types/scryfall/Invoke";
+import { getCardMessageObject } from "./scryfallCardFound";
 
 export async function scryfallShowCardList(
   message: Message,
@@ -33,9 +34,12 @@ export async function scryfallShowCardList(
     selectMenu
   );
 
+  const cardMessageObject: any = await getCardMessageObject(message, results[0]);
   const multipleCardsMessage: Message = await message.channel.send({
     components: [row.toJSON()],
     content: `Multiple cards found for "${cardName}"!`,
+    embeds: cardMessageObject.embeds,
+    files: cardMessageObject.files,
   });
 
   const filter: (interaction: Interaction) => boolean = (
@@ -58,7 +62,7 @@ export async function scryfallShowCardList(
     });
 
     if (modifiers.isSyntax) {
-      selectedValue += ` ${selectedValue}`
+      selectedValue += ` ${selectedValue}`;
     }
 
     await scryfallGetCard(message, selectedValue, modifiers, true);
