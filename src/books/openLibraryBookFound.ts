@@ -2,6 +2,7 @@ import HTMLParser, { HTMLElement } from "node-html-parser";
 import { Message, EmbedBuilder } from "discord.js";
 import {
   BOOKS_GOODREADS_SEARCH_URL,
+  BOOKS_INVALID_IMAGE_URL,
   REGEX_DISCORD_MESSAGE_LENGTH_SHORT,
 } from "../consts/constants";
 import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
@@ -35,9 +36,7 @@ export async function openBooksFound(
     .setTitle(book.title)
     .setURL(`https://openlibrary.org${book.key}`)
     .setDescription(authorString)
-    .setImage(
-      `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`
-    )
+    .setImage(await getSourceImage(book))
     .addFields(
       [
         workInfo.description
@@ -59,6 +58,51 @@ export async function openBooksFound(
     content: null,
     embeds: [embed],
   });
+}
+
+async function getSourceImage(book: OpenLibraryTypes.Book) {
+  let coverInfo: string = await fetch(
+    `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}.json`
+  ).then((response: Response) => response.text());
+  if (coverInfo !== "not found") {
+    return await getBestFitCover(coverInfo);
+  }
+
+  // If we don't immediately have a cover from the first query, check the editions
+  const editions: OpenLibraryTypes.Edition[] = await fetch(
+    `http://openlibrary.org${book.key}/editions.json`
+  )
+    .then((response: Response) => response.json())
+    .then(
+      (worksEditions: OpenLibraryTypes.WorksEditions) => worksEditions.entries
+    );
+  const bestFitEdition: OpenLibraryTypes.Edition | undefined = editions.find(
+    (edition: OpenLibraryTypes.Edition) => edition.ocaid === book.ia?.[0]
+  );
+  if (bestFitEdition) {
+    coverInfo = await fetch(
+      `https://covers.openlibrary.org/b/id/${bestFitEdition.covers[0]}.json`
+    ).then((response: Response) => response.text());
+    if (coverInfo !== "not found") {
+      return await getBestFitCover(coverInfo);
+    }
+  }
+
+  // If we weren't able to find a best fit edition,
+  // we need to do more work
+  return BOOKS_INVALID_IMAGE_URL;
+}
+
+async function getBestFitCover(coverInfo: string) {
+  const parsedCoverInfo: OpenLibraryTypes.Cover = JSON.parse(coverInfo);
+  const largestImageSize: string = parsedCoverInfo.filename_l
+    ? "L"
+    : parsedCoverInfo.filename_m
+    ? "M"
+    : "S";
+  return parsedCoverInfo.source_url !== ""
+    ? parsedCoverInfo.source_url
+    : `https://covers.openlibrary.org/b/olid/${parsedCoverInfo.olid}-${largestImageSize}.jpg`;
 }
 
 async function getGoodreadsDescription(

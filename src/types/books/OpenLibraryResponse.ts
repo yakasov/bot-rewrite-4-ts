@@ -29,7 +29,7 @@ export namespace OpenLibraryTypes {
     title: string;
   }
 
-  export interface Work {
+  export interface Work extends RevisionHistory {
     title: string;
     key: string;
     authors: {
@@ -37,21 +37,117 @@ export namespace OpenLibraryTypes {
       type: { key: string };
     }[];
     type: { key: string };
-    description?: string | {
-      type: string;
-      value: string;
-    };
+    description?: string | TypeValue;
     covers?: number[];
     subjects?: string[];
+  }
+
+  export interface TypeValue {
+    type: string;
+    value: string;
+  }
+
+  export interface WorksEditions {
+    links: {
+      self: string;
+      work: string;
+    };
+    size: number;
+    entries: Edition[];
+  }
+
+  export interface Edition extends RevisionHistory {
+    works: {
+      key: string;
+    }[];
+    title: string;
+    publishers: string[];
+    key: string;
+    type: {
+      key: string;
+    };
+    identifiers: Identifiers;
+    covers: number[];
+    isbn_13?: string[];
+    isbn_10?: string[];
+    oclc_numbers?: string[];
+    contributors?: Contributor[];
+    by_statement?: string;
+    languages?: {
+      key: string;
+    }[];
+    physical_format?: string;
+    pagination?: string;
+    publish_date?: string;
+    source_records?: string[];
+    number_of_pages?: number;
+    subjects: string[];
+    edition_name?: string;
+    first_sentence?: TypeValue;
+    series?: string[];
+    classifications?: any;
+    lc_classifications?: string[];
+    physical_dimensions?: string;
+    publish_places?: string[];
+    publish_country?: string;
+    subtitle?: string;
+    local_id?: string[];
+    ocaid?: string;
+    translation_of?: string;
+    other_titles?: string[];
+    work_titles?: string[];
+    contributions?: string[];
+    dewey_decimal_class?: string[];
+    weight?: string;
+    uri_descriptions?: string[];
+    uris?: string[];
+    notes?: string;
+  }
+
+  export interface Identifiers {
+    bookbrainz?: string[];
+    amazon?: string[];
+    goodreads?: string[];
+    musicbrainz?: string[];
+    librarything?: string[];
+    overdrive?: string[];
+    wikidata?: string[];
+  }
+
+  export interface Contributor {
+    role: string;
+    name: string;
+  }
+
+  export interface RevisionHistory {
     latest_revision: number;
     revision: number;
-    created: {
-      type: string;
-      value: string;
-    };
-    last_modified: {
-      type: string;
-      value: string;
-    }
+    created: TypeValue;
+    last_modified: TypeValue;
+  }
+
+  export interface Cover {
+    id: number;
+    category_id: number;
+    olid: string;
+    filename: string;
+    author: string;
+    ip: string;
+    source_url: string;
+    source?: string;
+    isbn?: string;
+    created: string;
+    last_modified: string;
+    archived: boolean;
+    failed: boolean;
+    width: number;
+    height: number;
+    filename_s: string;
+    filename_m: string;
+    filename_l: string;
+    isbn13?: string;
+    uploaded: boolean;
+    deleted: boolean;
+    filename_old?: string;
   }
 }
