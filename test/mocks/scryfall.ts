@@ -12,7 +12,7 @@ import {
   Legalities,
   Rarity,
   SetType,
-} from "scryfall-api";
+} from "yakasov-scryfall-api";
 
 export const mockCardCore = {
   id: "card-id",

@@ -1,6 +1,6 @@
 import { PricingData } from "../types/scryfall/PricingData";
 import { OracleResponse } from "../types/scryfall/OracleResponse";
-import { Card, Prices } from "scryfall-api";
+import { Card, Prices } from "yakasov-scryfall-api";
 import { URL_SCRYFALL_ORACLE } from "../consts/constants";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];

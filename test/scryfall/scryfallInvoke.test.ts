@@ -1,4 +1,4 @@
-import { Cards } from "scryfall-api";
+import { Cards } from "yakasov-scryfall-api";
 import * as TestModule from "../../src/scryfall/scryfallInvoke";
 import { mockDMChannel, mockMessage } from "../mocks/discord";
 

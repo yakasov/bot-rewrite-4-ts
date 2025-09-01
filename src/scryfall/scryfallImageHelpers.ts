@@ -2,7 +2,7 @@ import fs from "fs";
 import { IncomingMessage } from "http";
 import https from "https";
 import joinImages from "join-images";
-import { Card } from "scryfall-api";
+import { Card } from "yakasov-scryfall-api";
 import { Sharp } from "sharp";
 
 export async function getImageUrl(

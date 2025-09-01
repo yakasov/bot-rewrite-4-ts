@@ -1,5 +1,5 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { Card, Cards } from "scryfall-api";
+import { Card, Cards } from "yakasov-scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
 import { getLowestHighestData, to2DP } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
@@ -61,6 +61,13 @@ export async function getCardMessageObject(
     );
   }
 
+  if (cardDetails.game_changer) {
+    embed.setAuthor({
+      name: "This card is a Game Changer!",
+      iconURL: "attachment://diamond.png",
+    });
+  }
+
   const oracleId: string =
     cardDetails.oracle_id ?? cardDetails.card_faces?.[0].oracle_id ?? "";
   if (oracleId.length) {
@@ -89,6 +96,11 @@ export async function getCardMessageObject(
 
   return {
     embeds: [embed],
-    files: attachment ? [attachment] : [],
+    files: [
+      ...(attachment ? [attachment] : []),
+      ...(cardDetails.game_changer
+        ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
+        : []),
+    ],
   };
 }
