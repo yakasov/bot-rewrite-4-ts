@@ -9,7 +9,7 @@ import {
 import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
 import { Modifiers } from "../types/scryfall/Invoke";
-import { getCardMessageObject } from "./scryfallCardFound";
+import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 
 export async function scryfallShowCardList(
   message: Message,
@@ -21,9 +21,9 @@ export async function scryfallShowCardList(
 
   const selectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
     .setCustomId("scryfall_list_select")
-    .setPlaceholder("Choose a card")
+    .setPlaceholder("Select from other options...")
     .addOptions(
-      results.map((card: string, i: number) =>
+      results.slice(1).map((card: string, i: number) =>
         new StringSelectMenuOptionBuilder()
           .setLabel(`${i + 1}. ${card}`)
           .setValue(card)
@@ -37,7 +37,6 @@ export async function scryfallShowCardList(
   const cardMessageObject: any = await getCardMessageObject(message, results[0]);
   const multipleCardsMessage: Message = await message.channel.send({
     components: [row.toJSON()],
-    content: `Multiple cards found for "${cardName}"!`,
     embeds: cardMessageObject.embeds,
     files: cardMessageObject.files,
   });
@@ -68,10 +67,6 @@ export async function scryfallShowCardList(
     await scryfallGetCard(message, selectedValue, modifiers, true);
     await multipleCardsMessage.delete().catch((err) => console.error(err));
   } catch (err: any) {
-    console.error(err);
-    await multipleCardsMessage.edit({
-      components: [],
-      content: "No selection made in time.",
-    });
+    await multipleCardsMessage.delete().catch((err) => console.error(err));
   }
 }

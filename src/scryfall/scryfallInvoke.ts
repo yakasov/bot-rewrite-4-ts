@@ -41,27 +41,37 @@ export async function scryfallInvoke(message: Message): Promise<void> {
     const firstString: string = match.groups?.card ?? "";
 
     const modifiers: Modifiers = {
-      isExact: firstString.trim()[0] !== "?",
+      isFuzzy: firstString.trim()[0] === "?",
       isSyntax: firstString.trim()[0] === "*",
       isSpecificSet: match.groups?.set?.trim() ?? "",
       isSpecificNumber: parseInt(match.groups?.number?.trim() ?? "0"),
     };
     let cardName: string | undefined = firstString
       .trim()
-      .substring(Number(!modifiers.isExact))
+      .substring(Number(modifiers.isFuzzy))
       .substring(Number(modifiers.isSyntax));
 
     if (!cardName && !modifiers.isSpecificSet && !modifiers.isSpecificNumber)
       return;
 
     if (modifiers.isSyntax) {
-      cardName = SCRYFALL_SYNTAX_PREFIX + cardName
+      cardName = SCRYFALL_SYNTAX_PREFIX + cardName;
     }
 
     promises.push(scryfallGetCard(message, cardName, modifiers));
   }
 
+  let fetchingMultipleMessage: Message | undefined;
+  if (promises.length > 1) {
+    fetchingMultipleMessage = await message.reply(
+      `Fetching ${promises.length} cards...`
+    );
+  }
+
   await Promise.all(promises);
+  if (fetchingMultipleMessage) {
+    await fetchingMultipleMessage.delete().catch(console.error);
+  }
 }
 
 export async function scryfallGetCard(
@@ -73,7 +83,7 @@ export async function scryfallGetCard(
   let results: string[] = [""];
 
   if (modifiers.isSyntax) {
-    results = (await Cards.search(cardName).get(20)).map(
+    results = (await Cards.search(cardName).get(25)).map(
       (card: Card) => card.name
     );
   } else if (cardName) {
@@ -93,11 +103,11 @@ export async function scryfallGetCard(
    * _always_ go straight to scryfallCardFound, using the first result if multiple.
    */
   if (!results.length) {
-    scryfallNoCardFound(message, cardName);
+    await scryfallNoCardFound(message, cardName);
   } else if (
     results.length === 1 ||
     (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
-      modifiers.isExact) ||
+      !modifiers.isFuzzy) ||
     fromSelectMenu
   ) {
     await scryfallCardFound(

@@ -3,9 +3,13 @@ import { OracleResponse } from "../types/scryfall/OracleResponse";
 import { Card, Prices } from "scryfall-api";
 import { URL_SCRYFALL_ORACLE } from "../consts/constants";
 
-const acceptedPrices = ["usd", "usd_foil", "eur", "eur_foil"];
+const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
-export function convertPricesToGBP(prices: Prices): number[] {
+export function to2DP(number: number): string {
+  return (Math.round(number * 100) / 100).toFixed(2);
+}
+
+export function pricesToGBPArray(prices: Prices): number[] {
   return Object.entries(prices)
       .filter(([key, value]) => acceptedPrices.includes(key) && value !== null)
       .map(
@@ -46,7 +50,7 @@ export async function getLowestHighestData(
   
 
   Object.values(oracleCards).forEach((cardData: Card) => {
-    const convertedPrices = convertPricesToGBP(cardData.prices);
+    const convertedPrices = pricesToGBPArray(cardData.prices);
     const lowestPrice: number = Math.min(...convertedPrices) ?? Infinity;
     const highestPrice: number = Math.max(...convertedPrices) ?? -Infinity;
 

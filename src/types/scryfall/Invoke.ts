@@ -1,5 +1,5 @@
 export interface Modifiers {
-  isExact: boolean;
+  isFuzzy: boolean;
   isSyntax: boolean;
   isSpecificSet: string;
   isSpecificNumber: number;
