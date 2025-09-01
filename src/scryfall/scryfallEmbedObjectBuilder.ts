@@ -1,7 +1,7 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { Card, Cards } from "scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
-import { getLowestHighestData, pricesToGBPArray, to2DP } from "./scryfallHelpers";
+import { getLowestHighestData, to2DP } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
@@ -31,8 +31,6 @@ export async function getCardMessageObject(
   const attachment: AttachmentBuilder | null = isImageLocal
     ? new AttachmentBuilder(`${imageUrl}.jpg`)
     : null;
-  const foilOnly: boolean =
-    cardDetails.prices.usd === null && cardDetails.prices.usd_foil !== null;
   const releaseDate = moment(cardDetails.released_at);
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
@@ -40,30 +38,21 @@ export async function getCardMessageObject(
     cardDetails.legalities.commander === "legal"
       ? "Legal"
       : `Non-legal${unreleased ? "*" : ""}`;
-  const formattedPrice: number = Math.min(
-    ...pricesToGBPArray(cardDetails.prices)
-  );
-  const price: string = `£${
-    formattedPrice !== Infinity ? to2DP(formattedPrice) : "???"
-  }${foilOnly ? " (F)" : ""}`;
   const rarity: string =
     cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1);
-  const spacer: number = Math.floor(
-    (32 - legality.length - price.length - rarity.length) / 2
-  );
-
-  const footer: string = `${legality}${" ".repeat(
-    spacer + 1
-  )}${price}${" ".repeat(Number(unreleased) + spacer - 1)}${rarity}\n${
-    cardDetails.set_name
-  } (${cardDetails.set})${
-    unreleased ? `\n\n*Releases on ${releaseDate.format("Do MMM YYYY")}` : ""
-  }`;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(cardDetails.name)
     .setURL(cardDetails.scryfall_uri)
-    .setFooter({ text: footer });
+    .setDescription(`${cardDetails.set_name} (${cardDetails.set})\n*${rarity}*`)
+    .addFields({
+      name: "Legality",
+      value: `${legality}${
+        unreleased
+          ? `\n\n*Releases on ${releaseDate.format("Do MMM YYYY")}`
+          : ""
+      }`,
+    });
 
   if (imageUrl) {
     // EmbedBuilder.setImage actually checks that this is a valid URI!!!
@@ -79,16 +68,15 @@ export async function getCardMessageObject(
       await getLowestHighestData(oracleId);
 
     if (lowestHighestData) {
-      embed.addFields({
-        name: "Prices",
-        value:
+      embed.setFooter({
+        text:
           lowestHighestData.lowestPrice !== Infinity &&
           lowestHighestData.highestPrice !== -Infinity
-            ? `
-Lowest: [${lowestHighestData.lowestSet} @ \
-£${to2DP(lowestHighestData.lowestPrice)}](${lowestHighestData.lowestUrl})
-Highest: [${lowestHighestData.highestSet} @ \
-£${to2DP(lowestHighestData.highestPrice)}](${lowestHighestData.highestUrl})
+            ? `£${to2DP(lowestHighestData.lowestPrice)} (${
+                lowestHighestData.lowestSet
+              }) - £${to2DP(lowestHighestData.highestPrice)} (${
+                lowestHighestData.highestSet
+              })
 `
             : "No pricing data found!",
       });
