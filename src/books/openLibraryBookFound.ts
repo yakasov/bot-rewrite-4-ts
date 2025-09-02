@@ -1,13 +1,10 @@
-import HTMLParser, { HTMLElement } from "node-html-parser";
 import { Message, EmbedBuilder } from "discord.js";
-import {
-  BOOKS_GOODREADS_SEARCH_URL,
-  BOOKS_INVALID_IMAGE_URL,
-  REGEX_DISCORD_MESSAGE_LENGTH_SHORT,
-} from "../consts/constants";
+import { REGEX_DISCORD_MESSAGE_LENGTH_SHORT } from "../consts/constants";
 import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
 import { wrapCodeBlockString } from "../util/commonFunctions";
 import { isSendableChannel } from "../util/typeGuards";
+import { getSourceImage, getSourceDescription } from "./openLibraryHelpers";
+import { getWork } from "./openLibraryFetchers";
 
 export async function openBooksFound(
   message: Message,
@@ -26,10 +23,7 @@ export async function openBooksFound(
     return;
   }
 
-  const workInfo: OpenLibraryTypes.Work = await fetch(
-    `https://openlibrary.org${book.key}.json`
-  ).then((response: Response) => response.json());
-
+  const workInfo: OpenLibraryTypes.Work = await getWork(book.key);
   const authorString = book.author_name?.join(", ") ?? "Unknown Authors";
 
   const embed: EmbedBuilder = new EmbedBuilder()
@@ -39,12 +33,10 @@ export async function openBooksFound(
     .setImage(await getSourceImage(book))
     .addFields(
       [
-        workInfo.description
-          ? {
-              name: "Description",
-              value: await getGoodreadsDescription(book, workInfo),
-            }
-          : null,
+        {
+          name: "Description",
+          value: await getSourceDescription(book, workInfo),
+        },
         workInfo.subjects
           ? {
               name: "Tags",
@@ -58,88 +50,4 @@ export async function openBooksFound(
     content: null,
     embeds: [embed],
   });
-}
-
-async function getSourceImage(book: OpenLibraryTypes.Book) {
-  let coverInfo: string = await fetch(
-    `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}.json`
-  ).then((response: Response) => response.text());
-  if (coverInfo !== "not found") {
-    return await getBestFitCover(coverInfo);
-  }
-
-  // If we don't immediately have a cover from the first query, check the editions
-  const editions: OpenLibraryTypes.Edition[] = await fetch(
-    `http://openlibrary.org${book.key}/editions.json`
-  )
-    .then((response: Response) => response.json())
-    .then(
-      (worksEditions: OpenLibraryTypes.WorksEditions) => worksEditions.entries
-    );
-  const bestFitEdition: OpenLibraryTypes.Edition | undefined = editions.find(
-    (edition: OpenLibraryTypes.Edition) => edition.ocaid === book.ia?.[0]
-  );
-  if (bestFitEdition) {
-    coverInfo = await fetch(
-      `https://covers.openlibrary.org/b/id/${bestFitEdition.covers[0]}.json`
-    ).then((response: Response) => response.text());
-    if (coverInfo !== "not found") {
-      return await getBestFitCover(coverInfo);
-    }
-  }
-
-  // If we weren't able to find a best fit edition,
-  // we need to do more work
-  return BOOKS_INVALID_IMAGE_URL;
-}
-
-async function getBestFitCover(coverInfo: string) {
-  const parsedCoverInfo: OpenLibraryTypes.Cover = JSON.parse(coverInfo);
-  const largestImageSize: string = parsedCoverInfo.filename_l
-    ? "L"
-    : parsedCoverInfo.filename_m
-    ? "M"
-    : "S";
-  return parsedCoverInfo.source_url !== ""
-    ? parsedCoverInfo.source_url
-    : `https://covers.openlibrary.org/b/olid/${parsedCoverInfo.olid}-${largestImageSize}.jpg`;
-}
-
-async function getGoodreadsDescription(
-  book: OpenLibraryTypes.Book,
-  work: OpenLibraryTypes.Work
-): Promise<string> {
-  const isbn: string | undefined = book.ia
-    ?.find((i) => i.startsWith("isbn_"))
-    ?.replace("isbn_", "");
-
-  if (!isbn) {
-    return getDescription(work.description);
-  }
-
-  const pageHTML: string = await fetch(BOOKS_GOODREADS_SEARCH_URL + isbn).then(
-    (response: Response) => response.text()
-  );
-  const parsedHTML: HTMLElement = HTMLParser(pageHTML);
-  const description: string = parsedHTML.querySelectorAll(
-    ".DetailsLayoutRightParagraph__widthConstrained"
-  )?.[0].innerText;
-
-  if (!description) {
-    return getDescription(work.description);
-  }
-
-  return shortenDescription(description);
-}
-
-function shortenDescription(description: string) {
-  return description.length > 1000
-    ? description.slice(0, 1000) + "..."
-    : description;
-}
-
-function getDescription(description: OpenLibraryTypes.Work["description"]) {
-  const descriptionString =
-    typeof description === "string" ? description : description!.value;
-  return shortenDescription(descriptionString);
 }
