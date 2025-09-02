@@ -13,7 +13,8 @@ export const BASIC_JSON_FILES: string[] = [
   "./resources/roles.json",
 ];
 
-export const BOOKS_DESCRIPTION_ERROR: string = "The description is so unbelievably, undeniably fucked. This should never happen, oops";
+export const BOOKS_DESCRIPTION_ERROR: string =
+  "The description is so unbelievably, undeniably fucked. This should never happen, oops";
 export const BOOKS_GOODREADS_SEARCH_URL: string =
   "https://www.goodreads.com/search?utf8=✓&query=";
 export const BOOKS_INVALID_IMAGE_URL: string =
@@ -42,8 +43,9 @@ export const REGEX_YOUTUBE_URL_FULL: RegExp =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\/*/gu;
 
-export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING: string =
+export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_1: string =
   "[[minor spelling mistake]]";
+export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_2: string = "[[msm]]";
 export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
   "https://tenor.com/view/minor-spelling-mistake-dream-dream-youtuber-gif-13914252076385141995",
   "https://tenor.com/view/minor-spelling-mistake-spelling-mistake-gif-4898195786185830013",

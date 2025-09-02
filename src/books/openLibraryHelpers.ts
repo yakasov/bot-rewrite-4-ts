@@ -32,7 +32,11 @@ export async function getISBN(
     moment(a.publish_date).utc().diff(moment(b.publish_date).utc())
   );
   const recentEdition: OpenLibraryTypes.Edition | undefined = sortedEditions
-    .filter((edition) => edition.publish_date)
+    .filter(
+      (edition) =>
+        edition.publish_date &&
+        edition.languages?.some((language) => language.key === "/languages/eng")
+    )
     ?.pop();
   const editionISBN: string | undefined =
     recentEdition?.isbn_10?.[0] ?? recentEdition?.isbn_13?.[0];
