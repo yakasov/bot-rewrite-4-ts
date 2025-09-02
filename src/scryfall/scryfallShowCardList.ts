@@ -23,18 +23,23 @@ export async function scryfallShowCardList(
     .setCustomId("scryfall_list_select")
     .setPlaceholder("Select from other options...")
     .addOptions(
-      results.slice(1).map((card: string, i: number) =>
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`${i + 1}. ${card}`)
-          .setValue(card)
-      )
+      results
+        .slice(1)
+        .map((card: string, i: number) =>
+          new StringSelectMenuOptionBuilder()
+            .setLabel(`${i + 1}. ${card}`)
+            .setValue(card)
+        )
     );
 
   const row: ActionRowBuilder = new ActionRowBuilder().addComponents(
     selectMenu
   );
 
-  const cardMessageObject: any = await getCardMessageObject(message, results[0]);
+  const cardMessageObject: any = await getCardMessageObject(
+    message,
+    results[0]
+  );
   const multipleCardsMessage: Message = await message.channel.send({
     components: [row.toJSON()],
     embeds: cardMessageObject.embeds,
@@ -67,6 +72,12 @@ export async function scryfallShowCardList(
     await scryfallGetCard(message, selectedValue, modifiers, true);
     await multipleCardsMessage.delete().catch((err) => console.error(err));
   } catch (err: any) {
-    await multipleCardsMessage.delete().catch((err) => console.error(err));
+    await multipleCardsMessage
+      .edit({
+        components: [],
+        embeds: cardMessageObject.embeds,
+        files: cardMessageObject.files,
+      })
+      .catch((err) => console.error(err));
   }
 }
