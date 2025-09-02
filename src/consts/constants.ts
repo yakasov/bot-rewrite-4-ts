@@ -13,6 +13,7 @@ export const BASIC_JSON_FILES: string[] = [
   "./resources/roles.json",
 ];
 
+export const BOOKS_DESCRIPTION_ERROR: string = "The description is so unbelievably, undeniably fucked. This should never happen, oops";
 export const BOOKS_GOODREADS_SEARCH_URL: string =
   "https://www.goodreads.com/search?utf8=✓&query=";
 export const BOOKS_INVALID_IMAGE_URL: string =

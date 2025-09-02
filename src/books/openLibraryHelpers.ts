@@ -1,5 +1,8 @@
 import HTMLParser, { HTMLElement } from "node-html-parser";
-import { BOOKS_INVALID_IMAGE_URL } from "../consts/constants";
+import {
+  BOOKS_DESCRIPTION_ERROR,
+  BOOKS_INVALID_IMAGE_URL,
+} from "../consts/constants";
 import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
 import {
   getCoverById,
@@ -143,6 +146,8 @@ function shortenDescription(description: string) {
 
 function getDescription(description: OpenLibraryTypes.Work["description"]) {
   const descriptionString =
-    typeof description === "string" ? description : description!.value;
+    typeof description === "string"
+      ? description
+      : description?.value ?? BOOKS_DESCRIPTION_ERROR;
   return shortenDescription(descriptionString);
 }
