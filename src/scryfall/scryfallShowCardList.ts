@@ -13,7 +13,6 @@ import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 
 export async function scryfallShowCardList(
   message: Message,
-  cardName: string,
   results: string[],
   modifiers: Modifiers
 ): Promise<void> {
@@ -21,7 +20,7 @@ export async function scryfallShowCardList(
 
   const selectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
     .setCustomId("scryfall_list_select")
-    .setPlaceholder("Select from other options...")
+    .setPlaceholder("Select other cards...")
     .addOptions(
       results
         .slice(1)
@@ -32,16 +31,16 @@ export async function scryfallShowCardList(
         )
     );
 
-  const row: ActionRowBuilder = new ActionRowBuilder().addComponents(
+  const selectMenuRow: ActionRowBuilder = new ActionRowBuilder().addComponents(
     selectMenu
   );
 
-  const cardMessageObject: any = await getCardMessageObject(
+  const [, cardMessageObject]: any = await getCardMessageObject(
     message,
     results[0]
   );
   const multipleCardsMessage: Message = await message.channel.send({
-    components: [row.toJSON()],
+    components: [selectMenuRow.toJSON()],
     embeds: cardMessageObject.embeds,
     files: cardMessageObject.files,
   });

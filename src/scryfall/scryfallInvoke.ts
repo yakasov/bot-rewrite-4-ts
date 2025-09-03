@@ -120,7 +120,7 @@ export async function scryfallGetCard(
       modifiers.isSpecificNumber
     );
   } else {
-    await scryfallShowCardList(message, cardName, results, modifiers);
+    await scryfallShowCardList(message, results, modifiers);
   }
 }
 

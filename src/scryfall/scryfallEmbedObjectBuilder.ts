@@ -10,9 +10,21 @@ export async function getCardMessageObject(
   message: Message,
   cardName: string,
   set: string | undefined = undefined,
-  number: number | undefined = undefined
-): Promise<any> {
-  if (!isSendableChannel(message.channel)) return;
+  number: number | undefined = undefined,
+  indexString: string = ""
+): Promise<
+  [
+    Card | undefined,
+    (
+      | {
+          embeds?: EmbedBuilder[];
+          files?: AttachmentBuilder[];
+        }
+      | undefined
+    )
+  ]
+> {
+  if (!isSendableChannel(message.channel)) return [, ,];
 
   const cardDetails: Card | undefined = number
     ? await Cards.bySet(set!, number)
@@ -22,7 +34,7 @@ export async function getCardMessageObject(
     await message.channel.send(
       `Ran into an error fetching ${cardName} for set ${set} and number ${number}!`
     );
-    return;
+    return [, ,];
   }
 
   const [isImageLocal, imageUrl]: [boolean, string] = await getImageUrl(
@@ -35,24 +47,29 @@ export async function getCardMessageObject(
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
   const legality: string =
-    cardDetails.legalities.commander === "legal"
-      ? "Legal"
-      : `Non-legal${unreleased ? "*" : ""}`;
+    cardDetails.legalities.commander === "legal" ? "Legal" : `Non-legal`;
   const rarity: string =
     cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1);
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(cardDetails.name)
     .setURL(cardDetails.scryfall_uri)
-    .setDescription(`${cardDetails.set_name} (${cardDetails.set})\n*${rarity}*`)
-    .addFields({
-      name: "Legality",
-      value: `${legality}${
-        unreleased
-          ? `\n\n*Releases on ${releaseDate.format("Do MMM YYYY")}`
-          : ""
-      }`,
-    });
+    .addFields(
+      {
+        name: "Description",
+        value: `${cardDetails.set_name} (${cardDetails.set})\n*${rarity}*`,
+        inline: true,
+      },
+      {
+        name: "Legality",
+        value: `${legality}${
+          unreleased
+            ? `\n*Releases on ${releaseDate.format("Do MMM YYYY")}*`
+            : ""
+        }`,
+        inline: true,
+      }
+    );
 
   if (imageUrl) {
     // EmbedBuilder.setImage actually checks that this is a valid URI!!!
@@ -75,17 +92,17 @@ export async function getCardMessageObject(
       await getLowestHighestData(oracleId);
 
     if (lowestHighestData) {
+      const text: string =
+        lowestHighestData.lowestPrice !== Infinity &&
+        lowestHighestData.highestPrice !== -Infinity
+          ? `£${to2DP(lowestHighestData.lowestPrice)} (${
+              lowestHighestData.lowestSet
+            }) - £${to2DP(lowestHighestData.highestPrice)} (${
+              lowestHighestData.highestSet
+            })`
+          : "No pricing data found!";
       embed.setFooter({
-        text:
-          lowestHighestData.lowestPrice !== Infinity &&
-          lowestHighestData.highestPrice !== -Infinity
-            ? `£${to2DP(lowestHighestData.lowestPrice)} (${
-                lowestHighestData.lowestSet
-              }) - £${to2DP(lowestHighestData.highestPrice)} (${
-                lowestHighestData.highestSet
-              })
-`
-            : "No pricing data found!",
+        text: text + indexString,
       });
     }
   } else {
@@ -94,13 +111,16 @@ export async function getCardMessageObject(
     );
   }
 
-  return {
-    embeds: [embed],
-    files: [
-      ...(attachment ? [attachment] : []),
-      ...(cardDetails.game_changer
-        ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
-        : []),
-    ],
-  };
+  return [
+    cardDetails,
+    {
+      embeds: [embed],
+      files: [
+        ...(attachment ? [attachment] : []),
+        ...(cardDetails.game_changer
+          ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
+          : []),
+      ],
+    },
+  ];
 }
