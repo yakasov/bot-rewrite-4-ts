@@ -1,12 +1,12 @@
 import { BOOKS_GOODREADS_SEARCH_URL } from "../consts/constants";
-import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
+import type { Edition, Work, WorksEditions } from "../types/books/OpenLibraryResponse.d.ts";
 
 const badResponses = ["not found", "404 Not Found"];
-let cachedResponses: {
-  covers: { [key: string]: string | undefined };
-  editions: { [key: string]: OpenLibraryTypes.Edition[] };
-  goodreads: { [key: string]: string };
-  works: { [key: string]: OpenLibraryTypes.Work };
+const cachedResponses: {
+  covers: Record<string, string | undefined>;
+  editions: Record<string, Edition[]>;
+  goodreads: Record<string, string>;
+  works: Record<string, Work>;
 } = {
   covers: {},
   editions: {},
@@ -33,14 +33,14 @@ export async function getCoverById(
 
 export async function getEditions(
   key: string
-): Promise<OpenLibraryTypes.Edition[]> {
+): Promise<Edition[]> {
   if (!cachedResponses.editions[key])
     cachedResponses.editions[key] = await fetch(
       `http://openlibrary.org${key}/editions.json`
     )
       .then((response: Response) => response.json())
       .then(
-        (worksEditions: OpenLibraryTypes.WorksEditions) => worksEditions.entries
+        (worksEditions: WorksEditions) => worksEditions.entries
       );
 
   return cachedResponses.editions[key];
@@ -56,7 +56,7 @@ export async function getGoodreadsPage(isbn: string): Promise<string> {
   return cachedResponses.goodreads[isbn];
 }
 
-export async function getWork(key: string): Promise<OpenLibraryTypes.Work> {
+export async function getWork(key: string): Promise<Work> {
   if (!cachedResponses.works[key]) {
     cachedResponses.works[key] = await fetch(
       `https://openlibrary.org${key}.json`

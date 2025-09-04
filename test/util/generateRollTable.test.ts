@@ -2,8 +2,8 @@ import * as TestModule from "../../src/util/generateRollTable";
 import chanceResponsesJSON from "../../resources/chanceResponses.json";
 import { ChanceResponse } from "../../src/types/JSON";
 
-const chanceResponses: { [key: string]: ChanceResponse } =
-  chanceResponsesJSON as { [key: string]: ChanceResponse };
+const chanceResponses: Record<string, ChanceResponse> =
+  chanceResponsesJSON as Record<string, ChanceResponse>;
 
 describe("generateRollTable", () => {
   it("should generate a roll table with normalized chances", () => {

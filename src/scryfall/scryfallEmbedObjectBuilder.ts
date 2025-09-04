@@ -1,21 +1,17 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { Card } from "yakasov-scryfall-api";
-import { PricingData } from "../types/scryfall/PricingData";
+import type { PricingData } from "../types/scryfall/PricingData.d.ts";
 import { getLowestHighestData, to2DP } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
+import type { EmbedObject } from "../types/scryfall/Invoke.d.ts";
 
 export async function getCardMessageObject(
   message: Message,
   cardDetails: Card,
-  indexString: string = ""
-): Promise<
-  | {
-      embeds?: EmbedBuilder[];
-      files?: AttachmentBuilder[];
-    }
-  | undefined
+  indexString = ""
+): Promise<EmbedObject | undefined
 > {
   if (!isSendableChannel(message.channel)) return;
 

@@ -6,8 +6,8 @@ import {
   SlashCommandBooleanOption,
   ChatInputCommandInteraction,
 } from "discord.js";
-import { BotContext } from "../../types/BotContext";
-import { UserStats } from "../../types/Stats";
+import type { BotContext } from "../../types/BotContext.d.ts";
+import type { UserStats } from "../../types/Stats.d.ts";
 
 export default {
   data: new SlashCommandBuilder()
@@ -35,19 +35,19 @@ export default {
     interaction: ChatInputCommandInteraction,
     context: BotContext
   ): Promise<void> {
-    if (!context.stats) return;
+    if (!context.stats || !interaction.guild) return;
 
-    const userId: string = interaction.options.getUser("user")?.id!;
-    const attribute: string = interaction.options.getString("attribute")!;
-    const value: string = interaction.options.getString("value")!;
+    const userId: string = interaction.options.getUser("user")?.id as string;
+    const attribute: string = interaction.options.getString("attribute") as string;
+    const value: string = interaction.options.getString("value") as string;
     const add: boolean = interaction.options.getBoolean("add") ?? false;
     const userStats: UserStats =
-      context.stats[interaction.guild?.id!].users[userId];
+      context.stats[interaction.guild.id].users[userId];
 
     await interaction.client.application.fetch();
     if (
       interaction.user === interaction.client.application.owner ||
-      interaction.user.id === (await interaction.guild?.fetchOwner()!).user.id
+      interaction.user.id === (await interaction.guild.fetchOwner()).user.id
     ) {
       try {
         if (value === null) {
@@ -78,8 +78,8 @@ export default {
           `Set user ${userId} attribute ${attribute} to value ${userStats[attribute]}`
         );
         return;
-      } catch (err: any) {
-        await interaction.reply(err.message);
+      } catch (err: unknown) {
+        console.error(err);
         return;
       }
     }

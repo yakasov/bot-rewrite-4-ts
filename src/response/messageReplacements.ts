@@ -35,9 +35,9 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
    * and if true, we can apply the regex replacement, but only
    * for the matching regex (since 'for of TWITTER_LINKS' will try it twice).
    */
-  let contentArray: string[] = message.content.split(" ");
-  let replacedContentArray: string[] = [];
-  for (let word of contentArray) {
+  const contentArray: string[] = message.content.split(" ");
+  const replacedContentArray: string[] = [];
+  for (const word of contentArray) {
     if (word.includes("status")) {
       for (const [replacement, regex] of Object.entries(TWITTER_LINKS)) {
         if (regex.test(word)) {
@@ -49,14 +49,18 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
     }
   }
 
-  const content: string = `${getNicknameFromMessage(
+  const content = `${getNicknameFromMessage(
     message
   )} sent:\n${replacedContentArray.join(" ")}`;
 
-  if (message.reference && message.reference.channelId === message.channel.id) {
+  if (
+    message.reference &&
+    message.reference.messageId &&
+    message.reference.channelId === message.channel.id
+  ) {
     // messageId is a snowflake? so hopefully enforcing it as not-null works
     const replyMessage: Message = await message.channel.messages.fetch(
-      message.reference.messageId!
+      message.reference.messageId
     );
     await replyMessage.reply(content);
   } else {

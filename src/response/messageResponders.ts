@@ -1,14 +1,12 @@
 import { Message, StickerResolvable } from "discord.js";
 import chanceResponsesJson from "../../resources/chanceResponses.json";
-import { ChanceResponse } from "../types/JSON";
+import type { ChanceResponse } from "../types/JSON.d.ts";
 import { getNicknameFromMessage } from "./responseHelpers";
-import { BotContext } from "../types/BotContext";
+import type { BotContext } from "../types/BotContext.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
 
-const chanceResponses: { [key: string]: ChanceResponse } =
-  chanceResponsesJson as {
-    [key: string]: ChanceResponse;
-  };
+const chanceResponses: Record<string, ChanceResponse> =
+  chanceResponsesJson as Record<string, ChanceResponse>;
 
 export async function replyWithHypeMessage(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
@@ -34,7 +32,7 @@ export async function sendCustomResponse(
   }
 
   if (response.includes("{FOLLOWING}")) {
-    let lastMessage: string = "";
+    let lastMessage = "";
     if (
       message.content.toLowerCase().trim() === key ||
       message.content.toLowerCase().trim().endsWith(key)

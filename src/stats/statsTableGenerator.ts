@@ -1,4 +1,4 @@
-import { TableData } from "../types/Stats";
+import type { TableData } from "../types/Stats.d.ts";
 
 export function generateTable(data: TableData[]): string {
   if (!data || data.length === 0) {
@@ -16,7 +16,7 @@ export function generateTable(data: TableData[]): string {
       })
     ));
 
-  let tableString: string = `${headers
+  let tableString = `${headers
     .map((header: string, index: number) => {
       if (header === "★") {
         return null;

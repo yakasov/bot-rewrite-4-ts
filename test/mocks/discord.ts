@@ -85,7 +85,7 @@ export function mockDMChannel() {
   } as any;
 }
 
-export function mockBaseMessage(content: string = "Test message content") {
+export function mockBaseMessage(content = "Test message content") {
   return {
     attachments: new Collection(),
     author: mockUser(),
@@ -97,7 +97,7 @@ export function mockBaseMessage(content: string = "Test message content") {
   } as any;
 }
 
-export function mockMessage(content: string = "Test message content") {
+export function mockMessage(content = "Test message content") {
   return {
     channel: mockTextChannel(),
     guild: mockGuild(),

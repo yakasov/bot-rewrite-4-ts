@@ -3,7 +3,7 @@ import {
   BOOKS_DESCRIPTION_ERROR,
   BOOKS_INVALID_IMAGE_URL,
 } from "../consts/constants";
-import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
+import type { Book, Cover, Edition, Work } from "../types/books/OpenLibraryResponse.d.ts";
 import {
   getCoverById,
   getEditions,
@@ -12,7 +12,7 @@ import {
 import moment from "moment-timezone";
 
 export async function getISBN(
-  book: OpenLibraryTypes.Book
+  book: Book
 ): Promise<string | undefined> {
   const sourceISBN: string | undefined = book.ia
     ?.find((i) => i.startsWith("isbn_"))
@@ -27,11 +27,11 @@ export async function getISBN(
 
   // If we have multiple editions, we need to find the best fit edition
   // Usually this will be the *first* edition
-  const editions: OpenLibraryTypes.Edition[] = await getEditions(book.key);
+  const editions: Edition[] = await getEditions(book.key);
   const sortedEditions = editions.sort((a, b) =>
     moment(a.publish_date).utc().diff(moment(b.publish_date).utc())
   );
-  const recentEdition: OpenLibraryTypes.Edition | undefined = sortedEditions
+  const recentEdition: Edition | undefined = sortedEditions
     .filter(
       (edition) =>
         edition.publish_date &&
@@ -45,7 +45,7 @@ export async function getISBN(
 }
 
 export async function getSourceImage(
-  book: OpenLibraryTypes.Book
+  book: Book
 ): Promise<string> {
   /*
    * Goodreads probably has the best image available
@@ -71,13 +71,17 @@ export async function getSourceImage(
   }
 
   // If we don't immediately have a cover from the first query, check the editions
-  const bestFitEdition: OpenLibraryTypes.Edition | undefined = (
+  const bestFitEdition: Edition | undefined = (
     await getEditions(book.key)
-  ).find((edition: OpenLibraryTypes.Edition) => edition.ocaid === book.ia?.[0]);
-  if (bestFitEdition?.covers?.length! > 0) {
+  ).find((edition: Edition) => edition.ocaid === book.ia?.[0]);
+  if (
+    bestFitEdition &&
+    bestFitEdition.covers &&
+    bestFitEdition.covers.length > 0
+  ) {
     const coverInfoById: string | undefined = await getCoverById(
       book.key,
-      bestFitEdition!.covers[0].toString(),
+      bestFitEdition.covers[0].toString(),
       "id"
     );
     if (coverInfoById) {
@@ -91,7 +95,7 @@ export async function getSourceImage(
 }
 
 async function getBestFitCover(coverInfo: string) {
-  const parsedCoverInfo: OpenLibraryTypes.Cover = JSON.parse(coverInfo);
+  const parsedCoverInfo: Cover = JSON.parse(coverInfo);
   const largestImageSize: string = parsedCoverInfo.filename_l
     ? "L"
     : parsedCoverInfo.filename_m
@@ -103,7 +107,7 @@ async function getBestFitCover(coverInfo: string) {
 }
 
 async function getGoodreadsImage(
-  book: OpenLibraryTypes.Book
+  book: Book
 ): Promise<string | undefined> {
   const isbn: string | undefined = await getISBN(book);
 
@@ -119,8 +123,8 @@ async function getGoodreadsImage(
 }
 
 export async function getSourceDescription(
-  book: OpenLibraryTypes.Book,
-  work: OpenLibraryTypes.Work
+  book: Book,
+  work: Work
 ): Promise<string> {
   const isbn: string | undefined = await getISBN(book);
 
@@ -148,7 +152,7 @@ function shortenDescription(description: string) {
     : description;
 }
 
-function getDescription(description: OpenLibraryTypes.Work["description"]) {
+function getDescription(description: Work["description"]) {
   const descriptionString =
     typeof description === "string"
       ? description

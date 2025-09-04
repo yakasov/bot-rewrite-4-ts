@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { BotContext } from "../types/BotContext";
+import type { BotContext } from "../types/BotContext.d.ts";
 import {
   REGEX_STEAM_LINK,
   REGEX_TIME_MATCH,
@@ -14,9 +14,7 @@ import {
   sendCustomResponse,
 } from "./messageResponders";
 
-const responses: { [key: string]: string } = responsesJson as {
-  [key: string]: string;
-};
+const responses: Record<string, string> = responsesJson as Record<string, string>;
 
 export async function checkMessageInvoke(
   message: Message,

@@ -1,8 +1,7 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import moment from "moment-timezone";
-import { Config } from "../types/Config";
-import { Stats } from "../types/Stats";
-import { BotContext } from "../types/BotContext";
+import type { Config } from "../types/Config.d.ts";
+import type { BotContext } from "../types/BotContext.d.ts";
 import { generateRollTable } from "../util/generateRollTable";
 
 export function createBotContext(

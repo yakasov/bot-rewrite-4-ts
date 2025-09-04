@@ -6,19 +6,19 @@ import {
   StringSelectMenuInteraction,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
+import type { Book } from "../types/books/OpenLibraryResponse.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
 import { openBooksFound } from "./openLibraryBookFound";
 
 export async function openLibraryShowBookList(
   message: Message,
   replyMessage: Message,
-  results: OpenLibraryTypes.Book[],
+  results: Book[],
   input: string
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  const uniqueResults: OpenLibraryTypes.Book[] = results
+  const uniqueResults: Book[] = results
     .filter(
       (book, index, self) =>
         index ===
@@ -34,7 +34,7 @@ export async function openLibraryShowBookList(
     .setCustomId("openlibrary_book_select")
     .setPlaceholder("Choose a book")
     .addOptions(
-      uniqueResults.map((book: OpenLibraryTypes.Book, i: number) =>
+      uniqueResults.map((book: Book, i: number) =>
         new StringSelectMenuOptionBuilder()
           .setLabel(
             `${i + 1}. ${book.title} by ${
@@ -78,10 +78,10 @@ export async function openLibraryShowBookList(
     await openBooksFound(
       message,
       replyMessage,
-      uniqueResults.find((result) => result.key === selectedValue)!
+      uniqueResults.find((result) => result.key === selectedValue) as Book
     );
     await multipleBooksMessage.delete().catch((err) => console.error(err));
-  } catch (err: any) {
+  } catch {
     await multipleBooksMessage.edit({
       components: [],
       content: "No selection made in time.",

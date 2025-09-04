@@ -4,3 +4,8 @@ export interface Modifiers {
   isSpecificSet: string;
   isSpecificNumber: number;
 }
+
+export interface EmbedObject {
+  embeds?: EmbedBuilder[];
+  files?: AttachmentBuilder[];
+}

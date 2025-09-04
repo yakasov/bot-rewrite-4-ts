@@ -1,6 +1,6 @@
 import { Message, EmbedBuilder } from "discord.js";
 import { REGEX_DISCORD_MESSAGE_LENGTH_SHORT } from "../consts/constants";
-import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
+import type { Book, Work } from "../types/books/OpenLibraryResponse.d.ts";
 import { wrapCodeBlockString } from "../util/commonFunctions";
 import { isSendableChannel } from "../util/typeGuards";
 import { getSourceImage, getSourceDescription } from "./openLibraryHelpers";
@@ -9,7 +9,7 @@ import { getWork } from "./openLibraryFetchers";
 export async function openBooksFound(
   message: Message,
   replyMessage: Message,
-  book: OpenLibraryTypes.Book
+  book: Book
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -23,7 +23,7 @@ export async function openBooksFound(
     return;
   }
 
-  const workInfo: OpenLibraryTypes.Work = await getWork(book.key);
+  const workInfo: Work = await getWork(book.key);
   const authorString = book.author_name?.join(", ") ?? "Unknown Authors";
 
   const embed: EmbedBuilder = new EmbedBuilder()

@@ -19,13 +19,15 @@ export async function getImageUrl(
 }
 
 export async function combineImages(card: Card): Promise<string> {
-  const baseFilePath: string = `./resources/scryfall/images/${card.id}`;
+  const baseFilePath = `./resources/scryfall/images/${card.id}`;
 
   const filePaths: string[] = await Promise.all([
     downloadImage(card, 0, baseFilePath),
     downloadImage(card, 1, baseFilePath),
   ]);
-  const image: Sharp | undefined = await joinImages(filePaths, { direction: "horizontal" }).catch((err: any) => undefined);
+  const image: Sharp | undefined = await joinImages(filePaths, {
+    direction: "horizontal",
+  }).catch(() => undefined);
   if (!image) return "";
   await image.toFile(`${baseFilePath}.jpg`);
 
@@ -37,7 +39,7 @@ export function downloadImage(
   card: Card,
   i: number,
   baseFilePath: string
-): Promise<any> {
+): Promise<string> {
   if (!card.card_faces?.[i].image_uris?.large) return new Promise(() => {});
 
   return new Promise((resolve, reject) => {
@@ -46,7 +48,7 @@ export function downloadImage(
     );
     https
       .get(
-        card.card_faces?.[i].image_uris?.large!,
+        card.card_faces?.[i].image_uris?.large as string,
         (response: IncomingMessage) => {
           response.pipe(file);
 
@@ -70,7 +72,7 @@ export async function deleteFiles(filePaths: string[]): Promise<void> {
     filePaths.map(
       (filePath: string) =>
         new Promise<void>((resolve, reject) => {
-          fs.unlink(filePath, (err: any) => {
+          fs.unlink(filePath, (err: unknown) => {
             if (err) {
               reject(err);
             } else {

@@ -1,9 +1,7 @@
-import { PricingData } from "../types/scryfall/PricingData";
-import { OracleResponse } from "../types/scryfall/OracleResponse";
+import type { PricingData } from "../types/scryfall/PricingData.d.ts";
+import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
 import { Card, Cards, Prices } from "yakasov-scryfall-api";
 import { URL_SCRYFALL_ORACLE } from "../consts/constants";
-import { Message } from "discord.js";
-import { isSendableChannel } from "../util/typeGuards";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -15,7 +13,7 @@ export function pricesToGBPArray(prices: Prices): number[] {
   return Object.entries(prices)
     .filter(([key, value]) => acceptedPrices.includes(key) && value !== null)
     .map(
-      ([key, value]) => parseFloat(value!) * (key.includes("usd") ? 0.75 : 0.87)
+      ([key, value]) => parseFloat(value) * (key.includes("usd") ? 0.75 : 0.87)
     );
 }
 
@@ -81,8 +79,8 @@ export async function getCardDetails(
   set: string | undefined = undefined,
   number: number | undefined = undefined
 ): Promise<Card | undefined> {
-  const cardDetails: Card | undefined = number
-    ? await Cards.bySet(set!, number)
+  const cardDetails: Card | undefined = set && number
+    ? await Cards.bySet(set, number)
     : await Cards.byName(cardName, set, false);
 
   return cardDetails;

@@ -1,10 +1,9 @@
 import { Guild, TextChannel } from "discord.js";
 import {
   GenericBooleanObject,
-  GenericObject,
   GenericStringObject,
 } from "../types/Generic";
-import { FortniteTypes } from "../types/responses/FortniteResponse";
+import { Entry, FestivalItem, FestivalItems, FortniteResponse, ResponseData } from "../types/responses/FortniteResponse";
 import { URL_FORTNITE_API, URL_FORTNITE_SONGS } from "../consts/constants";
 import { BotContext } from "../types/BotContext";
 
@@ -19,7 +18,7 @@ export const emoteMessages: GenericStringObject = {
 };
 
 export async function getFortniteShop(): Promise<
-  FortniteTypes.ResponseData | undefined
+  ResponseData | undefined
 > {
   try {
     const response: Response = await fetch(URL_FORTNITE_API);
@@ -28,16 +27,16 @@ export async function getFortniteShop(): Promise<
       return undefined;
     }
 
-    const data: FortniteTypes.Response | undefined = await response.json();
+    const data: FortniteResponse | undefined = await response.json();
     return data?.data;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching Fortnite shop:", err);
     return undefined;
   }
 }
 
 export async function getFestivalData(): Promise<
-  FortniteTypes.FestivalItem[] | undefined
+  FestivalItem[] | undefined
 > {
   try {
     const response: Response = await fetch(URL_FORTNITE_SONGS);
@@ -46,9 +45,9 @@ export async function getFestivalData(): Promise<
       return undefined;
     }
 
-    const data: FortniteTypes.FestivalItems | undefined = await response.json();
+    const data: FestivalItems | undefined = await response.json();
     return data ? Object.values(data) : undefined;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching Fortnite Festival data:", err);
     return undefined;
   }
@@ -83,17 +82,17 @@ export async function checkFortnite(context: BotContext): Promise<void> {
     return;
   }
 
-  const data: FortniteTypes.ResponseData | undefined = await getFortniteShop();
-  const festivalData: FortniteTypes.FestivalItem[] | undefined =
+  const data: ResponseData | undefined = await getFortniteShop();
+  const festivalData: FestivalItem[] | undefined =
     await getFestivalData();
 
   if (data?.entries && context.config.fortnite?.checkEmotes) {
     const emotes: string[] = data.entries
       .filter(
-        (entry: GenericObject) =>
+        (entry: Entry) =>
           entry.brItems && entry.brItems[0].type.value === "emote"
       )
-      .map((entry: GenericObject) => entry.brItems[0].name);
+      .map((entry: Entry) => entry.brItems?.[0].name ?? "");
 
     for (const emote in emoteFlags) {
       if (emotes.includes(emote) && !emoteFlags[emote]) {
@@ -107,9 +106,9 @@ export async function checkFortnite(context: BotContext): Promise<void> {
 
   if (festivalData && context.config.fortnite?.checkSongs) {
     const songs: string[] = festivalData
-      .filter((entry: FortniteTypes.FestivalItem) => entry.featured)
+      .filter((entry: FestivalItem) => entry.featured)
       .map(
-        (entry: FortniteTypes.FestivalItem) =>
+        (entry: FestivalItem) =>
           `${entry.title} - ${entry.artist}`
       );
 

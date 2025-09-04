@@ -72,14 +72,14 @@ describe("levelUp", () => {
 
 describe("getLevelName", () => {
   it("should return expected name for given level", () => {
-    const ranks = ranksJSON as { [key: string]: string };
+    const ranks = ranksJSON as Record<string, string>;
     const levelName = TestModule.getLevelName(20);
 
     expect(levelName).toBe(`${ranks["3"]}\u001b[0m`);
   });
 
   it("should return highest name if level exceeds highest name level", () => {
-    const ranks = ranksJSON as { [key: string]: string };
+    const ranks = ranksJSON as Record<string, string>;
     const highestRank = Object.keys(ranks).pop() as string;
     const levelName = TestModule.getLevelName(500);
 

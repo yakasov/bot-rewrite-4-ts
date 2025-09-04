@@ -1,5 +1,5 @@
-import { FortniteTypes } from "../../src/types/responses/FortniteResponse";
-import { MinecraftTypes } from "../../src/types/responses/MinecraftResponse";
+import { FortniteResponse } from "../../src/types/responses/FortniteResponse";
+import { MinecraftResponse } from "../../src/types/responses/MinecraftResponse";
 
 export function mockResponse(responseData: any): Response {
   return {
@@ -13,7 +13,7 @@ export function mockResponse(responseData: any): Response {
   } as Response;
 }
 
-export function mockFortniteResponse(): FortniteTypes.Response {
+export function mockFortniteResponse(): FortniteResponse {
   return {
     status: 200,
     data: {
@@ -229,7 +229,7 @@ export function mockFortniteFestivalResponse() {
   };
 }
 
-export function mockMinecraftResponse(): MinecraftTypes.Response {
+export function mockMinecraftResponse(): MinecraftResponse {
   return {
     eula_blocked: false,
     expires_at: Date.now(),

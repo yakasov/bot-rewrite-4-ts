@@ -3,8 +3,8 @@ import {
   Interaction,
   SlashCommandBuilder,
 } from "discord.js";
-import { BotContext } from "../../types/BotContext";
-import { GuildStats, TableData } from "../../types/Stats";
+import type { BotContext } from "../../types/BotContext.d.ts";
+import type { GuildStats, TableData } from "../../types/Stats.d.ts";
 import {
   formatTime,
   getNicknameFromInteraction,
@@ -26,9 +26,9 @@ export default {
     interaction: ChatInputCommandInteraction,
     context: BotContext
   ): Promise<void> {
-    if (!context.stats) return;
+    if (!context.stats || !interaction.guild) return;
 
-    const guildStats = context.stats?.[interaction.guild?.id!];
+    const guildStats = context.stats?.[interaction.guild.id];
     if (!guildStats) {
       await interaction.reply("This server has no statistics yet!");
       return;
@@ -58,7 +58,7 @@ function buildTableData(
   interaction: Interaction,
   context: BotContext
 ) {
-  /* eslint-disable sort-keys */
+   
   return topScores.slice(0, STATS_TOP_SCORES_N).map(([userName], i) => ({
     "#": i + 1,
     Name: getNicknameFromInteraction(interaction, userName, true),
@@ -72,7 +72,7 @@ function buildTableData(
     "Voice Time": formatTime(guildStats.users[userName].voiceTime),
     Rank: getLevelName(guildStats.users[userName].level),
   }));
-  /* eslint-enable sort-keys */
+   
 }
 
 function formatUserRankingLine(

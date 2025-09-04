@@ -1,11 +1,23 @@
-import { Channel } from "discord.js";
+import {
+  Channel,
+  Message,
+  MessageCreateOptions,
+  MessagePayload,
+} from "discord.js";
 
 export function isSendableChannel(
   channel: Channel
-): channel is Extract<typeof channel, { send: Function }> {
+): channel is Extract<
+  typeof channel,
+  {
+    send: (
+      options: string | MessagePayload | MessageCreateOptions
+    ) => Promise<Message<true>> | Promise<Message<false>>;
+  }
+> {
   return (
     channel.isTextBased() &&
     !channel.isDMBased() &&
-    typeof (channel as any).send === "function"
+    typeof (channel).send === "function"
   );
 }

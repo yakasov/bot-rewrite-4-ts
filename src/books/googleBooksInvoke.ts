@@ -10,7 +10,7 @@ import {
   REGEX_BOOKS_PATTERN,
 } from "../consts/constants";
 import { wrapCodeBlockString } from "../util/commonFunctions";
-import { GoogleBooksTypes } from "../types/books/GoogleBooksResponse";
+import type { Book, BooksResponse } from "../types/books/GoogleBooksResponse.d.ts";
 
 export async function googleBooksInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
@@ -47,9 +47,9 @@ export async function googleBooksSearch(
 
   const result = await fetch(url)
     .then((response: Response) => response.json())
-    .then((json: GoogleBooksTypes.Response) => {
+    .then((json: BooksResponse) => {
       if (json.items) {
-        return json.items.filter((i: any) => i && i.volumeInfo)[0];
+        return json.items.filter((i: Book) => i && i.volumeInfo)[0];
       }
 
       return undefined;
@@ -68,7 +68,7 @@ export async function googleBooksSearch(
 
 export async function googleBooksFound(
   message: Message,
-  book: GoogleBooksTypes.Book
+  book: Book
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -82,7 +82,10 @@ export async function googleBooksFound(
     return;
   }
 
-  const info = book.volumeInfo!;
+  // TODO: Should volumeInfo be nullable on the type?
+  if (!book.volumeInfo) return;
+
+  const info = book.volumeInfo;
 
   const authorString = info.authors?.join(", ") ?? "Unknown authors";
   const descriptionNode = HTMLParser.parse(

@@ -1,20 +1,22 @@
 import { Card } from "yakasov-scryfall-api";
-import { OracleResponse } from "../types/scryfall/OracleResponse";
+import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
 import { Message, ButtonInteraction, Interaction } from "discord.js";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 import { getActionButtonsRow } from "./scryfallCardFound";
 import { getCardDetails } from "./scryfallHelpers";
 
-const printCache: { [key: string]: Card[] } = {};
+const printCache: Record<string, Card[]> = {};
 
 export async function getPrintList(card: Card): Promise<Card[]> {
-  if (!printCache[card.oracle_id!]) {
-    printCache[card.oracle_id!] = await fetch(card.prints_search_uri)
+  if (!card.oracle_id) return [];
+
+  if (!printCache[card.oracle_id]) {
+    printCache[card.oracle_id] = await fetch(card.prints_search_uri)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.data);
   }
 
-  return printCache[card.oracle_id!];
+  return printCache[card.oracle_id];
 }
 
 function getNextIndex(newIndex: number, max: number): number {
@@ -79,7 +81,7 @@ export async function handlePrintingChoice(
       printDetails,
       newCardDetails
     );
-  } catch (err: any) {
+  } catch {
     await message
       .edit({
         components: [],

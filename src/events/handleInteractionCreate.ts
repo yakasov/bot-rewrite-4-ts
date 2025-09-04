@@ -4,7 +4,7 @@ import {
   InteractionReplyOptions,
   MessageFlags,
 } from "discord.js";
-import { BotContext } from "../types/BotContext";
+import type { BotContext } from "../types/BotContext.d.ts";
 
 const reply: InteractionReplyOptions = {
   content: "There was an error while executing this command!",
@@ -28,7 +28,7 @@ export async function handleInteractionCreate(
 
   try {
     await command.execute(interaction, context);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
 
     if (interaction.replied || interaction.deferred) {

@@ -19,7 +19,7 @@ export function initialiseDatabase(): void {
     });
 
     console.log("Successfully created database pool.");
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Failed to create database pool:", err);
     throw err;
   }
@@ -39,7 +39,7 @@ export async function createTables(): Promise<void> {
     await conn.query(USER_CREATE_QUERY);
 
     console.log("Database tables created/verified successfully");
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error creating database tables:", err);
     throw err;
   } finally {
@@ -53,5 +53,6 @@ export function getDatabasePool(): mariadb.Pool {
   if (!pool) {
     initialiseDatabase();
   }
-  return pool!;
+
+  return pool as mariadb.Pool;
 }

@@ -1,6 +1,6 @@
 import { GuildMember, Interaction } from "discord.js";
-import { BotContext } from "../types/BotContext";
-import { GuildStats, Stats, StatsEvent, UserStats } from "../types/Stats";
+import type { BotContext } from "../types/BotContext.d.ts";
+import type { GuildStats, Stats, StatsEvent, UserStats } from "../types/Stats.d.ts";
 import {
   calculateExperience,
   getRequiredExperienceCumulative,
@@ -91,7 +91,7 @@ export function checkAllUserStats(context: BotContext): void {
   if (!stats) return;
 
   for (const [guildId, guildStats] of Object.entries(stats)) {
-    const users: { [userId: string]: UserStats } = guildStats.users;
+    const users: Record<string, UserStats> = guildStats.users;
 
     for (const [userId, userStats] of Object.entries(users)) {
       calculateExperience(userStats, context);
@@ -120,8 +120,8 @@ export function getDateNowInSeconds(): number {
 
 export function getNicknameFromInteraction(
   interaction: Interaction,
-  id: string = "",
-  sanitize: boolean = false
+  id = "",
+  sanitize = false
 ): string | undefined {
   // Used for fetching nickname from interaction
   const member: GuildMember | undefined = interaction.guild?.members.cache

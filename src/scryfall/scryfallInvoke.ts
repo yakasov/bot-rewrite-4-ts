@@ -10,7 +10,7 @@ import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
 import { scryfallShowCardList } from "./scryfallShowCardList";
 import { isSendableChannel } from "../util/typeGuards";
-import { Modifiers } from "../types/scryfall/Invoke";
+import type { Modifiers } from "../types/scryfall/Invoke.d.ts";
 
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
@@ -77,9 +77,9 @@ export async function scryfallInvoke(message: Message): Promise<void> {
 
 export async function scryfallGetCard(
   message: Message,
-  cardName: string = "",
+  cardName = "",
   modifiers: Modifiers,
-  fromSelectMenu: boolean = false
+  fromSelectMenu = false
 ): Promise<void> {
   let results: string[] = [""];
 

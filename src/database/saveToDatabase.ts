@@ -1,9 +1,10 @@
 import { Pool, PoolConnection } from "mariadb";
 import { getDatabasePool } from "./initialiseDatabase";
-import { BotContext } from "../types/BotContext";
-import { UserStats } from "../types/Stats";
+import type { BotContext } from "../types/BotContext.d.ts";
+import type { UserStats } from "../types/Stats.d.ts";
 import { GUILD_INSERT_QUERY, USER_INSERT_QUERY } from "./queries";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function isUserStats(obj: any): obj is UserStats {
   return (
     obj && typeof obj === "object" && "messages" in obj && "voiceTime" in obj
@@ -48,7 +49,7 @@ export async function saveStatsToDatabase(context: BotContext): Promise<void> {
     }
 
     await conn.commit();
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (conn) {
       await conn.rollback();
     }

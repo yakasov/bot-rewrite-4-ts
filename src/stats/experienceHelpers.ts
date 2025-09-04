@@ -1,5 +1,5 @@
-import { BotContext } from "../types/BotContext";
-import { UserStats } from "../types/Stats";
+import type { BotContext } from "../types/BotContext.ts";
+import type { UserStats } from "../types/Stats.ts";
 import { sendMessage } from "./sendStatsMessage";
 import ranksJSON from "../../resources/ranks.json";
 
@@ -45,10 +45,10 @@ export function levelUp(
 }
 
 export function getLevelName(level: number): string {
-  const ranks = ranksJSON as { [key: string]: string };
+  const ranks = ranksJSON as Record<string, string>;
   let nameLevel: number = Math.floor(level / 10) + 1;
   const highestKey: number = parseInt(
-    Object.keys(ranks as { [key: string]: string }).slice(-1)[0]
+    Object.keys(ranks as Record<string, string>).slice(-1)[0]
   );
   if (nameLevel > highestKey) {
     nameLevel = highestKey;

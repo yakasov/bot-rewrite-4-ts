@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
-import { Modifiers } from "../types/scryfall/Invoke";
+import type { EmbedObject, Modifiers } from "../types/scryfall/Invoke.d.ts";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 import { getCardDetails } from "./scryfallHelpers";
 import { Card } from "yakasov-scryfall-api";
@@ -38,10 +38,10 @@ export async function scryfallShowCardList(
   );
 
   const cardDetails: Card = await getCardDetails(results[0]) as Card;
-  const cardMessageObject: any = await getCardMessageObject(
+  const cardMessageObject: EmbedObject = await getCardMessageObject(
     message,
     cardDetails
-  );
+  ) as EmbedObject;
   const multipleCardsMessage: Message = await message.channel.send({
     components: [selectMenuRow.toJSON()],
     embeds: cardMessageObject.embeds,
@@ -73,7 +73,7 @@ export async function scryfallShowCardList(
 
     await scryfallGetCard(message, selectedValue, modifiers, true);
     await multipleCardsMessage.delete().catch((err) => console.error(err));
-  } catch (err: any) {
+  } catch {
     await multipleCardsMessage
       .edit({
         components: [],

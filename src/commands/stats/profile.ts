@@ -13,8 +13,8 @@ import {
   orderStatsByRank,
 } from "../../stats/statsHelpers";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
-import { BotContext } from "../../types/BotContext";
-import { GuildStats, UserStats } from "../../types/Stats";
+import type { BotContext } from "../../types/BotContext.d.ts";
+import type { GuildStats, UserStats } from "../../types/Stats.d.ts";
 import {
   getRequiredExperience,
   getLevelName,
@@ -34,13 +34,15 @@ export default {
     interaction: ChatInputCommandInteraction,
     context: BotContext
   ): Promise<void> {
+    if (!interaction.guild) return;
+
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    let user: string | null = interaction.options.getUser("user")?.id ?? null;
+    const user: string | null = interaction.options.getUser("user")?.id ?? null;
     const debug = interaction.options.getBoolean("debug") ?? false;
 
     const guildStats: GuildStats | undefined =
-      context.stats?.[interaction.guild?.id!];
+      context.stats?.[interaction.guild.id];
     if (!guildStats) {
       await interaction.reply("This server has no statistics yet!");
       return;

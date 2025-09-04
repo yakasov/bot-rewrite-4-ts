@@ -1,17 +1,13 @@
 import chanceResponsesJSON from "../../resources/chanceResponses.json";
 import { ChanceResponse } from "../types/JSON";
 
-const chanceResponses: { [key: string]: ChanceResponse } =
-  chanceResponsesJSON as { [key: string]: ChanceResponse };
+const chanceResponses: Record<string, ChanceResponse> =
+  chanceResponsesJSON as Record<string, ChanceResponse>;
 
-export function generateRollTable(newResponses?: {
-  [key: string]: ChanceResponse;
-}): ChanceResponse[] {
-  const responses: {
-    [key: string]: ChanceResponse;
-  } = newResponses ?? chanceResponses;
+export function generateRollTable(newResponses?: Record<string, ChanceResponse>): ChanceResponse[] {
+  const responses: Record<string, ChanceResponse> = newResponses ?? chanceResponses;
 
-  let cumChance: number = 0;
+  let cumChance = 0;
   const totalChance: number = Object.values(responses).reduce(
     (sum, response) => sum + response.chance,
     0

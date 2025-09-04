@@ -1,8 +1,8 @@
 import { Pool, PoolConnection } from "mariadb";
 import { getDatabasePool } from "./initialiseDatabase";
 import { GUILD_SELECT_QUERY, USER_SELECT_QUERY } from "./queries";
-import { Stats } from "../types/Stats";
-import { GuildsStructure, UserStatsStructure } from "../types/Database";
+import type { Stats } from "../types/Stats.d.ts";
+import type { GuildsStructure, UserStatsStructure } from "../types/Database.d.ts";
 
 export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
   const pool: Pool = getDatabasePool();
@@ -52,7 +52,7 @@ export async function loadStatsFromDatabase(): Promise<Stats | undefined> {
     }
 
     return stats;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error loading stats from database:", err);
     return undefined;
   } finally {
