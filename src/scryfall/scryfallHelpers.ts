@@ -81,7 +81,7 @@ export async function getCardDetails(
 ): Promise<Card | undefined> {
   const cardDetails: Card | undefined = set && number
     ? await Cards.bySet(set, number)
-    : await Cards.byName(cardName, set, false);
+    : await Cards.byName(cardName, set, true);
 
   return cardDetails;
 }
