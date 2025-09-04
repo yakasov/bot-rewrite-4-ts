@@ -2,8 +2,7 @@ import { Channel, Message } from "discord.js";
 import {
   REGEX_SCRYFALL_PATTERN,
   SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES,
-  SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_1,
-  SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_2,
+  SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS,
   SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
 import { Card, Cards } from "yakasov-scryfall-api";
@@ -28,10 +27,9 @@ export async function scryfallInvoke(message: Message): Promise<void> {
 
   if (
     message.content.toLocaleLowerCase() &&
-    [
-      SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_1,
-      SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_2,
-    ].some((string) => message.content.includes(string))
+    SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS.some((string) =>
+      message.content.includes(string)
+    )
   ) {
     await sendMinorSpellingMistakeGif(message.channel);
     return;

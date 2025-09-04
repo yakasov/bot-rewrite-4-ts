@@ -8,6 +8,8 @@ import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 import { handlePrintingChoice, getPrintList } from "./scryfallPrintHelpers";
 import { Card } from "yakasov-scryfall-api";
+import { getCardDetails } from "./scryfallHelpers";
+import { SCRYFALL_PRINTINGS_SEARCH } from "../consts/constants";
 
 export async function scryfallCardFound(
   message: Message,
@@ -17,41 +19,57 @@ export async function scryfallCardFound(
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  let [cardDetails, cardObject] = await getCardMessageObject(
-    message,
+  const cardDetails: Card | undefined = await getCardDetails(
     cardName,
     set,
     number
   );
 
-  if (!cardObject || !cardDetails) return;
+  if (!cardDetails) {
+    await message.channel.send(
+      `Ran into an error fetching ${cardName} for set ${set} and number ${number}!`
+    );
+    return;
+  }
+
+  const printDetails: Card[] = cardDetails.oracle_id
+    ? await getPrintList(cardDetails)
+    : [];
+
+  const currentIndex: number = printDetails
+    .map((card: Card) => card.id)
+    .indexOf(cardDetails.id);
+  const cardObject = await getCardMessageObject(
+    message,
+    cardDetails,
+    `   |   ${currentIndex + 1} / ${printDetails.length}`
+  );
 
   const cardFoundMessage: Message = await message.channel.send({
-    components: [getActionButtonsRow().toJSON()],
+    components: printDetails.length > 1 ? [getActionButtonsRow(cardName).toJSON()] : [],
     ...cardObject,
   });
 
-  // We can't do a print search with an oracle_id
-  if (!cardDetails.oracle_id) return;
-
-  const printDetails: Card[] = await getPrintList(cardDetails);
-
   if (printDetails.length === 1) return;
 
-  await handlePrintingChoice(cardFoundMessage, message.author.id, printDetails, cardDetails);
+  await handlePrintingChoice(
+    cardFoundMessage,
+    message.author.id,
+    printDetails,
+    cardDetails
+  );
 }
 
-export function getActionButtonsRow(): ActionRowBuilder {
+export function getActionButtonsRow(cardName: string): ActionRowBuilder {
   const previousButton = new ButtonBuilder()
     .setCustomId("previous")
     .setLabel("< Previous")
     .setStyle(ButtonStyle.Primary);
 
   const middleButton = new ButtonBuilder()
-    .setCustomId("unused")
     .setLabel("Printings")
-    .setStyle(ButtonStyle.Secondary)
-    .setDisabled(true);
+    .setURL(SCRYFALL_PRINTINGS_SEARCH.replace("<<REPLACE>>", encodeURIComponent(cardName)))
+    .setStyle(ButtonStyle.Link)
 
   const nextButton = new ButtonBuilder()
     .setCustomId("next")

@@ -10,6 +10,8 @@ import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
 import { Modifiers } from "../types/scryfall/Invoke";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
+import { getCardDetails } from "./scryfallHelpers";
+import { Card } from "yakasov-scryfall-api";
 
 export async function scryfallShowCardList(
   message: Message,
@@ -35,9 +37,10 @@ export async function scryfallShowCardList(
     selectMenu
   );
 
-  const [, cardMessageObject]: any = await getCardMessageObject(
+  const cardDetails: Card = await getCardDetails(results[0]) as Card;
+  const cardMessageObject: any = await getCardMessageObject(
     message,
-    results[0]
+    cardDetails
   );
   const multipleCardsMessage: Message = await message.channel.send({
     components: [selectMenuRow.toJSON()],

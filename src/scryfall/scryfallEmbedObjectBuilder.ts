@@ -1,5 +1,5 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { Card, Cards } from "yakasov-scryfall-api";
+import { Card } from "yakasov-scryfall-api";
 import { PricingData } from "../types/scryfall/PricingData";
 import { getLowestHighestData, to2DP } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
@@ -8,34 +8,16 @@ import moment from "moment-timezone";
 
 export async function getCardMessageObject(
   message: Message,
-  cardName: string,
-  set: string | undefined = undefined,
-  number: number | undefined = undefined,
+  cardDetails: Card,
   indexString: string = ""
 ): Promise<
-  [
-    Card | undefined,
-    (
-      | {
-          embeds?: EmbedBuilder[];
-          files?: AttachmentBuilder[];
-        }
-      | undefined
-    )
-  ]
+  | {
+      embeds?: EmbedBuilder[];
+      files?: AttachmentBuilder[];
+    }
+  | undefined
 > {
-  if (!isSendableChannel(message.channel)) return [, ,];
-
-  const cardDetails: Card | undefined = number
-    ? await Cards.bySet(set!, number)
-    : await Cards.byName(cardName, set, false);
-
-  if (!cardDetails) {
-    await message.channel.send(
-      `Ran into an error fetching ${cardName} for set ${set} and number ${number}!`
-    );
-    return [, ,];
-  }
+  if (!isSendableChannel(message.channel)) return;
 
   const [isImageLocal, imageUrl]: [boolean, string] = await getImageUrl(
     cardDetails
@@ -111,16 +93,13 @@ export async function getCardMessageObject(
     );
   }
 
-  return [
-    cardDetails,
-    {
-      embeds: [embed],
-      files: [
-        ...(attachment ? [attachment] : []),
-        ...(cardDetails.game_changer
-          ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
-          : []),
-      ],
-    },
-  ];
+  return {
+    embeds: [embed],
+    files: [
+      ...(attachment ? [attachment] : []),
+      ...(cardDetails.game_changer
+        ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
+        : []),
+    ],
+  };
 }

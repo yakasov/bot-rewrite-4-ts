@@ -3,6 +3,7 @@ import { OracleResponse } from "../types/scryfall/OracleResponse";
 import { Message, ButtonInteraction, Interaction } from "discord.js";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 import { getActionButtonsRow } from "./scryfallCardFound";
+import { getCardDetails } from "./scryfallHelpers";
 
 const printCache: { [key: string]: Card[] } = {};
 
@@ -53,11 +54,14 @@ export async function handlePrintingChoice(
       nextIndex = getNextIndex(currentIndex + 1, printDetails.length);
     }
 
-    const [newCardDetails, cardObject] = await getCardMessageObject(
-      message,
+    const newCardDetails: Card = (await getCardDetails(
       cardDetails.name,
       printDetails[nextIndex].set,
-      parseInt(printDetails[nextIndex].collector_number),
+      parseInt(printDetails[nextIndex].collector_number)
+    )) as Card;
+    const cardObject = await getCardMessageObject(
+      message,
+      newCardDetails,
       `   |   ${nextIndex + 1} / ${printDetails.length}`
     );
 
@@ -65,7 +69,7 @@ export async function handlePrintingChoice(
     if (!newCardDetails || !cardObject) return;
 
     await collected.update({
-      components: [getActionButtonsRow().toJSON()],
+      components: [getActionButtonsRow(newCardDetails.name).toJSON()],
       ...cardObject,
     });
 

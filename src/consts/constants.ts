@@ -43,9 +43,10 @@ export const REGEX_YOUTUBE_URL_FULL: RegExp =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT: RegExp = /^https?:\/\/youtu\.be\/*/gu;
 
-export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_1: string =
-  "[[minor spelling mistake]]";
-export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRING_2: string = "[[msm]]";
+export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS: string[] = [
+  "[[minor spelling mistake]]",
+  "[[msm]]",
+];
 export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
   "https://tenor.com/view/minor-spelling-mistake-dream-dream-youtuber-gif-13914252076385141995",
   "https://tenor.com/view/minor-spelling-mistake-spelling-mistake-gif-4898195786185830013",
@@ -60,6 +61,8 @@ export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
   "https://tenor.com/view/patrick-star-minor-s-spongebob-spongebob-meme-spongebob-squarepants-gif-10940848928744248792",
   "https://tenor.com/view/minor-spelling-mistake-gif-21179057",
 ];
+export const SCRYFALL_PRINTINGS_SEARCH: string =
+  "https://scryfall.com/search?as=grid&order=released&q=%21%22<<REPLACE>>%22+include%3Aextras&unique=prints";
 export const SCRYFALL_SYNTAX_PREFIX: string = "order:edhrec game:paper ";
 
 export const STEAM_URL_LINK: string =
