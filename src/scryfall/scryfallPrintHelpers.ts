@@ -64,7 +64,7 @@ export async function handlePrintingChoice(
     const cardObject = await getCardMessageObject(
       message,
       newCardDetails,
-      `   |   ${nextIndex + 1} / ${printDetails.length}`
+      `   |   Printing ${nextIndex + 1} / ${printDetails.length}`
     );
 
     // Should never be true, just a type guard

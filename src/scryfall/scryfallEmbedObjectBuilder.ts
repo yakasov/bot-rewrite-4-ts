@@ -2,26 +2,26 @@ import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { Card } from "yakasov-scryfall-api";
 import type { PricingData } from "../types/scryfall/PricingData.d.ts";
 import { getLowestHighestData, to2DP } from "./scryfallHelpers";
-import { getImageUrl } from "./scryfallImageHelpers";
+import { getImageUrl, getSetImage } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
 import type { EmbedObject } from "../types/scryfall/Invoke.d.ts";
+import { SCRYFALL_SET_IMAGES_PATH } from "../consts/constants.js";
 
 export async function getCardMessageObject(
   message: Message,
   cardDetails: Card,
   indexString = ""
-): Promise<EmbedObject | undefined
-> {
+): Promise<EmbedObject | undefined> {
   if (!isSendableChannel(message.channel)) return;
 
   const [isImageLocal, imageUrl]: [boolean, string] = await getImageUrl(
     cardDetails
   );
-  const attachment: AttachmentBuilder | null = isImageLocal
+  const cardImageAttachment: AttachmentBuilder | null = isImageLocal
     ? new AttachmentBuilder(`${imageUrl}.jpg`)
     : null;
-  const releaseDate = moment(cardDetails.released_at);
+  const releaseDate: moment.Moment = moment(cardDetails.released_at);
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
   const legality: string =
@@ -29,13 +29,23 @@ export async function getCardMessageObject(
   const rarity: string =
     cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1);
 
+  const setImageAttachment: AttachmentBuilder | null = await getSetImage(
+    cardDetails
+  ).then((value: boolean) =>
+    value
+      ? new AttachmentBuilder(
+          `${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.id}.png`
+        )
+      : null
+  );
+
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(cardDetails.name)
     .setURL(cardDetails.scryfall_uri)
     .addFields(
       {
-        name: "Description",
-        value: `${cardDetails.set_name} (${cardDetails.set})\n*${rarity}*`,
+        name: "Type",
+        value: `${cardDetails.type_line}\n*${rarity}*`,
         inline: true,
       },
       {
@@ -56,11 +66,15 @@ export async function getCardMessageObject(
     );
   }
 
-  if (cardDetails.game_changer) {
+  if (setImageAttachment) {
     embed.setAuthor({
-      name: "This card is a Game Changer!",
-      iconURL: "attachment://diamond.png",
+      name: `${cardDetails.set_name} (${cardDetails.set})`,
+      iconURL: `attachment://${cardDetails.id}.png`,
     });
+  }
+
+  if (cardDetails.game_changer) {
+    embed.setThumbnail("attachment://diamond.png");
   }
 
   const oracleId: string =
@@ -92,7 +106,8 @@ export async function getCardMessageObject(
   return {
     embeds: [embed],
     files: [
-      ...(attachment ? [attachment] : []),
+      ...(cardImageAttachment ? [cardImageAttachment] : []),
+      ...(setImageAttachment ? [setImageAttachment] : []),
       ...(cardDetails.game_changer
         ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
         : []),

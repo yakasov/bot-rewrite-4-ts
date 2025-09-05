@@ -42,11 +42,12 @@ export async function scryfallCardFound(
   const cardObject = await getCardMessageObject(
     message,
     cardDetails,
-    `   |   ${currentIndex + 1} / ${printDetails.length}`
+    `   |   Printing ${currentIndex + 1} / ${printDetails.length}`
   );
 
   const cardFoundMessage: Message = await message.channel.send({
-    components: printDetails.length > 1 ? [getActionButtonsRow(cardName).toJSON()] : [],
+    components:
+      printDetails.length > 1 ? [getActionButtonsRow(cardName).toJSON()] : [],
     ...cardObject,
   });
 
@@ -68,8 +69,13 @@ export function getActionButtonsRow(cardName: string): ActionRowBuilder {
 
   const middleButton = new ButtonBuilder()
     .setLabel("Printings")
-    .setURL(SCRYFALL_PRINTINGS_SEARCH.replace("<<REPLACE>>", encodeURIComponent(cardName)))
-    .setStyle(ButtonStyle.Link)
+    .setURL(
+      SCRYFALL_PRINTINGS_SEARCH.replace(
+        "<<REPLACE>>",
+        encodeURIComponent(cardName)
+      )
+    )
+    .setStyle(ButtonStyle.Link);
 
   const nextButton = new ButtonBuilder()
     .setCustomId("next")

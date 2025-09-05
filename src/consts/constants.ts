@@ -63,6 +63,7 @@ export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
 ];
 export const SCRYFALL_PRINTINGS_SEARCH =
   "https://scryfall.com/search?as=grid&order=released&q=%21%22<<REPLACE>>%22+include%3Aextras&unique=prints";
+export const SCRYFALL_SET_IMAGES_PATH = "./resources/scryfall/sets";
 export const SCRYFALL_SYNTAX_PREFIX = "order:edhrec game:paper ";
 
 export const STEAM_URL_LINK =
