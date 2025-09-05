@@ -6,7 +6,10 @@ import { getImageUrl, getSetImage } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
 import type { EmbedObject } from "../types/scryfall/Invoke.d.ts";
-import { SCRYFALL_SET_IMAGES_PATH } from "../consts/constants.js";
+import {
+  SCRYFALL_HEX_COLOR_CODES,
+  SCRYFALL_SET_IMAGES_PATH,
+} from "../consts/constants.js";
 
 export async function getCardMessageObject(
   message: Message,
@@ -41,6 +44,7 @@ export async function getCardMessageObject(
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(cardDetails.name)
+    .setColor(SCRYFALL_HEX_COLOR_CODES[cardDetails.border_color])
     .setURL(cardDetails.scryfall_uri)
     .addFields(
       {

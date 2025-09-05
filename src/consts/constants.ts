@@ -1,3 +1,5 @@
+import { BorderColor } from "yakasov-scryfall-api";
+
 export const AI_DEFAULT_TEMP = 0.9;
 export const AI_MAX_TOKENS = 4096;
 export const AI_MODEL = "gpt-4o-mini";
@@ -32,8 +34,7 @@ export const MTG_PACK_SIZE = 12;
 export const REGEX_BOOKS_PATTERN =
   /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
-export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT =
-  /[\s\S]{1,1980}(?!\S)/gu;
+export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
 export const REGEX_SANITIZE_STRING = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_PATTERN =
   /\[\[\s*(?<card>[^|\]]*?)\s*(?:\|\s*(?<set>[^|\]]*?))?(?:\|\s*(?<number>[^|\]]+?))?\s*\]\]/gu;
@@ -43,6 +44,14 @@ export const REGEX_YOUTUBE_URL_FULL =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT = /^https?:\/\/youtu\.be\/*/gu;
 
+export const SCRYFALL_HEX_COLOR_CODES: Record<BorderColor, number> = {
+  // "black": 0x000000,
+  black: 0x4c4d53, // Black looks a bit ugly so using default colour
+  borderless: 0x4c4d53,
+  gold: 0xaa8c55,
+  silver: 0xa5afb6,
+  white: 0xffffff,
+};
 export const SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS: string[] = [
   "[[minor spelling mistake]]",
   "[[msm]]",
@@ -83,8 +92,7 @@ export const URL_API_RULES = "https://jmcd.uk/bot/getRules";
 export const URL_FORTNITE_API = "https://fortnite-api.com/v2/shop";
 export const URL_FORTNITE_SONGS =
   "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/jam_tracks.json";
-export const URL_MINECRAFT_STATUS =
-  "https://api.mcstatus.io/v2/status/java";
+export const URL_MINECRAFT_STATUS = "https://api.mcstatus.io/v2/status/java";
 export const URL_SCRYFALL_ORACLE =
   "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A<<ORACLE_ID>>&unique=prints";
 export const URL_TTS_API =
