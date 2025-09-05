@@ -37,11 +37,11 @@ export async function scryfallShowCardList(
     selectMenu
   );
 
-  const cardDetails: Card = await getCardDetails(results[0]) as Card;
-  const cardMessageObject: EmbedObject = await getCardMessageObject(
+  const cardDetails: Card = (await getCardDetails(results[0])) as Card;
+  const cardMessageObject: EmbedObject = (await getCardMessageObject(
     message,
     cardDetails
-  ) as EmbedObject;
+  )) as EmbedObject;
   const multipleCardsMessage: Message = await message.channel.send({
     components: [selectMenuRow.toJSON()],
     embeds: cardMessageObject.embeds,
@@ -71,8 +71,10 @@ export async function scryfallShowCardList(
       selectedValue += ` ${selectedValue}`;
     }
 
-    await scryfallGetCard(message, selectedValue, modifiers, true);
-    await multipleCardsMessage.delete().catch((err) => console.error(err));
+    await Promise.all([
+      scryfallGetCard(message, selectedValue, modifiers, true),
+      multipleCardsMessage.delete().catch((err) => console.error(err)),
+    ]);
   } catch {
     await multipleCardsMessage
       .edit({

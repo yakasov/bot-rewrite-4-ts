@@ -70,17 +70,18 @@ export async function handlePrintingChoice(
     // Should never be true, just a type guard
     if (!newCardDetails || !cardObject) return;
 
-    await collected.update({
-      components: [getActionButtonsRow(newCardDetails.name).toJSON()],
-      ...cardObject,
-    });
-
-    handlePrintingChoice(
-      message,
-      originalAuthorId,
-      printDetails,
-      newCardDetails
-    );
+    Promise.all([
+      collected.update({
+        components: [getActionButtonsRow(newCardDetails.name).toJSON()],
+        ...cardObject,
+      }),
+      handlePrintingChoice(
+        message,
+        originalAuthorId,
+        printDetails,
+        newCardDetails
+      ),
+    ]);
   } catch {
     await message
       .edit({
