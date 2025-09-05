@@ -93,7 +93,9 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
     fs.readdir(
       SCRYFALL_SET_IMAGES_PATH,
       (_: NodeJS.ErrnoException | null, files: string[]) => {
-        files.map((file: string) => setImageCache.push(file));
+        if (files) {
+          files.map((file: string) => setImageCache.push(file));
+        }
       }
     );
   }
