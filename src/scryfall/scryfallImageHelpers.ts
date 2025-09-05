@@ -113,8 +113,14 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   });
   const hasSaved: boolean = await setIconPng
     .toFile(`${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.id}.png`)
-    .then((_: sharp.OutputInfo) => true)
-    .catch((_: unknown) => false);
+    .then((_: sharp.OutputInfo) => {
+      setImageCache.push(cardDetails.id);
+      return true;
+    })
+    .catch((err: unknown) => {
+      console.error(err);
+      return false;
+    });
 
   setImageCache.push(cardDetails.id);
 
