@@ -3,9 +3,9 @@ import {
   ChatInputCommandInteraction,
   MessageFlags,
 } from "discord.js";
-import { BotContext } from "../../types/BotContext";
+import type { BotContext } from "../../types/BotContext.d.ts";
 import { addToStats } from "../../stats/statsHelpers";
-import { GuildStats } from "../../types/Stats";
+import type { GuildStats } from "../../types/Stats.d.ts";
 
 export default {
   data: new SlashCommandBuilder()
@@ -15,6 +15,8 @@ export default {
     interaction: ChatInputCommandInteraction,
     context: BotContext
   ): Promise<void> {
+    if (!interaction.guild) return;
+
     await interaction.client.application.fetch();
     if (
       interaction.user === interaction.client.application.owner ||
@@ -24,13 +26,13 @@ export default {
     ) {
       addToStats(
         {
-          guildId: interaction.guild?.id!,
+          guildId: interaction.guild.id,
           type: "guildInit",
           userId: "",
         },
         context
       );
-      const guildStats: GuildStats = context.stats?.[interaction.guild?.id!]!;
+      const guildStats: GuildStats = context.stats?.[interaction.guild.id] as GuildStats;
       guildStats.guild.allowResponses = !guildStats.guild.allowResponses;
 
       await interaction.reply(

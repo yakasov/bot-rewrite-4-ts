@@ -1,16 +1,16 @@
 import fs from "node:fs";
 import configJson from "../../resources/config.json";
 import { Pool } from "mariadb";
-import { BotContext } from "../types/BotContext";
+import type { BotContext } from "../types/BotContext.d.ts";
 import {
   createTables,
   getDatabasePool,
   initialiseDatabase,
 } from "./initialiseDatabase";
-import { Stats } from "../types/Stats";
+import type { Stats } from "../types/Stats.d.ts";
 import { saveStatsToDatabase } from "./saveToDatabase";
 import { createBotContext } from "../context/createBotContext";
-import { Config } from "../types/Config";
+import type { Config } from "../types/Config.d.ts";
 
 export async function setupDatabase(): Promise<void> {
   const config: Config = configJson;
@@ -28,11 +28,11 @@ export async function setupDatabase(): Promise<void> {
         context.stats = statsData;
 
         await saveStatsToDatabase(context);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error migrating stats:", err);
       }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Database setup failed:", err);
   } finally {
     await closeDatabase();

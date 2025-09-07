@@ -1,4 +1,4 @@
-import { Card } from "scryfall-api";
+import { Card } from "yakasov-scryfall-api";
 
 export interface OracleResponse {
   object: string;

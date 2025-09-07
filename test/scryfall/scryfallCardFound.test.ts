@@ -1,4 +1,4 @@
-import { Cards } from "scryfall-api";
+import { Cards } from "yakasov-scryfall-api";
 import * as TestModule from "../../src/scryfall/scryfallCardFound";
 import { mockMessage } from "../mocks/discord";
 import { mockCard } from "../mocks/scryfall";
@@ -14,7 +14,7 @@ describe("scryfallCardFound", () => {
 
     await TestModule.scryfallCardFound(message, cardName, set);
     expect(message.channel.send).toHaveBeenCalledWith(
-      "Ran into an error fetching card name for set undefined!"
+      "Ran into an error fetching card name for set undefined and number undefined!"
     );
   });
 

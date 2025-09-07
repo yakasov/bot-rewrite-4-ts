@@ -1,4 +1,4 @@
-import { Cards } from "scryfall-api";
+import { Cards } from "yakasov-scryfall-api";
 import * as TestModule from "../../src/scryfall/scryfallInvoke";
 import { mockDMChannel, mockMessage } from "../mocks/discord";
 
@@ -88,7 +88,7 @@ describe("scryfallGetCard", () => {
       )
       .mockResolvedValue(undefined);
 
-    await TestModule.scryfallGetCard(message, cardName, undefined, false);
+    await TestModule.scryfallGetCard(message, cardName, undefined, undefined, false);
     expect(scryfallShowCardListSpy).toHaveBeenCalled();
   });
 });

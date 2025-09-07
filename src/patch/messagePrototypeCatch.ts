@@ -12,7 +12,7 @@ export function messagePrototypeCatch() {
   Message.prototype.reply = function (
     this: Message,
     options: string | MessagePayload | MessageReplyOptions
-  ): Promise<OmitPartialGroupDMChannel<Message<any>>> {
+  ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
     try {
       if (typeof options === "string") {
         return superReply.call(this, {
@@ -29,19 +29,19 @@ export function messagePrototypeCatch() {
         ...options,
         failIfNotExists: false,
       });
-    } catch (err: any) {
-      console.error(err?.message);
+    } catch (err: unknown) {
+      console.error(err);
       return Promise.reject(err);
     }
   };
 
   Message.prototype.delete = function (
     this: Message
-  ): Promise<OmitPartialGroupDMChannel<Message<any>>> {
+  ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
     try {
       return superDelete.call(this);
-    } catch (err: any) {
-      console.error(err?.message);
+    } catch (err: unknown) {
+      console.error(err);
       return Promise.reject(err);
     }
   };

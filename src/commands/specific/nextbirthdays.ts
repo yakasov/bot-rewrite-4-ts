@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
-import { BotContext } from "../../types/BotContext";
+import type { BotContext } from "../../types/BotContext.d.ts";
 import birthdaysJSON from "../../../resources/birthdays.json";
-import { Birthdays } from "../../types/Birthdays";
+import type { Birthdays } from "../../types/Birthdays.d.ts";
 
 const birthdays: Birthdays = birthdaysJSON as Birthdays;
 
@@ -33,7 +33,7 @@ function parseBirthday(date: string): moment.Moment {
   return moment(date, "DD/MM/YYYY");
 }
 
-function getNextBirthdays(currentDate: Date, count: number = 5): string {
+function getNextBirthdays(currentDate: Date, count = 5): string {
   const year: number = currentDate.getFullYear();
 
   let orderedBirthdays: string[][] = Object.values(birthdays).map(
@@ -52,8 +52,8 @@ function getNextBirthdays(currentDate: Date, count: number = 5): string {
       parseBirthday(dateB).diff(currentDate, "days")
   );
 
-  let future: number = 0;
-  let output: string = "";
+  let future = 0;
+  let output = "";
   for (const [date, name] of orderedBirthdays) {
     if (parseBirthday(date).isAfter(currentDate, "day") && future < count) {
       output += `${parseBirthday(date).format("MMMM Do")}: ${name}\n`;

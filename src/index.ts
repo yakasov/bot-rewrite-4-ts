@@ -1,8 +1,8 @@
-import { Client, Events, Interaction, Message, VoiceState } from "discord.js";
+import { Events, Interaction, Message, VoiceState } from "discord.js";
 import configJson from "../resources/config.json";
-import { BotContext } from "./types/BotContext";
+import type { BotContext } from "./types/BotContext.d.ts";
 import { createBotContext } from "./context/createBotContext";
-import { Config } from "./types/Config";
+import type { Config } from "./types/Config.d.ts";
 import { messagePrototypeCatch } from "./patch/messagePrototypeCatch";
 import { loadCommands } from "./commands/loadCommands";
 import { handleClientReady } from "./events/handleClientReady";
@@ -19,7 +19,7 @@ process.on("unhandledRejection", (error) => {
 const config: Config = configJson;
 const botContext: BotContext = createBotContext(config);
 
-botContext.client.once(Events.ClientReady, async (client: Client) => {
+botContext.client.once(Events.ClientReady, async () => {
   await loadCommands(botContext.client);
 
   botContext.stats = databaseKeysPresent ? await loadStatsFromDatabase() : undefined;

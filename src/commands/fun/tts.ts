@@ -12,7 +12,7 @@ import {
   SlashCommandBuilder,
   SlashCommandStringOption,
 } from "discord.js";
-import { TTSResponse } from "../../types/responses/TTSResponse";
+import type { TTSResponse } from "../../types/responses/TTSResponse.d.ts";
 import { URL_TTS_API } from "../../consts/constants";
 
 export default {
@@ -26,16 +26,21 @@ export default {
         .setRequired(true)
     ),
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    if (!(interaction.member instanceof GuildMember)) return;
+    if (
+      !(interaction.member instanceof GuildMember) ||
+      !interaction.guild ||
+      !interaction.member.voice.channelId
+    )
+      return;
     await interaction.deferReply();
 
-    const prompt: string = interaction.options.getString("prompt")!;
+    const prompt: string = interaction.options.getString("prompt") as string;
 
     const player: AudioPlayer = createAudioPlayer();
     joinVoiceChannel({
-      adapterCreator: interaction.guild?.voiceAdapterCreator!,
-      channelId: interaction.member?.voice.channelId!,
-      guildId: interaction.guild?.id!,
+      adapterCreator: interaction.guild.voiceAdapterCreator,
+      channelId: interaction.member.voice.channelId,
+      guildId: interaction.guild.id,
     }).subscribe(player);
 
     await fetch(URL_TTS_API, {
@@ -55,7 +60,10 @@ export default {
           const res: AudioResource = createAudioResource("resources/tts.mp3");
           player.play(res);
         } else {
-          await interaction.reply(response.error!);
+          console.error(response.error);
+          await interaction.reply(
+            response.error ?? "Got some kind of error. I dunno"
+          );
         }
       });
   },

@@ -4,7 +4,7 @@ import {
   BOOKS_SEARCH_OPENLIBRARY_URL,
   REGEX_BOOKS_PATTERN,
 } from "../consts/constants";
-import { OpenLibraryTypes } from "../types/books/OpenLibraryResponse";
+import type { BooksResponse } from "../types/books/OpenLibraryResponse.d.ts";
 import { openLibraryShowBookList } from "./openLibraryShowBookList";
 import { openBooksFound } from "./openLibraryBookFound";
 
@@ -35,7 +35,7 @@ export async function openLibrarySearch(
   message: Message,
   input: string,
   author: string | undefined,
-  searchMultiple: boolean = false
+  searchMultiple = false
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -50,7 +50,7 @@ export async function openLibrarySearch(
 
   const results = await fetch(url)
     .then((response: Response) => response.json())
-    .then((json: OpenLibraryTypes.Response) => json.docs);
+    .then((json: BooksResponse) => json.docs);
 
   if (!results || results.length === 0) {
     replyMessage.edit(

@@ -1,4 +1,6 @@
-import { Message, SlashCommandBuilder } from "discord.js";
+/* eslint-disable */
+
+import { SlashCommandBuilder } from "discord.js";
 
 declare module "discord.js" {
     export interface Client {

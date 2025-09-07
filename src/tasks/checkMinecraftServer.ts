@@ -1,15 +1,21 @@
 import { ActivityType } from "discord.js";
-import { BotContext } from "../types/BotContext";
-import { MinecraftQueryStates } from "../types/RunState";
-import { MinecraftTypes } from "../types/responses/MinecraftResponse";
+import type { BotContext } from "../types/BotContext.d.ts";
+import type { MinecraftResponse, User } from "../types/responses/MinecraftResponse.d.ts";
 import { URL_MINECRAFT_STATUS } from "../consts/constants";
+
+enum MinecraftQueryStates {
+  NORMAL = 0,
+  FIRST_RUN = 1,
+  ERROR_STOP = 2,
+  ERROR_RETRY = 3,
+}
 
 export async function getMCStatus(
   context: BotContext
-): Promise<MinecraftTypes.Response | null> {
+): Promise<MinecraftResponse | null> {
   return fetch(`${URL_MINECRAFT_STATUS}/${context.config.minecraft.serverIp}`)
     .then((response: Response) => response.json())
-    .then((response: MinecraftTypes.Response | null) => response)
+    .then((response: MinecraftResponse | null) => response)
     .catch((err) => {
       console.error(`\n${err}`);
 
@@ -44,7 +50,7 @@ export async function checkMinecraftServer(
     return;
   }
 
-  const response: MinecraftTypes.Response | null = await getMCStatus(context);
+  const response: MinecraftResponse | null = await getMCStatus(context);
 
   if (response === null) return;
 
@@ -56,12 +62,12 @@ export async function checkMinecraftServer(
     context.runState.minecraft = MinecraftQueryStates.NORMAL;
   }
 
-  let activityString: string = "";
+  let activityString = "";
   const { online } = response.players ?? 0;
 
   if (online) {
     const players: string[] = response.players.list.map(
-      (player: MinecraftTypes.User) => player.name_raw
+      (player: User) => player.name_raw
     );
     activityString = `(${players.length}) ${players.join(", ")}`;
   } else {

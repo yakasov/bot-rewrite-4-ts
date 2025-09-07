@@ -3,4 +3,5 @@ node_modules
 dist
 coverage
 *.backup
-resources/scryfall
+resources/scryfall/images/*
+resources/scryfall/sets/*

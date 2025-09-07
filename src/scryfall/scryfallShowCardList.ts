@@ -8,32 +8,44 @@ import {
 } from "discord.js";
 import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
+import type { EmbedObject, Modifiers } from "../types/scryfall/Invoke.d.ts";
+import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
+import { getCardDetails } from "./scryfallHelpers";
+import { Card } from "yakasov-scryfall-api";
 
 export async function scryfallShowCardList(
   message: Message,
-  cardName: string,
-  results: string[]
+  results: string[],
+  modifiers: Modifiers
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
   const selectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
     .setCustomId("scryfall_list_select")
-    .setPlaceholder("Choose a card")
+    .setPlaceholder("Select other cards...")
     .addOptions(
-      results.map((card: string, i: number) =>
-        new StringSelectMenuOptionBuilder()
-          .setLabel(`${i + 1}. ${card}`)
-          .setValue(card)
-      )
+      results
+        .slice(1)
+        .map((card: string, i: number) =>
+          new StringSelectMenuOptionBuilder()
+            .setLabel(`${i + 1}. ${card}`)
+            .setValue(card)
+        )
     );
 
-  const row: ActionRowBuilder = new ActionRowBuilder().addComponents(
+  const selectMenuRow: ActionRowBuilder = new ActionRowBuilder().addComponents(
     selectMenu
   );
 
+  const cardDetails: Card = (await getCardDetails(results[0])) as Card;
+  const cardMessageObject: EmbedObject = (await getCardMessageObject(
+    message,
+    cardDetails
+  )) as EmbedObject;
   const multipleCardsMessage: Message = await message.channel.send({
-    components: [row.toJSON()],
-    content: `Multiple cards found for "${cardName}"!`,
+    components: [selectMenuRow.toJSON()],
+    embeds: cardMessageObject.embeds,
+    files: cardMessageObject.files,
   });
 
   const filter: (interaction: Interaction) => boolean = (
@@ -49,19 +61,27 @@ export async function scryfallShowCardList(
         time: 30_000,
       })) as StringSelectMenuInteraction;
 
-    const [selectedValue]: string[] = collected.values;
+    let [selectedValue]: string[] = collected.values;
     await collected.update({
       components: [],
       content: `Fetching ${selectedValue}...`,
     });
 
-    await scryfallGetCard(message, selectedValue, "", undefined, true, true);
-    await multipleCardsMessage.delete().catch((err) => console.error(err));
-  } catch (err: any) {
-    console.error(err);
-    await multipleCardsMessage.edit({
-      components: [],
-      content: "No selection made in time.",
-    });
+    if (modifiers.isSyntax) {
+      selectedValue += ` ${selectedValue}`;
+    }
+
+    await Promise.all([
+      scryfallGetCard(message, selectedValue, modifiers, true),
+      multipleCardsMessage.delete().catch((err) => console.error(err)),
+    ]);
+  } catch {
+    await multipleCardsMessage
+      .edit({
+        components: [],
+        embeds: cardMessageObject.embeds,
+        files: cardMessageObject.files,
+      })
+      .catch((err) => console.error(err));
   }
 }

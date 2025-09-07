@@ -13,7 +13,7 @@ describe("generateTable", () => {
     const tableStringArray = tableString.split("\n");
 
     expect(tableStringArray[0].replace(/ /gu, "")).toEqual(
-      "#NameLevelMsgsVoiceTimeTitle"
+      "#NameLevelMsgsVoiceTimeRank"
     );
     expect(new RegExp(/^[-\-]+$/gu).test(tableStringArray[1])).toEqual(true);
     expect(tableStringArray[2].indexOf("test")).toEqual(

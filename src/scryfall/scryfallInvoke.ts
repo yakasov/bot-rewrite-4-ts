@@ -2,13 +2,15 @@ import { Channel, Message } from "discord.js";
 import {
   REGEX_SCRYFALL_PATTERN,
   SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES,
-  SCRYFALL_MINOR_SPELLING_MISTAKE_STRING,
+  SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS,
+  SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
-import { Cards } from "scryfall-api";
+import { Card, Cards } from "yakasov-scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
 import { scryfallShowCardList } from "./scryfallShowCardList";
 import { isSendableChannel } from "../util/typeGuards";
+import type { Modifiers } from "../types/scryfall/Invoke.d.ts";
 
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
@@ -24,9 +26,10 @@ export async function scryfallInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
   if (
-    message.content
-      .toLocaleLowerCase()
-      .includes(SCRYFALL_MINOR_SPELLING_MISTAKE_STRING)
+    message.content.toLocaleLowerCase() &&
+    SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS.some((string) =>
+      message.content.includes(string)
+    )
   ) {
     await sendMinorSpellingMistakeGif(message.channel);
     return;
@@ -36,39 +39,57 @@ export async function scryfallInvoke(message: Message): Promise<void> {
   let match: RegExpMatchArray | null = null;
 
   while ((match = REGEX_SCRYFALL_PATTERN.exec(message.content)) !== null) {
-    const isExact: boolean = match.groups?.card[0] !== "?";
-    const cardName: string | undefined = match.groups?.card
-      .substring(Number(!isExact))
-      .trim();
-    const isSpecificSet: string = match.groups?.set?.trim() ?? "";
-    const isSpecificNumber: number = parseInt(
-      match.groups?.number?.trim() ?? "0"
-    );
-    if (!cardName) return;
+    const firstString: string = match.groups?.card ?? "";
 
-    promises.push(
-      scryfallGetCard(
-        message,
-        cardName,
-        isSpecificSet,
-        isSpecificNumber,
-        isExact
-      )
+    const modifiers: Modifiers = {
+      isFuzzy: firstString.trim()[0] === "?",
+      isSyntax: firstString.trim()[0] === "*",
+      isSpecificSet: match.groups?.set?.trim() ?? "",
+      isSpecificNumber: parseInt(match.groups?.number?.trim() ?? "0"),
+    };
+    let cardName: string | undefined = firstString
+      .trim()
+      .substring(Number(modifiers.isFuzzy))
+      .substring(Number(modifiers.isSyntax));
+
+    if (!cardName && !modifiers.isSpecificSet && !modifiers.isSpecificNumber)
+      return;
+
+    if (modifiers.isSyntax) {
+      cardName = SCRYFALL_SYNTAX_PREFIX + cardName;
+    }
+
+    promises.push(scryfallGetCard(message, cardName, modifiers));
+  }
+
+  let fetchingMultipleMessage: Message | undefined;
+  if (promises.length > 1) {
+    fetchingMultipleMessage = await message.reply(
+      `Fetching ${promises.length} cards...`
     );
   }
 
   await Promise.all(promises);
+  if (fetchingMultipleMessage) {
+    await fetchingMultipleMessage.delete().catch(console.error);
+  }
 }
 
 export async function scryfallGetCard(
   message: Message,
-  cardName: string,
-  isSpecificSet: string | undefined = undefined,
-  isSpecificNumber: number | undefined = undefined,
-  isExact: boolean = true,
-  fromSelectMenu: boolean = false
+  cardName = "",
+  modifiers: Modifiers,
+  fromSelectMenu = false
 ): Promise<void> {
-  const results: string[] = await Cards.autoCompleteName(cardName);
+  let results: string[] = [""];
+
+  if (modifiers.isSyntax) {
+    results = (await Cards.search(cardName).get(25)).map(
+      (card: Card) => card.name
+    );
+  } else if (cardName) {
+    results = await Cards.autoCompleteName(cardName);
+  }
 
   /*
    * An explanation for 'fromSelectMenu':
@@ -83,21 +104,21 @@ export async function scryfallGetCard(
    * _always_ go straight to scryfallCardFound, using the first result if multiple.
    */
   if (!results.length) {
-    scryfallNoCardFound(message, cardName);
+    await scryfallNoCardFound(message, cardName);
   } else if (
     results.length === 1 ||
     (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
-      isExact) ||
+      !modifiers.isFuzzy) ||
     fromSelectMenu
   ) {
     await scryfallCardFound(
       message,
       results[0],
-      isSpecificSet,
-      isSpecificNumber
+      modifiers.isSpecificSet,
+      modifiers.isSpecificNumber
     );
   } else {
-    await scryfallShowCardList(message, cardName, results);
+    await scryfallShowCardList(message, results, modifiers);
   }
 }
 

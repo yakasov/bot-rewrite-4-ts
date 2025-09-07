@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
-import { BotContext } from "../../types/BotContext";
+import type { BotContext } from "../../types/BotContext.d.ts";
 import { getMCStatus } from "../../tasks/checkMinecraftServer";
-import { MinecraftTypes } from "../../types/responses/MinecraftResponse";
+import type { MinecraftResponse, NeatResponse } from "../../types/responses/MinecraftResponse.d.ts";
 
 export default {
   data: new SlashCommandBuilder()
@@ -21,10 +21,10 @@ export default {
       return;
     }
 
-    const response: MinecraftTypes.Response | null = await getMCStatus(context);
+    const response: MinecraftResponse | null = await getMCStatus(context);
     if (response === null) return;
 
-    const mappedResponse: MinecraftTypes.NeatResponse = {
+    const mappedResponse: NeatResponse = {
       host: response.host,
       ip: response.ip_address,
       port: response.port,

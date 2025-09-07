@@ -31,8 +31,8 @@ export default {
         .setImage(avatar)
         .setAuthor({ name: interaction.member?.displayName });
       await interaction.reply({ embeds: [embed] });
-    } catch (err: any) {
-      await interaction.reply(err.message);
+    } catch (err: unknown) {
+      console.error(err);
     }
   },
 };

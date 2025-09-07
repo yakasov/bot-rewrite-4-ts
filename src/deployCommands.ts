@@ -1,9 +1,11 @@
+/* eslint-disable */
+
 import { REST, Routes } from "discord.js";
 import path from "node:path";
 import configJSON from "../resources/config.json";
 import { getCommandFiles } from "./util/getCommandFiles";
 import { keys } from "./keys";
-import { Config } from "./types/Config";
+import type { Config } from "./types/Config.d.ts";
 
 const config: Config = configJSON;
 
@@ -46,7 +48,7 @@ async function deployCommands() {
         (data as any[]).length
       } application (/) commands.`
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
   }
 }

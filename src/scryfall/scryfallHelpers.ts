@@ -1,17 +1,24 @@
-import { PricingData } from "../types/scryfall/PricingData";
-import { OracleResponse } from "../types/scryfall/OracleResponse";
-import { Card, Prices } from "scryfall-api";
-import { URL_SCRYFALL_ORACLE } from "../consts/constants";
+import type { PricingData } from "../types/scryfall/PricingData.d.ts";
+import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
+import { Card, Cards, Prices } from "yakasov-scryfall-api";
+import {
+  SCRYFALL_DEFAULT_QUERY,
+  URL_SCRYFALL_ORACLE,
+} from "../consts/constants";
 
-const acceptedPrices = ["usd", "usd_foil", "eur", "eur_foil"];
+const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
+let totalCards: number = 0;
 
-export function convertPricesToGBP(prices: Prices): number[] {
+export function to2DP(number: number): string {
+  return (Math.round(number * 100) / 100).toFixed(2);
+}
+
+export function pricesToGBPArray(prices: Prices): number[] {
   return Object.entries(prices)
-      .filter(([key, value]) => acceptedPrices.includes(key) && value !== null)
-      .map(
-        ([key, value]) =>
-          parseFloat(value!) * (key.includes("usd") ? 0.75 : 0.87)
-      );
+    .filter(([key, value]) => acceptedPrices.includes(key) && value !== null)
+    .map(
+      ([key, value]) => parseFloat(value) * (key.includes("usd") ? 0.75 : 0.87)
+    );
 }
 
 export async function getLowestHighestData(
@@ -43,10 +50,9 @@ export async function getLowestHighestData(
     lowestSet: "",
     lowestUrl: "",
   };
-  
 
   Object.values(oracleCards).forEach((cardData: Card) => {
-    const convertedPrices = convertPricesToGBP(cardData.prices);
+    const convertedPrices = pricesToGBPArray(cardData.prices);
     const lowestPrice: number = Math.min(...convertedPrices) ?? Infinity;
     const highestPrice: number = Math.max(...convertedPrices) ?? -Infinity;
 
@@ -70,4 +76,27 @@ export async function getLowestHighestData(
   });
 
   return lowestHighestData;
+}
+
+export async function getCardDetails(
+  cardName: string,
+  set: string | undefined = undefined,
+  number: number | undefined = undefined
+): Promise<Card | undefined> {
+  const cardDetails: Card | undefined =
+    set && number
+      ? await Cards.bySet(set, number)
+      : await Cards.byName(cardName, set, true);
+
+  return cardDetails;
+}
+
+export async function getTotalCards() {
+  if (totalCards === 0) {
+    totalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
+      .then((response: Response) => response.json())
+      .then((response: OracleResponse) => response.total_cards);
+  }
+
+  return totalCards;
 }

@@ -8,15 +8,20 @@ import {
 } from "discord.js";
 import birthdaysJSON from "../../resources/birthdays.json";
 import moment from "moment-timezone";
-import { BotContext } from "../types/BotContext";
-import { BirthdayStates } from "../types/RunState";
-import { Birthdays } from "../types/Birthdays";
+import type { BotContext } from "../types/BotContext.d.ts";
+import type { Birthdays } from "../types/Birthdays.d.ts";
 
 const birthdays: Birthdays = birthdaysJSON;
 
+enum BirthdayStates {
+  NORMAL = 0,
+  FIRST_RUN = 1,
+  ERROR_STOP = 2,
+}
+
 export async function checkBirthdays(
   context: BotContext,
-  force: boolean = false
+  force = false
 ): Promise<void> {
   const today: moment.Moment = moment().tz("Europe/London");
 
@@ -52,13 +57,14 @@ export async function checkBirthdays(
     const guildMembers: Collection<string, GuildMember> = guild.members.cache;
 
     if (context.runState.birthdays === BirthdayStates.FIRST_RUN) {
-      const promises: Promise<void | User>[] = [];
+      const promises: Promise<undefined | User>[] = [];
 
       for (const id of Object.keys(birthdays)) {
         if (!guildMembers.some((member: GuildMember) => member.id === id)) {
           promises.push(
             context.client.users.fetch(id).then((user: User) => {
               console.warn(`${id} (${user?.tag || "unknown user"})`);
+              return undefined;
             })
           );
         }

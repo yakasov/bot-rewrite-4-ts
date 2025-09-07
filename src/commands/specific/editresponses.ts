@@ -8,11 +8,11 @@ import {
 } from "discord.js";
 import { generateRollTable } from "../../util/generateRollTable";
 import chanceResponsesJSON from "../../../resources/chanceResponses.json";
-import { ChanceResponse } from "../../types/JSON";
-import { BotContext } from "../../types/BotContext";
+import type { ChanceResponse } from "../../types/JSON.d.ts";
+import type { BotContext } from "../../types/BotContext.d.ts";
 
-const chanceResponses: { [key: string]: ChanceResponse } =
-  chanceResponsesJSON as { [key: string]: ChanceResponse };
+const chanceResponses: Record<string, ChanceResponse> =
+  chanceResponsesJSON as Record<string, ChanceResponse>;
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,7 +42,9 @@ export default {
     interaction: ChatInputCommandInteraction,
     context: BotContext
   ): Promise<void> {
-    const key: string = interaction.options.getString("key")!;
+    if (!interaction.guild) return;
+
+    const key: string = interaction.options.getString("key") as string;
     const string: string | null = interaction.options.getString("string");
     const chance: number | null = interaction.options.getNumber("chance");
     const type: string | null = interaction.options.getString("type");
@@ -51,7 +53,7 @@ export default {
     await interaction.client.application.fetch();
     if (
       interaction.user === interaction.client.application.owner ||
-      interaction.user.id === (await interaction.guild?.fetchOwner()!).user.id
+      interaction.user.id === (await interaction.guild.fetchOwner()).user.id
     ) {
       try {
         if (!chanceResponses[key] && !(string && chance && type)) {
@@ -89,8 +91,8 @@ export default {
 
         await interaction.reply(`Updated ${key}.`);
         return;
-      } catch (err: any) {
-        await interaction.reply(err.message);
+      } catch (err: unknown) {
+        console.error(err);
         return;
       }
     }

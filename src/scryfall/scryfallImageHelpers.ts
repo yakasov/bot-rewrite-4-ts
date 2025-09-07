@@ -2,8 +2,12 @@ import fs from "fs";
 import { IncomingMessage } from "http";
 import https from "https";
 import joinImages from "join-images";
-import { Card } from "scryfall-api";
-import { Sharp } from "sharp";
+import { Card } from "yakasov-scryfall-api";
+import sharp, { Sharp } from "sharp";
+import { SetResponse } from "../types/scryfall/SetResponse";
+import { SCRYFALL_SET_IMAGES_PATH } from "../consts/constants";
+
+const setImageCache: string[] = [];
 
 export async function getImageUrl(
   cardDetails: Card
@@ -25,7 +29,9 @@ export async function combineImages(card: Card): Promise<string> {
     downloadImage(card, 0, baseFilePath),
     downloadImage(card, 1, baseFilePath),
   ]);
-  const image: Sharp | undefined = await joinImages(filePaths, { direction: "horizontal" }).catch((err: any) => undefined);
+  const image: Sharp | undefined = await joinImages(filePaths, {
+    direction: "horizontal",
+  }).catch(() => undefined);
   if (!image) return "";
   await image.toFile(`${baseFilePath}.jpg`);
 
@@ -37,7 +43,7 @@ export function downloadImage(
   card: Card,
   i: number,
   baseFilePath: string
-): Promise<any> {
+): Promise<string> {
   if (!card.card_faces?.[i].image_uris?.large) return new Promise(() => {});
 
   return new Promise((resolve, reject) => {
@@ -46,7 +52,7 @@ export function downloadImage(
     );
     https
       .get(
-        card.card_faces?.[i].image_uris?.large!,
+        card.card_faces?.[i].image_uris?.large as string,
         (response: IncomingMessage) => {
           response.pipe(file);
 
@@ -70,7 +76,7 @@ export async function deleteFiles(filePaths: string[]): Promise<void> {
     filePaths.map(
       (filePath: string) =>
         new Promise<void>((resolve, reject) => {
-          fs.unlink(filePath, (err: any) => {
+          fs.unlink(filePath, (err: unknown) => {
             if (err) {
               reject(err);
             } else {
@@ -80,4 +86,43 @@ export async function deleteFiles(filePaths: string[]): Promise<void> {
         })
     )
   );
+}
+
+export async function getSetImage(cardDetails: Card): Promise<boolean> {
+  if (setImageCache.length === 0) {
+    fs.readdir(
+      SCRYFALL_SET_IMAGES_PATH,
+      (_: NodeJS.ErrnoException | null, files: string[]) => {
+        if (files) {
+          files.map((file: string) => setImageCache.push(file));
+        }
+      }
+    );
+  }
+
+  if (setImageCache.includes(cardDetails.id)) return true;
+
+  const setInfo: SetResponse = await fetch(cardDetails.set_uri).then(
+    (response: Response) => response.json()
+  );
+  const setSvgBuffer: ArrayBuffer = await fetch(setInfo.icon_svg_uri).then(
+    (response: Response) => response.arrayBuffer()
+  );
+  const setIconPng: Sharp = sharp(setSvgBuffer, { density: 300 }).negate({
+    alpha: false,
+  });
+  const hasSaved: boolean = await setIconPng
+    .toFile(`${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.id}.png`)
+    .then((_: sharp.OutputInfo) => {
+      setImageCache.push(cardDetails.id);
+      return true;
+    })
+    .catch((err: unknown) => {
+      console.error(err);
+      return false;
+    });
+
+  setImageCache.push(cardDetails.id);
+
+  return hasSaved;
 }

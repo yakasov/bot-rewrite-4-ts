@@ -12,14 +12,13 @@ import {
   Legalities,
   Rarity,
   SetType,
-} from "scryfall-api";
+} from "yakasov-scryfall-api";
 
 export const mockCardCore = {
   id: "card-id",
   lang: "en" as CardLanguage,
   layout: "battle" as CardLayout,
-  // This is a good reason to NOT use TypeScript
-  object: "card" as "card",
+  object: "card" as const,
   prints_search_uri: "https://www.example-uri.com/",
   rulings_uri: "https://www.example-uri.com/",
   scryfall_uri: "https://www.example-uri.com/",
@@ -126,5 +125,5 @@ export const mockCardFace: CardFace = {
   },
   mana_cost: "5",
   name: "card-face",
-  object: "card_face" as "card_face",
+  object: "card_face" as const,
 };

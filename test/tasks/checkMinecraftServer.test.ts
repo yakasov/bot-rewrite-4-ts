@@ -1,7 +1,6 @@
 import * as TestModule from "../../src/tasks/checkMinecraftServer";
 import { MinecraftQueryStates } from "../../src/types/RunState";
 import { mockBotContext } from "../mocks/context";
-import { mockClient } from "../mocks/discord";
 import { mockMinecraftResponse, mockResponse } from "../mocks/responses";
 
 describe("getMCStatus", () => {

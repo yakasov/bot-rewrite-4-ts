@@ -1,6 +1,6 @@
 import { Guild, GuildBasedChannel, User } from "discord.js";
-import { BotContext } from "../types/BotContext";
-import { GuildStats, StatsMessage } from "../types/Stats";
+import type { BotContext } from "../types/BotContext.d.ts";
+import type { GuildStats, StatsMessage } from "../types/Stats.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
 
 export async function sendMessage(

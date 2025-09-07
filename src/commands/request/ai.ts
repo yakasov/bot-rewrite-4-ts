@@ -13,7 +13,7 @@ import {
   AI_MODEL,
   REGEX_DISCORD_MESSAGE_LENGTH,
 } from "../../consts/constants";
-import { BotContext } from "../../types/BotContext";
+import type { BotContext } from "../../types/BotContext.d.ts";
 import OpenAI from "openai";
 import { keys } from "../../keys";
 import {
@@ -21,7 +21,7 @@ import {
   ChatCompletionMessage,
   ChatCompletionUserMessageParam,
 } from "openai/resources/index";
-import { OpenAIConversation } from "../../types/OpenAI";
+import type { OpenAIConversation } from "../../types/OpenAI.d.ts";
 
 const openai: OpenAI | undefined = keys.OPENAI_TOKEN ? new OpenAI({
   apiKey: keys.OPENAI_TOKEN,
@@ -62,7 +62,7 @@ export default {
 
     await interaction.deferReply();
 
-    const prompt: string = interaction.options.getString("prompt")!;
+    const prompt: string = interaction.options.getString("prompt") as string;
     const temperature: number =
       interaction.options.getNumber("temperature") ?? AI_DEFAULT_TEMP;
 
@@ -73,7 +73,7 @@ export default {
     await interaction.followUp(`Given prompt: ${prompt}`);
 
     let response: ChatCompletion | null = null;
-    let attempts: number = 0;
+    let attempts = 0;
     const timestamp: number = Date.now();
 
     conversation = conversation.concat({
@@ -90,7 +90,7 @@ export default {
           model: AI_MODEL,
           temperature,
         });
-      } catch (err) {
+      } catch (err: unknown) {
         handleAIError(err, interaction, attempts, timestamp);
         shortenConversation();
       }
@@ -121,7 +121,7 @@ export default {
 };
 
 function handleAIError(
-  err: any,
+  err: unknown,
   interaction: Interaction,
   attempts: number,
   timestamp: number
@@ -135,15 +135,11 @@ function handleAIError(
     }
   );
 
-  if (err && err.error) {
-    console.error(
-      `\nAI Error Type: ${err.type}, message: ${err.error.message}`
-    );
-  }
+  console.error(err);
 }
 
-function formatMessages(err: any, messages: OpenAIConversation[]): string {
-  let string: string = `${err}\n\n`;
+function formatMessages(err: unknown, messages: OpenAIConversation[]): string {
+  let string = `${err}\n\n`;
   messages.forEach((message) => {
     string += `Role: ${message.role}\nContent: ${message.content}\n\n`;
   });

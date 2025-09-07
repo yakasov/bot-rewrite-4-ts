@@ -31,10 +31,11 @@ export default {
     ),
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
     // TODO: Check this command even works still
-    if (!(interaction.member instanceof GuildMember)) return;
+    if (!(interaction.member instanceof GuildMember) || !interaction.guild)
+      return;
     await interaction.deferReply();
 
-    const url: string = interaction.options.getString("url")!;
+    const url: string = interaction.options.getString("url") as string;
     if (
       !REGEX_YOUTUBE_URL_FULL.test(url) &&
       !REGEX_YOUTUBE_URL_SHORT.test(url)
@@ -55,12 +56,12 @@ export default {
       const player: AudioPlayer = createAudioPlayer();
       // TODO: Will this work if already in voice channel?
       joinVoiceChannel({
-        adapterCreator: interaction.guild?.voiceAdapterCreator!,
+        adapterCreator: interaction.guild.voiceAdapterCreator,
         channelId: voiceChannelId,
-        guildId: interaction.guild?.id!,
+        guildId: interaction.guild.id,
       }).subscribe(player);
 
-      const ytUrl: string = `${url}&bpctr=${Date.now()}&has_verified=1`;
+      const ytUrl = `${url}&bpctr=${Date.now()}&has_verified=1`;
       const stream: Stream.Readable = ytdl(ytUrl, {
         filter: "audioonly",
         highWaterMark: YT_MAX_AUDIO_SIZE,
@@ -69,8 +70,9 @@ export default {
       player.play(res);
 
       await interaction.editReply("Now playing!");
-    } catch (err: any) {
-      await interaction.editReply(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      console.error(err);
+      await interaction.editReply(`Error: ${err}`);
     }
   },
 };

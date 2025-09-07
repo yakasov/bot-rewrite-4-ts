@@ -1,15 +1,11 @@
-export interface Stats {
-  [guildId: string]: GuildStats;
-}
+export type Stats = Record<string, GuildStats>;
 
 export interface GuildStats {
   guild: {
     allowResponses: boolean;
     rankUpChannel: string;
   };
-  users: {
-    [userId: string]: UserStats;
-  };
+  users: Record<string, UserStats>;
 }
 
 export interface UserStats {
@@ -51,6 +47,6 @@ export interface TableData {
   Level: string;
   Msgs: number;
   "Voice Time": string;
-  Title: string;
+  Rank: string;
   [key: string]: string | number | undefined;
 }

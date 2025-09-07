@@ -1,5 +1,5 @@
 import { ActivityType } from "discord.js";
-import { BotContext } from "../types/BotContext";
+import type { BotContext } from "../types/BotContext.d.ts";
 import { checkBirthdays } from "../tasks/checkBirthdays";
 import { checkMinecraftServer } from "../tasks/checkMinecraftServer";
 import { checkFortnite } from "../tasks/checkFortnite";

@@ -1,10 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { Stats, GuildStats, UserStats } from "../types/Stats";
+import type { Stats, GuildStats, UserStats } from "../types/Stats.d.ts";
 
-interface OldStats {
-  [guildId: string]: OldGuildStats;
-}
+type OldStats = Record<string, OldGuildStats>;
 
 interface OldGuildStats {
   allowResponses: boolean;

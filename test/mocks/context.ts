@@ -10,6 +10,10 @@ export function mockBotContext(): BotContext {
         allowResponses: true,
         responseChance: 100,
       },
+      fortnite: {
+        checkEmotes: true,
+        checkSongs: true
+      },
       ids: {
         mainGuild: "guild-id",
         birthdayChannel: "birthday-channel-id",
