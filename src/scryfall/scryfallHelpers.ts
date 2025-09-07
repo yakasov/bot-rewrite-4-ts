@@ -1,13 +1,9 @@
 import type { PricingData } from "../types/scryfall/PricingData.d.ts";
 import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
 import { Card, Cards, Prices } from "yakasov-scryfall-api";
-import {
-  SCRYFALL_DEFAULT_QUERY,
-  URL_SCRYFALL_ORACLE,
-} from "../consts/constants";
+import { URL_SCRYFALL_ORACLE } from "../consts/constants";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
-let totalCards: number = 0;
 
 export function to2DP(number: number): string {
   return (Math.round(number * 100) / 100).toFixed(2);
@@ -89,14 +85,4 @@ export async function getCardDetails(
       : await Cards.byName(cardName, set, true);
 
   return cardDetails;
-}
-
-export async function getTotalCards() {
-  if (totalCards === 0) {
-    totalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
-      .then((response: Response) => response.json())
-      .then((response: OracleResponse) => response.total_cards);
-  }
-
-  return totalCards;
 }

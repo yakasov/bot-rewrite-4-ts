@@ -6,10 +6,11 @@ import {
 } from "discord.js";
 import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
-import { handlePrintingChoice, getPrintList } from "./scryfallPrintHelpers";
+import { handlePrintingChoice } from "./scryfallPrintHelpers";
 import { Card } from "yakasov-scryfall-api";
 import { getCardDetails } from "./scryfallHelpers";
 import { SCRYFALL_PRINTINGS_SEARCH } from "../consts/constants";
+import { getPrintList } from "./scryfallCaching";
 
 export async function scryfallCardFound(
   message: Message,

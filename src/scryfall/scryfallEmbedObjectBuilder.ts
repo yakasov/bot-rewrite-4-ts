@@ -1,8 +1,8 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { Card } from "yakasov-scryfall-api";
 import type { PricingData } from "../types/scryfall/PricingData.d.ts";
-import { getLowestHighestData, getTotalCards, to2DP } from "./scryfallHelpers";
-import { getImageUrl, getSetImage } from "./scryfallImageHelpers";
+import { getLowestHighestData, to2DP } from "./scryfallHelpers";
+import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
 import type { EmbedObject } from "../types/scryfall/Invoke.d.ts";
@@ -10,6 +10,15 @@ import {
   SCRYFALL_HEX_COLOR_CODES,
   SCRYFALL_SET_IMAGES_PATH,
 } from "../consts/constants.js";
+import {
+  getCommanderRanks,
+  getSetImage,
+  getTotalCards,
+} from "./scryfallCaching.js";
+
+function getPercentileString(amount: number, total: number) {
+  return `(top ${((amount / total) * 100).toPrecision(3)}%)`;
+}
 
 export async function getCardMessageObject(
   message: Message,
@@ -34,10 +43,19 @@ export async function getCardMessageObject(
   const edhrecRank: string = cardDetails.edhrec_rank
     ? `\n\nEDHREC Rank #${
         cardDetails.edhrec_rank
-      } of ${await getTotalCards()} (top ${(
-        (cardDetails.edhrec_rank / (await getTotalCards())) *
-        100
-      ).toPrecision(3)}%)`
+      } of ${await getTotalCards()} ${getPercentileString(
+        cardDetails.edhrec_rank,
+        await getTotalCards()
+      )}`
+    : "";
+  const commanderRanks: Record<string, number> = await getCommanderRanks();
+  const commanderEdhrecRank: string = commanderRanks[cardDetails.id]
+    ? `\nCommander #${commanderRanks[cardDetails.id]} of ${
+        Object.keys(commanderRanks).length
+      } ${getPercentileString(
+        commanderRanks[cardDetails.id],
+        Object.keys(commanderRanks).length
+      )}`
     : "";
 
   const setImageAttachment: AttachmentBuilder | null = await getSetImage(
@@ -57,7 +75,7 @@ export async function getCardMessageObject(
     .addFields(
       {
         name: "Type",
-        value: `${cardDetails.type_line}\n*${rarity}*${edhrecRank}`,
+        value: `${cardDetails.type_line}\n*${rarity}*${edhrecRank}${commanderEdhrecRank}`,
         inline: true,
       },
       {
