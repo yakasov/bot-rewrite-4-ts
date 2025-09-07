@@ -32,7 +32,12 @@ export async function getCardMessageObject(
   const rarity: string =
     cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1);
   const edhrecRank: string = cardDetails.edhrec_rank
-    ? `\n\nEDHREC Rank #${cardDetails.edhrec_rank} of ${await getTotalCards()}`
+    ? `\n\nEDHREC Rank #${
+        cardDetails.edhrec_rank
+      } of ${await getTotalCards()} (top ${(
+        (cardDetails.edhrec_rank / (await getTotalCards())) *
+        100
+      ).toPrecision(3)}%)`
     : "";
 
   const setImageAttachment: AttachmentBuilder | null = await getSetImage(
