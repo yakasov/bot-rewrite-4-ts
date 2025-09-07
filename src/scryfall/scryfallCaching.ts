@@ -98,8 +98,8 @@ export async function readWriteCommanderCache(): Promise<number> {
           flag: "r",
         })
       );
-    } catch (err: unknown) {
-      console.error(err);
+    } catch {
+      console.warn("No previous commanders.json exists!");
     }
     return cachedCommanderData.length;
   } else {
