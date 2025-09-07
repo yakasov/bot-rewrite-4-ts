@@ -75,7 +75,7 @@ export async function getCommanderRanks(): Promise<Record<string, number>> {
         "legal:commander is:commander order:edhrec"
       ).get(3000);
       for (const [index, card] of commandersArray.entries()) {
-        commanderRanks[card.id] = index;
+        commanderRanks[card.id] = index + 1;
       }
 
       await readWriteCommanderCache();
