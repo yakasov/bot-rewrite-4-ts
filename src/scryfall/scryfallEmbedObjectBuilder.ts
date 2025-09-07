@@ -1,7 +1,7 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { Card } from "yakasov-scryfall-api";
 import type { PricingData } from "../types/scryfall/PricingData.d.ts";
-import { getLowestHighestData, to2DP } from "./scryfallHelpers";
+import { getLowestHighestData, getTotalCards, to2DP } from "./scryfallHelpers";
 import { getImageUrl, getSetImage } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
@@ -49,7 +49,9 @@ export async function getCardMessageObject(
     .addFields(
       {
         name: "Type",
-        value: `${cardDetails.type_line}\n*${rarity}*`,
+        value: `${cardDetails.type_line}\n*${rarity}*\n\nEDHREC Rank #${
+          cardDetails.edhrec_rank ?? "???"
+        } of ${await getTotalCards()}`,
         inline: true,
       },
       {
@@ -77,10 +79,6 @@ export async function getCardMessageObject(
     });
   }
 
-  if (cardDetails.game_changer) {
-    embed.setThumbnail("attachment://diamond.png");
-  }
-
   const oracleId: string =
     cardDetails.oracle_id ?? cardDetails.card_faces?.[0].oracle_id ?? "";
   if (oracleId.length) {
@@ -99,6 +97,9 @@ export async function getCardMessageObject(
           : "No pricing data found!";
       embed.setFooter({
         text: text + indexString,
+        ...(cardDetails.game_changer
+          ? { iconURL: "attachment://diamond.png" }
+          : {}),
       });
     }
   } else {
