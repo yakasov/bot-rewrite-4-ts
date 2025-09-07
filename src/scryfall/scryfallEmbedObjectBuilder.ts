@@ -75,7 +75,7 @@ export async function getCardMessageObject(
     .addFields(
       {
         name: "Type",
-        value: `${cardDetails.type_line}\n*${rarity}*${edhrecRank}${commanderEdhrecRank}`,
+        value: `${cardDetails.type_line}\n*${rarity}*`,
         inline: true,
       },
       {
@@ -100,6 +100,13 @@ export async function getCardMessageObject(
     embed.setAuthor({
       name: `${cardDetails.set_name} (${cardDetails.set})`,
       iconURL: `attachment://${cardDetails.id}.png`,
+    });
+  }
+
+  if (cardDetails.edhrec_rank) {
+    embed.addFields({
+      name: "Ranking",
+      value: `${edhrecRank}${commanderEdhrecRank}`,
     });
   }
 
