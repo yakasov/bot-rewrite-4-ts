@@ -3,6 +3,12 @@ export interface Modifiers {
   isSyntax: boolean;
   isSpecificSet: string;
   isSpecificNumber: number;
+  syntaxInfo?: SyntaxInfo;
+}
+
+export interface SyntaxInfo {
+  totalCards: number;
+  searchURL: string;
 }
 
 export interface EmbedObject {

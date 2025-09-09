@@ -44,6 +44,9 @@ export async function scryfallShowCardList(
   )) as EmbedObject;
   const multipleCardsMessage: Message = await message.channel.send({
     components: [selectMenuRow.toJSON()],
+    content: modifiers.syntaxInfo
+      ? `[__Click here to see ${modifiers.syntaxInfo.totalCards} results on Scryfall!__](${modifiers.syntaxInfo.searchURL})`
+      : "",
     embeds: cardMessageObject.embeds,
     files: cardMessageObject.files,
   });
@@ -79,8 +82,6 @@ export async function scryfallShowCardList(
     await multipleCardsMessage
       .edit({
         components: [],
-        embeds: cardMessageObject.embeds,
-        files: cardMessageObject.files,
       })
       .catch((err) => console.error(err));
   }

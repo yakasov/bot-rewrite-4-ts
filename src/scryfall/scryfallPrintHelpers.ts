@@ -16,13 +16,13 @@ function getNextIndex(newIndex: number, max: number): number {
 
 export async function handlePrintingChoice(
   message: Message,
-  originalAuthorId: string,
+  originalMessage: Message,
   printDetails: Card[],
   cardDetails: Card
 ) {
   const filter: (interaction: Interaction) => boolean = (
     interaction: Interaction
-  ) => interaction.isButton() && interaction.user.id === originalAuthorId;
+  ) => interaction.isButton() && interaction.user.id === originalMessage.author.id;
 
   try {
     const collected: ButtonInteraction = (await message.awaitMessageComponent({
@@ -33,12 +33,18 @@ export async function handlePrintingChoice(
     const currentIndex: number = printDetails
       .map((card: Card) => card.id)
       .indexOf(cardDetails.id);
-    let nextIndex: number;
+    let nextIndex: number = 0;
 
     if (collected.customId === "previous") {
       nextIndex = getNextIndex(currentIndex - 1, printDetails.length);
-    } else {
+    } else if (collected.customId === "next") {
       nextIndex = getNextIndex(currentIndex + 1, printDetails.length);
+    } else {
+      await Promise.all([
+        message.delete().catch(() => {}),
+        originalMessage.delete().catch(() => {})
+      ]);
+      return;
     }
 
     const newCardDetails: Card = (await getCardDetails(
@@ -62,7 +68,7 @@ export async function handlePrintingChoice(
       }),
       handlePrintingChoice(
         message,
-        originalAuthorId,
+        originalMessage,
         printDetails,
         newCardDetails
       ),

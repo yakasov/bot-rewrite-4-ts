@@ -56,7 +56,7 @@ export async function scryfallCardFound(
 
   await handlePrintingChoice(
     cardFoundMessage,
-    message.author.id,
+    message,
     printDetails,
     cardDetails
   );
@@ -65,11 +65,11 @@ export async function scryfallCardFound(
 export function getActionButtonsRow(cardName: string): ActionRowBuilder {
   const previousButton = new ButtonBuilder()
     .setCustomId("previous")
-    .setLabel("< Previous")
+    .setLabel("←")
     .setStyle(ButtonStyle.Primary);
 
   const middleButton = new ButtonBuilder()
-    .setLabel("Printings")
+    .setLabel("Prints")
     .setURL(
       SCRYFALL_PRINTINGS_SEARCH.replace(
         "<<REPLACE>>",
@@ -80,12 +80,18 @@ export function getActionButtonsRow(cardName: string): ActionRowBuilder {
 
   const nextButton = new ButtonBuilder()
     .setCustomId("next")
-    .setLabel("Next >")
+    .setLabel("→")
     .setStyle(ButtonStyle.Primary);
+
+  const deleteButton = new ButtonBuilder()
+    .setCustomId("delete")
+    .setLabel("╳")
+    .setStyle(ButtonStyle.Danger);
 
   return new ActionRowBuilder().addComponents(
     previousButton,
     middleButton,
-    nextButton
+    nextButton,
+    deleteButton
   );
 }

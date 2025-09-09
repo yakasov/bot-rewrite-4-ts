@@ -5,7 +5,7 @@ import {
   SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS,
   SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
-import { Card, Cards } from "yakasov-scryfall-api";
+import { Card, Cards, MagicPageResult } from "yakasov-scryfall-api";
 import { scryfallCardFound } from "./scryfallCardFound";
 import { scryfallNoCardFound } from "./scryfallNoCardFound";
 import { scryfallShowCardList } from "./scryfallShowCardList";
@@ -84,9 +84,15 @@ export async function scryfallGetCard(
   let results: string[] = [""];
 
   if (modifiers.isSyntax) {
-    results = (await Cards.search(cardName).get(25)).map(
-      (card: Card) => card.name
-    );
+    const search: MagicPageResult<Card> = Cards.search(cardName);
+    const searchResults: Card[] = await search.get(25);
+    modifiers.syntaxInfo = {
+      totalCards: search.count,
+      searchURL: `https://scryfall.com/search?q=${encodeURIComponent(
+        cardName
+      )}`,
+    };
+    results = searchResults.map((card: Card) => card.name);
   } else if (cardName) {
     results = await Cards.autoCompleteName(cardName);
   }
