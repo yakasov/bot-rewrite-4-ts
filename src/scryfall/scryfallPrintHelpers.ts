@@ -3,6 +3,7 @@ import { Message, ButtonInteraction, Interaction } from "discord.js";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 import { getActionButtonsRow } from "./scryfallCardFound";
 import { getCardDetails } from "./scryfallHelpers";
+import { EmbedObject } from "../types/scryfall/Invoke";
 
 function getNextIndex(newIndex: number, max: number): number {
   if (newIndex === max) {
@@ -22,7 +23,8 @@ export async function handlePrintingChoice(
 ) {
   const filter: (interaction: Interaction) => boolean = (
     interaction: Interaction
-  ) => interaction.isButton() && interaction.user.id === originalMessage.author.id;
+  ) =>
+    interaction.isButton() && interaction.user.id === originalMessage.author.id;
 
   try {
     const collected: ButtonInteraction = (await message.awaitMessageComponent({
@@ -42,7 +44,7 @@ export async function handlePrintingChoice(
     } else {
       await Promise.all([
         message.delete().catch(() => {}),
-        originalMessage.delete().catch(() => {})
+        originalMessage.delete().catch(() => {}),
       ]);
       return;
     }
@@ -52,7 +54,7 @@ export async function handlePrintingChoice(
       printDetails[nextIndex].set,
       parseInt(printDetails[nextIndex].collector_number)
     )) as Card;
-    const cardObject = await getCardMessageObject(
+    const cardObject: EmbedObject | undefined = await getCardMessageObject(
       message,
       newCardDetails,
       `   |   Printing ${nextIndex + 1} / ${printDetails.length}`

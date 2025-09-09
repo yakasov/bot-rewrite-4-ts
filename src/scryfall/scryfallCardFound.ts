@@ -11,6 +11,7 @@ import { Card } from "yakasov-scryfall-api";
 import { getCardDetails } from "./scryfallHelpers";
 import { SCRYFALL_PRINTINGS_SEARCH } from "../consts/constants";
 import { getPrintList } from "./scryfallCaching";
+import { EmbedObject } from "../types/scryfall/Invoke";
 
 export async function scryfallCardFound(
   message: Message,
@@ -40,11 +41,13 @@ export async function scryfallCardFound(
   const currentIndex: number = printDetails
     .map((card: Card) => card.id)
     .indexOf(cardDetails.id);
-  const cardObject = await getCardMessageObject(
+  const cardObject: EmbedObject | undefined = await getCardMessageObject(
     message,
     cardDetails,
     `   |   Printing ${currentIndex + 1} / ${printDetails.length}`
   );
+
+  if (!cardObject) return;
 
   const cardFoundMessage: Message = await message.channel.send({
     components:

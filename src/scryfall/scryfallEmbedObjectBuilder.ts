@@ -17,7 +17,7 @@ import {
 } from "./scryfallCaching.js";
 
 function getPercentileString(amount: number, total: number) {
-  return `(top ${((amount / total) * 100).toPrecision(3)}%)`;
+  return `(top ${Math.min(100, ((amount / total) * 100)).toPrecision(3)}%)`;
 }
 
 export async function getCardMessageObject(
