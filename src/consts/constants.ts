@@ -44,8 +44,8 @@ export const REGEX_YOUTUBE_URL_FULL =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT = /^https?:\/\/youtu\.be\/*/gu;
 
-export const SCRYFALL_DEFAULT_QUERY: string = "https://api.scryfall.com/cards/search?q=f:edh";
-export const SCRYFALL_DEFAULT_COMMANDER_QUERY: string = "https://api.scryfall.com/cards/search?q=legal%3Acommander+is%3Acommander";
+export const SCRYFALL_DEFAULT_QUERY = "https://api.scryfall.com/cards/search?q=f:edh";
+export const SCRYFALL_DEFAULT_COMMANDER_QUERY = "https://api.scryfall.com/cards/search?q=legal%3Acommander+is%3Acommander";
 export const SCRYFALL_HEX_COLOR_CODES: Record<BorderColor, number> = {
   // "black": 0x000000,
   black: 0x4c4d53, // Black looks a bit ugly so using default colour

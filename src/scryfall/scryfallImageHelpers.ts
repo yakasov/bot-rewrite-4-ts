@@ -19,7 +19,7 @@ export async function getImageUrl(
 }
 
 export async function combineImages(card: Card): Promise<string> {
-  const baseFilePath: string = `./resources/scryfall/images/${card.id}`;
+  const baseFilePath = `./resources/scryfall/images/${card.id}`;
 
   const filePaths: string[] = await Promise.all([
     downloadImage(card, 0, baseFilePath),

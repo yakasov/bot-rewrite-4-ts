@@ -33,7 +33,7 @@ export async function handlePrintingChoice(
     const currentIndex: number = printDetails
       .map((card: Card) => card.id)
       .indexOf(cardDetails.id);
-    let nextIndex: number = 0;
+    let nextIndex = 0;
 
     if (collected.customId === "previous") {
       nextIndex = getNextIndex(currentIndex - 1, printDetails.length);
