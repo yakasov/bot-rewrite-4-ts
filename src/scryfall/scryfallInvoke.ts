@@ -43,6 +43,7 @@ export async function scryfallInvoke(message: Message): Promise<void> {
 
     const modifiers: Modifiers = {
       isFuzzy: firstString.trim()[0] === "?",
+      isPrinting: firstString.trim()[0] === "!",
       isSyntax: firstString.trim()[0] === "*",
       isSpecificSet: match.groups?.set?.trim() ?? "",
       isSpecificNumber: parseInt(match.groups?.number?.trim() ?? "0"),
@@ -50,6 +51,7 @@ export async function scryfallInvoke(message: Message): Promise<void> {
     let cardName: string | undefined = firstString
       .trim()
       .substring(Number(modifiers.isFuzzy))
+      .substring(Number(modifiers.isPrinting))
       .substring(Number(modifiers.isSyntax));
 
     if (!cardName && !modifiers.isSpecificSet && !modifiers.isSpecificNumber)
@@ -120,8 +122,7 @@ export async function scryfallGetCard(
     await scryfallCardFound(
       message,
       results[0],
-      modifiers.isSpecificSet,
-      modifiers.isSpecificNumber
+      modifiers
     );
   } else {
     await scryfallShowCardList(message, results, modifiers);

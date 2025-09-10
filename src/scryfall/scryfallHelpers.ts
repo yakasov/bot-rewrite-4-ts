@@ -1,7 +1,13 @@
 import type { PricingData } from "../types/scryfall/PricingData.d.ts";
 import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
 import { Card, Cards, Prices } from "yakasov-scryfall-api";
-import { URL_SCRYFALL_ORACLE } from "../consts/constants";
+import {
+  SCRYFALL_EDHREC_API_SEARCH,
+  URL_SCRYFALL_ORACLE,
+} from "../consts/constants";
+import { EDHRecResponse } from "../types/scryfall/EDHRecResponse.js";
+import { encodeURIToBasic } from "./scryfallCardFound.js";
+import { CardDetails } from "../types/scryfall/Invoke.js";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -78,11 +84,36 @@ export async function getCardDetails(
   cardName: string,
   set: string | undefined = undefined,
   number: number | undefined = undefined
-): Promise<Card | undefined> {
-  const cardDetails: Card | undefined =
+): Promise<CardDetails> {
+  const cardDetailsPromise: Promise<Card | undefined> =
     set && number
-      ? await Cards.bySet(set, number)
-      : await Cards.byName(cardName, set, true);
+      ? Cards.bySet(set, number)
+      : Cards.byName(cardName, set, true);
+  const edhRecPromise: Promise<EDHRecResponse | undefined> =
+    getEDHRecDetails(cardName);
 
-  return cardDetails;
+  const [cardDetails, edhRecDetails] = await Promise.all([
+    cardDetailsPromise,
+    edhRecPromise,
+  ]);
+
+  return { scry: cardDetails, edh: edhRecDetails };
+}
+
+export async function getEDHRecDetails(
+  cardName: string
+): Promise<EDHRecResponse | undefined> {
+  const EDHRecDetails: EDHRecResponse | undefined = await fetch(
+    SCRYFALL_EDHREC_API_SEARCH.replace(
+      "<<REPLACE>>",
+      encodeURIToBasic(cardName)
+    )
+  )
+    .then((response: Response) => response.text())
+    .then((response: string) =>
+      response[0] !== "<" ? JSON.parse(response) : undefined
+    )
+    .catch(() => undefined);
+
+  return EDHRecDetails;
 }

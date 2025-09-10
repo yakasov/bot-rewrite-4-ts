@@ -1,5 +1,9 @@
+import { Card } from "yakasov-scryfall-api";
+import { EDHRecResponse } from "./EDHRecResponse";
+
 export interface Modifiers {
   isFuzzy: boolean;
+  isPrinting: boolean;
   isSyntax: boolean;
   isSpecificSet: string;
   isSpecificNumber: number;
@@ -14,4 +18,9 @@ export interface SyntaxInfo {
 export interface EmbedObject {
   embeds?: EmbedBuilder[];
   files?: AttachmentBuilder[];
+}
+
+export interface CardDetails {
+  scry?: Card;
+  edh?: EDHRecResponse;
 }

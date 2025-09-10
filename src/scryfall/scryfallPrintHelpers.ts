@@ -1,9 +1,12 @@
 import { Card } from "yakasov-scryfall-api";
 import { Message, ButtonInteraction, Interaction } from "discord.js";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
-import { getActionButtonsRow } from "./scryfallCardFound";
+import {
+  getActionButtonsRow,
+  getPostActionButtonsRow,
+} from "./scryfallCardFound";
 import { getCardDetails } from "./scryfallHelpers";
-import { EmbedObject } from "../types/scryfall/Invoke";
+import { CardDetails, EmbedObject } from "../types/scryfall/Invoke";
 
 function getNextIndex(newIndex: number, max: number): number {
   if (newIndex === max) {
@@ -19,12 +22,15 @@ export async function handlePrintingChoice(
   message: Message,
   originalMessage: Message,
   printDetails: Card[],
-  cardDetails: Card
-) {
+  cardDetails: CardDetails
+): Promise<void> {
+  if (!cardDetails.scry) return;
+
   const filter: (interaction: Interaction) => boolean = (
     interaction: Interaction
   ) =>
     interaction.isButton() && interaction.user.id === originalMessage.author.id;
+  let cardName = "";
 
   try {
     const collected: ButtonInteraction = (await message.awaitMessageComponent({
@@ -34,7 +40,7 @@ export async function handlePrintingChoice(
 
     const currentIndex: number = printDetails
       .map((card: Card) => card.id)
-      .indexOf(cardDetails.id);
+      .indexOf(cardDetails.scry.id);
     let nextIndex = 0;
 
     if (collected.customId === "previous") {
@@ -49,11 +55,14 @@ export async function handlePrintingChoice(
       return;
     }
 
-    const newCardDetails: Card = (await getCardDetails(
-      cardDetails.name,
-      printDetails[nextIndex].set,
-      parseInt(printDetails[nextIndex].collector_number)
-    )) as Card;
+    const newCardDetails: CardDetails = (
+      await getCardDetails(
+        cardDetails.scry.name,
+        printDetails[nextIndex].set,
+        parseInt(printDetails[nextIndex].collector_number)
+      )
+    );
+    cardName = newCardDetails.scry?.name ?? "";
     const cardObject: EmbedObject | undefined = await getCardMessageObject(
       message,
       newCardDetails,
@@ -65,7 +74,7 @@ export async function handlePrintingChoice(
 
     Promise.all([
       collected.update({
-        components: [getActionButtonsRow(newCardDetails.name).toJSON()],
+        components: [getActionButtonsRow(cardName).toJSON()],
         ...cardObject,
       }),
       handlePrintingChoice(
@@ -78,7 +87,7 @@ export async function handlePrintingChoice(
   } catch {
     await message
       .edit({
-        components: [],
+        components: [getPostActionButtonsRow(cardName).toJSON()],
       })
       .catch((err) => console.error(err));
   }

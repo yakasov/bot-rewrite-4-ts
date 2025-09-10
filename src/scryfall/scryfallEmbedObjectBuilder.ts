@@ -1,11 +1,10 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { Card } from "yakasov-scryfall-api";
 import type { PricingData } from "../types/scryfall/PricingData.d.ts";
 import { getLowestHighestData, to2DP } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
-import type { EmbedObject } from "../types/scryfall/Invoke.d.ts";
+import type { CardDetails, EmbedObject } from "../types/scryfall/Invoke.d.ts";
 import {
   SCRYFALL_HEX_COLOR_CODES,
   SCRYFALL_SET_IMAGES_PATH,
@@ -17,65 +16,66 @@ import {
 } from "./scryfallCaching.js";
 
 function getPercentileString(amount: number, total: number) {
-  return `(top ${Math.min(100, ((amount / total) * 100)).toPrecision(3)}%)`;
+  return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;
 }
 
 export async function getCardMessageObject(
   message: Message,
-  cardDetails: Card,
+  cardDetails: CardDetails,
   indexString = ""
 ): Promise<EmbedObject | undefined> {
-  if (!isSendableChannel(message.channel)) return;
+  if (!isSendableChannel(message.channel) || !cardDetails.scry) return;
 
   const [isImageLocal, imageUrl]: [boolean, string] = await getImageUrl(
-    cardDetails
+    cardDetails.scry
   );
   const cardImageAttachment: AttachmentBuilder | null = isImageLocal
     ? new AttachmentBuilder(`${imageUrl}.jpg`)
     : null;
-  const releaseDate: moment.Moment = moment(cardDetails.released_at);
+  const releaseDate: moment.Moment = moment(cardDetails.scry.released_at);
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
   const legality: string =
-    cardDetails.legalities.commander === "legal" ? "Legal" : `Non-legal`;
+    cardDetails.scry.legalities.commander === "legal" ? "Legal" : `Non-legal`;
   const rarity: string =
-    cardDetails.rarity.charAt(0).toUpperCase() + cardDetails.rarity.slice(1);
-  const edhrecRank: string = cardDetails.edhrec_rank
+    cardDetails.scry.rarity.charAt(0).toUpperCase() +
+    cardDetails.scry.rarity.slice(1);
+  const edhrecRank: string = cardDetails.scry.edhrec_rank
     ? `\n\nEDHREC Rank #${
-        cardDetails.edhrec_rank
+        cardDetails.scry.edhrec_rank
       } of ${await getTotalCards()} ${getPercentileString(
-        cardDetails.edhrec_rank,
+        cardDetails.scry.edhrec_rank,
         await getTotalCards()
       )}`
     : "";
   const commanderRanks: Record<string, number> = await getCommanderRanks();
-  const commanderEdhrecRank: string = commanderRanks[cardDetails.id]
-    ? `\nCommander #${commanderRanks[cardDetails.id]} of ${
+  const commanderEdhrecRank: string = commanderRanks[cardDetails.scry.id]
+    ? `\nCommander #${commanderRanks[cardDetails.scry.id]} of ${
         Object.keys(commanderRanks).length
       } ${getPercentileString(
-        commanderRanks[cardDetails.id],
+        commanderRanks[cardDetails.scry.id],
         Object.keys(commanderRanks).length
       )}`
     : "";
 
   const setImageAttachment: AttachmentBuilder | null = await getSetImage(
-    cardDetails
+    cardDetails.scry
   ).then((value: boolean) =>
     value
       ? new AttachmentBuilder(
-          `${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.id}.png`
+          `${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.scry?.id}.png`
         )
       : null
   );
 
   const embed: EmbedBuilder = new EmbedBuilder()
-    .setTitle(cardDetails.name)
-    .setColor(SCRYFALL_HEX_COLOR_CODES[cardDetails.border_color])
-    .setURL(cardDetails.scryfall_uri)
+    .setTitle(cardDetails.scry.name)
+    .setColor(SCRYFALL_HEX_COLOR_CODES[cardDetails.scry.border_color])
+    .setURL(cardDetails.scry.scryfall_uri)
     .addFields(
       {
         name: "Type",
-        value: `${cardDetails.type_line}\n*${rarity}*`,
+        value: `${cardDetails.scry.type_line}\n*${rarity}*`,
         inline: true,
       },
       {
@@ -98,12 +98,12 @@ export async function getCardMessageObject(
 
   if (setImageAttachment) {
     embed.setAuthor({
-      name: `${cardDetails.set_name} (${cardDetails.set})`,
-      iconURL: `attachment://${cardDetails.id}.png`,
+      name: `${cardDetails.scry.set_name} (${cardDetails.scry.set})`,
+      iconURL: `attachment://${cardDetails.scry.id}.png`,
     });
   }
 
-  if (cardDetails.edhrec_rank) {
+  if (cardDetails.scry.edhrec_rank) {
     embed.addFields({
       name: "Ranking",
       value: `${edhrecRank}${commanderEdhrecRank}`,
@@ -111,7 +111,9 @@ export async function getCardMessageObject(
   }
 
   const oracleId: string =
-    cardDetails.oracle_id ?? cardDetails.card_faces?.[0].oracle_id ?? "";
+    cardDetails.scry.oracle_id ??
+    cardDetails.scry.card_faces?.[0].oracle_id ??
+    "";
   if (oracleId.length) {
     const lowestHighestData: PricingData | undefined =
       await getLowestHighestData(oracleId);
@@ -127,15 +129,22 @@ export async function getCardMessageObject(
             })`
           : "No pricing data found!";
       embed.setFooter({
-        text: text + indexString,
-        ...(cardDetails.game_changer
+        text:
+          text +
+          indexString +
+          (cardDetails.edh
+            ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(
+                3
+              )}`
+            : ""),
+        ...(cardDetails.scry.game_changer
           ? { iconURL: "attachment://diamond.png" }
           : {}),
       });
     }
   } else {
     console.error(
-      `Couldn't find an Oracle ID for card named ${cardDetails.name}, ID ${cardDetails.id}!`
+      `Couldn't find an Oracle ID for card named ${cardDetails.scry.name}, ID ${cardDetails.scry.id}!`
     );
   }
 
@@ -144,7 +153,7 @@ export async function getCardMessageObject(
     files: [
       ...(cardImageAttachment ? [cardImageAttachment] : []),
       ...(setImageAttachment ? [setImageAttachment] : []),
-      ...(cardDetails.game_changer
+      ...(cardDetails.scry.game_changer
         ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
         : []),
     ],

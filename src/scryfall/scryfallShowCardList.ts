@@ -8,10 +8,9 @@ import {
 } from "discord.js";
 import { scryfallGetCard } from "./scryfallInvoke";
 import { isSendableChannel } from "../util/typeGuards";
-import type { EmbedObject, Modifiers } from "../types/scryfall/Invoke.d.ts";
+import type { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke.d.ts";
 import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
 import { getCardDetails } from "./scryfallHelpers";
-import { Card } from "yakasov-scryfall-api";
 
 export async function scryfallShowCardList(
   message: Message,
@@ -37,7 +36,7 @@ export async function scryfallShowCardList(
     selectMenu
   );
 
-  const cardDetails: Card = (await getCardDetails(results[0])) as Card;
+  const cardDetails: CardDetails = (await getCardDetails(results[0]));
   const cardMessageObject: EmbedObject = (await getCardMessageObject(
     message,
     cardDetails
