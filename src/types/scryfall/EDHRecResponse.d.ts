@@ -94,7 +94,7 @@ export interface CardView {
 }
 
 export interface EDHRecCard {
-  potential_decks: number;
+  potential_decks?: number;
   color_identity: string[];
   cmc: number;
   image_uris: {
@@ -114,7 +114,7 @@ export interface EDHRecCard {
   spellbook_uri: string;
   type: string;
   combos: boolean;
-  label: string;
+  label?: string;
   legal_commander: boolean;
   url: string | null;
 }
