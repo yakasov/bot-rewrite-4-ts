@@ -132,7 +132,8 @@ export async function getCardMessageObject(
         text:
           text +
           indexString +
-          (cardDetails.edh
+          (cardDetails.edh &&
+          cardDetails.edh.container.json_dict.card.salt !== 0
             ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(
                 3
               )}`

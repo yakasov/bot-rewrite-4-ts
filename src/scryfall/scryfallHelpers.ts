@@ -83,14 +83,16 @@ export async function getLowestHighestData(
 export async function getCardDetails(
   cardName: string,
   set: string | undefined = undefined,
-  number: number | undefined = undefined
+  number: number | undefined = undefined,
+  passthroughEDH: EDHRecResponse | undefined = undefined
 ): Promise<CardDetails> {
   const cardDetailsPromise: Promise<Card | undefined> =
     set && number
       ? Cards.bySet(set, number)
       : Cards.byName(cardName, set, true);
-  const edhRecPromise: Promise<EDHRecResponse | undefined> =
-    getEDHRecDetails(cardName);
+  const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
+    ? Promise.resolve(passthroughEDH)
+    : getEDHRecDetails(cardName);
 
   const [cardDetails, edhRecDetails] = await Promise.all([
     cardDetailsPromise,

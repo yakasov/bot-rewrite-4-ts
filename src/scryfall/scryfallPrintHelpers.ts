@@ -59,7 +59,8 @@ export async function handlePrintingChoice(
       await getCardDetails(
         cardDetails.scry.name,
         printDetails[nextIndex].set,
-        parseInt(printDetails[nextIndex].collector_number)
+        parseInt(printDetails[nextIndex].collector_number),
+        cardDetails.edh
       )
     );
     cardName = newCardDetails.scry?.name ?? "";
