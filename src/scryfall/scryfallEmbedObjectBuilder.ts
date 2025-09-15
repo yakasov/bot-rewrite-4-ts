@@ -1,6 +1,5 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import type { PricingData } from "../types/scryfall/PricingData.d.ts";
-import { getLowestHighestData, to2DP } from "./scryfallHelpers";
+import { getExactPrice } from "./scryfallHelpers";
 import { getImageUrl } from "./scryfallImageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
@@ -13,7 +12,9 @@ import {
   getCommanderRanks,
   getSetImage,
   getTotalCards,
+  getTotalLegalCards,
 } from "./scryfallCaching.js";
+import { TagLink } from "../types/scryfall/EDHRecResponse";
 
 function getPercentileString(amount: number, total: number) {
   return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;
@@ -36,24 +37,33 @@ export async function getCardMessageObject(
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
   const legality: string =
-    cardDetails.scry.legalities.commander === "legal" ? "Legal" : `Non-legal`;
+    cardDetails.scry.legalities.commander === "legal"
+      ? "Legal"
+      : cardDetails.scry.legalities.commander === "banned"
+      ? "Banned"
+      : "Non-legal";
   const rarity: string =
     cardDetails.scry.rarity.charAt(0).toUpperCase() +
     cardDetails.scry.rarity.slice(1);
+
+  const cardDifference: number =
+    (await getTotalLegalCards()) - (await getTotalCards());
   const edhrecRank: string = cardDetails.scry.edhrec_rank
     ? `\n\nEDHREC Rank #${
-        cardDetails.scry.edhrec_rank
+        cardDetails.scry.edhrec_rank - cardDifference
       } of ${await getTotalCards()} ${getPercentileString(
-        cardDetails.scry.edhrec_rank,
+        cardDetails.scry.edhrec_rank - cardDifference,
         await getTotalCards()
       )}`
     : "";
   const commanderRanks: Record<string, number> = await getCommanderRanks();
-  const commanderEdhrecRank: string = commanderRanks[cardDetails.scry.id]
-    ? `\nCommander #${commanderRanks[cardDetails.scry.id]} of ${
-        Object.keys(commanderRanks).length
-      } ${getPercentileString(
-        commanderRanks[cardDetails.scry.id],
+  const commanderEdhrecRank: string = commanderRanks[
+    cardDetails.scry.oracle_id ?? cardDetails.scry.id
+  ]
+    ? `\nCommander #${
+        commanderRanks[cardDetails.scry.oracle_id ?? cardDetails.scry.id]
+      } of ${Object.keys(commanderRanks).length} ${getPercentileString(
+        commanderRanks[cardDetails.scry.oracle_id ?? cardDetails.scry.id],
         Object.keys(commanderRanks).length
       )}`
     : "";
@@ -110,44 +120,31 @@ export async function getCardMessageObject(
     });
   }
 
-  const oracleId: string =
-    cardDetails.scry.oracle_id ??
-    cardDetails.scry.card_faces?.[0].oracle_id ??
-    "";
-  if (oracleId.length) {
-    const lowestHighestData: PricingData | undefined =
-      await getLowestHighestData(oracleId);
-
-    if (lowestHighestData) {
-      const text: string =
-        lowestHighestData.lowestPrice !== Infinity &&
-        lowestHighestData.highestPrice !== -Infinity
-          ? `£${to2DP(lowestHighestData.lowestPrice)} (${
-              lowestHighestData.lowestSet
-            }) - £${to2DP(lowestHighestData.highestPrice)} (${
-              lowestHighestData.highestSet
-            })`
-          : "No pricing data found!";
-      embed.setFooter({
-        text:
-          text +
-          indexString +
-          (cardDetails.edh &&
-          cardDetails.edh.container.json_dict.card.salt !== 0
-            ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(
-                3
-              )}`
-            : ""),
-        ...(cardDetails.scry.game_changer
-          ? { iconURL: "attachment://diamond.png" }
-          : {}),
-      });
-    }
-  } else {
-    console.error(
-      `Couldn't find an Oracle ID for card named ${cardDetails.scry.name}, ID ${cardDetails.scry.id}!`
+  if (cardDetails.edh?.panels.taglinks) {
+    embed.setDescription(
+      cardDetails.edh?.panels.taglinks
+        .slice(0, 4)
+        .map((tag: TagLink) => tag.value)
+        .join(", ")
     );
   }
+
+  const collectorNumberString: string =
+    cardDetails.scry.collector_number.toString();
+  embed.setFooter({
+    text:
+      `(${cardDetails.scry.set.toUpperCase()} | ${collectorNumberString.padStart(
+        4 - collectorNumberString.length,
+        "0"
+      )}): £${getExactPrice(cardDetails.scry.prices)}` +
+      indexString +
+      (cardDetails.edh && cardDetails.edh.container.json_dict.card.salt !== 0
+        ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(3)}`
+        : ""),
+    ...(cardDetails.scry.game_changer
+      ? { iconURL: "attachment://diamond.png" }
+      : {}),
+  });
 
   return {
     embeds: [embed],

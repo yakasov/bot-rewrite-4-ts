@@ -19,6 +19,10 @@ export interface EDHRecResponse {
 export interface Panels {
   piechart: Piechart;
   links: Link[];
+  mana_curve?: Record<number, number>;
+  rank_over_time?: Record<string, RankOverTime>;
+  combocounts?: ComboCount[];
+  taglinks?: TagLink[];
   articles?: Article[];
 }
 
@@ -137,4 +141,24 @@ export interface Price {
   price: number;
   slug?: string;
   url?: string;
+}
+
+export interface TagLink {
+  count: number;
+  slug: string;
+  value: string;
+}
+
+export interface RankOverTime {
+  commander_count: number;
+  perc_of_decks_overall: number;
+  perc_of_decks_overall_ma: number;
+  rank: number;
+  rank_ma: number;
+}
+
+export interface ComboCount {
+  value: string;
+  alt: string;
+  href: string;
 }

@@ -2,12 +2,14 @@ import type { PricingData } from "../types/scryfall/PricingData.d.ts";
 import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
 import { Card, Cards, Prices } from "yakasov-scryfall-api";
 import {
+  SCRYFALL_EDHREC_API_COMMANDER_SEARCH,
   SCRYFALL_EDHREC_API_SEARCH,
   URL_SCRYFALL_ORACLE,
 } from "../consts/constants";
 import { EDHRecResponse } from "../types/scryfall/EDHRecResponse.js";
 import { encodeURIToBasic } from "./scryfallCardFound.js";
 import { CardDetails } from "../types/scryfall/Invoke.js";
+import { getCommanderRanks } from "./scryfallCaching.js";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -21,6 +23,16 @@ export function pricesToGBPArray(prices: Prices): number[] {
     .map(
       ([key, value]) => parseFloat(value) * (key.includes("usd") ? 0.75 : 0.87)
     );
+}
+
+export function getExactPrice(prices: Prices): number | string {
+  if (prices.usd) {
+    return (parseFloat(prices.usd) * 0.75).toFixed(2);
+  } else if (prices.eur) {
+    return (parseFloat(prices.eur) * 0.87).toFixed(2);
+  }
+
+  return "???";
 }
 
 export async function getLowestHighestData(
@@ -90,23 +102,25 @@ export async function getCardDetails(
     set && number
       ? Cards.bySet(set, number)
       : Cards.byName(cardName, set, true);
+  const cardDetails: Card | undefined = await cardDetailsPromise;
+
+  const isCommander: boolean = (await getCommanderRanks())[
+    cardDetails?.oracle_id ?? cardDetails?.id ?? ""
+  ] !== undefined;
   const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
     ? Promise.resolve(passthroughEDH)
-    : getEDHRecDetails(cardName);
-
-  const [cardDetails, edhRecDetails] = await Promise.all([
-    cardDetailsPromise,
-    edhRecPromise,
-  ]);
+    : getEDHRecDetails(cardName, isCommander);
+  const edhRecDetails: EDHRecResponse | undefined = await edhRecPromise;
 
   return { scry: cardDetails, edh: edhRecDetails };
 }
 
 export async function getEDHRecDetails(
-  cardName: string
+  cardName: string,
+  isCommander = false
 ): Promise<EDHRecResponse | undefined> {
   const EDHRecDetails: EDHRecResponse | undefined = await fetch(
-    SCRYFALL_EDHREC_API_SEARCH.replace(
+    (isCommander ? SCRYFALL_EDHREC_API_COMMANDER_SEARCH : SCRYFALL_EDHREC_API_SEARCH).replace(
       "<<REPLACE>>",
       encodeURIToBasic(cardName)
     )

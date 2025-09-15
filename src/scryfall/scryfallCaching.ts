@@ -4,6 +4,7 @@ import type { OracleResponse } from "../types/scryfall/OracleResponse";
 import type { SetResponse } from "../types/scryfall/SetResponse";
 import sharp, { Sharp } from "sharp";
 import {
+  SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY,
   SCRYFALL_DEFAULT_COMMANDER_QUERY,
   SCRYFALL_DEFAULT_QUERY,
   SCRYFALL_SET_IMAGES_PATH,
@@ -13,6 +14,7 @@ const printCache: Record<string, Card[]> = {};
 const setImageCache: string[] = [];
 const commanderRanks: Record<string, number> = {};
 let commanderCards = 0;
+let totalLegalCards = 0;
 let totalCards = 0;
 
 export async function getPrintList(card: Card): Promise<Card[]> {
@@ -71,14 +73,22 @@ export async function getCommanderRanks(): Promise<Record<string, number>> {
     const cachedLength: number = await readWriteCommanderCache();
 
     if ((await getTotalCommanderCards()) !== cachedLength) {
+      console.warn("No commander cache found! Generating one now...");
+      const startTime = Date.now();
       const commandersArray: Card[] = await Cards.search(
         "legal:commander is:commander order:edhrec"
       ).get(3000);
       for (const [index, card] of commandersArray.entries()) {
-        commanderRanks[card.id] = index + 1;
+        commanderRanks[card.oracle_id ?? card.id] = index + 1;
       }
 
       await readWriteCommanderCache();
+      console.warn(
+        `Commander cache created after ${(
+          (Date.now() - startTime) /
+          1000
+        ).toPrecision(2)}s!`
+      );
     }
   }
 
@@ -121,9 +131,19 @@ export async function getTotalCommanderCards(): Promise<number> {
   return commanderCards;
 }
 
+export async function getTotalLegalCards(): Promise<number> {
+  if (totalLegalCards === 0) {
+    totalLegalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
+      .then((response: Response) => response.json())
+      .then((response: OracleResponse) => response.total_cards);
+  }
+
+  return totalLegalCards;
+}
+
 export async function getTotalCards(): Promise<number> {
   if (totalCards === 0) {
-    totalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
+    totalCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards);
   }

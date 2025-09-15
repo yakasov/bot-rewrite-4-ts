@@ -30,7 +30,7 @@ export async function handlePrintingChoice(
     interaction: Interaction
   ) =>
     interaction.isButton() && interaction.user.id === originalMessage.author.id;
-  let cardName = "";
+  const cardName = cardDetails.scry.name;
 
   try {
     const collected: ButtonInteraction = (await message.awaitMessageComponent({
@@ -63,7 +63,6 @@ export async function handlePrintingChoice(
         cardDetails.edh
       )
     );
-    cardName = newCardDetails.scry?.name ?? "";
     const cardObject: EmbedObject | undefined = await getCardMessageObject(
       message,
       newCardDetails,
