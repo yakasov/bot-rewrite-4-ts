@@ -1,9 +1,9 @@
 import { Message } from "discord.js";
 import { BotContext } from "../types/BotContext";
-import { scryfallInvoke } from "../scryfall/scryfallInvoke";
+import { scryfallInvoke } from "../scryfall/invoke";
 import { addToStats } from "../stats/statsHelpers";
 import { checkMessageInvoke } from "../response/checkMessageInvoke";
-import { openLibraryInvoke } from "../books/openLibraryInvoke";
+import { openLibraryInvoke } from "../books/openLibrary/invoke";
 
 export async function handleMessageCreate(
   message: Message,

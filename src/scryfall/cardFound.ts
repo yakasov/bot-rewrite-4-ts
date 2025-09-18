@@ -5,17 +5,17 @@ import {
   Message,
 } from "discord.js";
 import { isSendableChannel } from "../util/typeGuards";
-import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
-import { handlePrintingChoice } from "./scryfallPrintHelpers";
+import { getCardMessageObject } from "./embedObjectBuilder";
+import { handlePrintingChoice } from "./helpers/printHelpers";
 import { Card } from "yakasov-scryfall-api";
-import { getCardDetails } from "./scryfallHelpers";
+import { getCardDetails } from "./helpers/commonHelpers";
 import {
   REGEX_SCRYFALL_EDHREC_PATTERN,
   SCRYFALL_EDHREC_SEARCH,
   SCRYFALL_PRINTINGS_SEARCH,
   SCRYFALL_SPELLBOOK_URL,
 } from "../consts/constants";
-import { getPrintList } from "./scryfallCaching";
+import { getPrintList } from "./caching";
 import { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
 
 export async function scryfallCardFound(

@@ -6,9 +6,9 @@ import {
   SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
 import { Card, Cards, MagicPageResult } from "yakasov-scryfall-api";
-import { scryfallCardFound } from "./scryfallCardFound";
-import { scryfallNoCardFound } from "./scryfallNoCardFound";
-import { scryfallShowCardList } from "./scryfallShowCardList";
+import { scryfallCardFound } from "./cardFound";
+import { scryfallNoCardFound } from "./noCardFound";
+import { scryfallShowCardList } from "./showCardList";
 import { isSendableChannel } from "../util/typeGuards";
 import type { Modifiers } from "../types/scryfall/Invoke.d.ts";
 

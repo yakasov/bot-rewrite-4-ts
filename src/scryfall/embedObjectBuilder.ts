@@ -1,9 +1,9 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { getExactPrice } from "./scryfallHelpers";
-import { getImageUrl } from "./scryfallImageHelpers";
+import { getExactPrice } from "./helpers/commonHelpers";
+import { getImageUrl } from "./helpers/imageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
-import type { CardDetails, EmbedObject } from "../types/scryfall/Invoke.d.ts";
+import type { CardDetails, EmbedObject } from "../types/scryfall/Invoke";
 import {
   SCRYFALL_HEX_COLOR_CODES,
   SCRYFALL_SET_IMAGES_PATH,
@@ -13,7 +13,7 @@ import {
   getSetImage,
   getTotalCards,
   getTotalLegalCards,
-} from "./scryfallCaching.js";
+} from "./caching.js";
 import { TagLink } from "../types/scryfall/EDHRecResponse";
 
 function getPercentileString(amount: number, total: number) {

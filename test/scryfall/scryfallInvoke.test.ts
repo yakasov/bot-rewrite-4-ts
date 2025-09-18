@@ -1,5 +1,5 @@
 import { Cards } from "yakasov-scryfall-api";
-import * as TestModule from "../../src/scryfall/scryfallInvoke";
+import * as TestModule from "../../src/scryfall/invoke";
 import { mockDMChannel, mockMessage } from "../mocks/discord";
 
 describe("scryfallInvoke", () => {

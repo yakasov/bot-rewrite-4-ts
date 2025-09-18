@@ -2,13 +2,13 @@ import HTMLParser, { HTMLElement } from "node-html-parser";
 import {
   BOOKS_DESCRIPTION_ERROR,
   BOOKS_INVALID_IMAGE_URL,
-} from "../consts/constants";
-import type { Book, Cover, Edition, Work } from "../types/books/OpenLibraryResponse.d.ts";
+} from "../../consts/constants";
+import type { Book, Cover, Edition, Work } from "../../types/books/OpenLibraryResponse";
 import {
   getCoverById,
   getEditions,
   getGoodreadsPage,
-} from "./openLibraryFetchers";
+} from "./fetchers";
 import moment from "moment-timezone";
 
 export async function getISBN(

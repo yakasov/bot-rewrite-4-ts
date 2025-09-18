@@ -1,15 +1,15 @@
-import type { PricingData } from "../types/scryfall/PricingData.d.ts";
-import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
+import type { PricingData } from "../../types/scryfall/PricingData";
+import type { OracleResponse } from "../../types/scryfall/OracleResponse";
 import { Card, Cards, Prices } from "yakasov-scryfall-api";
 import {
   SCRYFALL_EDHREC_API_COMMANDER_SEARCH,
   SCRYFALL_EDHREC_API_SEARCH,
   URL_SCRYFALL_ORACLE,
-} from "../consts/constants";
-import { EDHRecResponse } from "../types/scryfall/EDHRecResponse.js";
-import { encodeURIToBasic } from "./scryfallCardFound.js";
-import { CardDetails } from "../types/scryfall/Invoke.js";
-import { getCommanderRanks } from "./scryfallCaching.js";
+} from "../../consts/constants.js";
+import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
+import { encodeURIToBasic } from "../cardFound";
+import { CardDetails } from "../../types/scryfall/Invoke";
+import { getCommanderRanks } from "../caching";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 

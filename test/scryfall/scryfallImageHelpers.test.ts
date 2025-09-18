@@ -1,4 +1,4 @@
-import * as TestModule from "../../src/scryfall/scryfallImageHelpers";
+import * as TestModule from "../../src/scryfall/helpers/imageHelpers";
 import { mockCard } from "../mocks/scryfall";
 
 describe("getImageUrl", () => {

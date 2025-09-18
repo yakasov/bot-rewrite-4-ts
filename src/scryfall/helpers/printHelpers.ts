@@ -1,12 +1,12 @@
 import { Card } from "yakasov-scryfall-api";
 import { Message, ButtonInteraction, Interaction } from "discord.js";
-import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
+import { getCardMessageObject } from "../embedObjectBuilder";
 import {
   getActionButtonsRow,
   getPostActionButtonsRow,
-} from "./scryfallCardFound";
-import { getCardDetails } from "./scryfallHelpers";
-import { CardDetails, EmbedObject } from "../types/scryfall/Invoke";
+} from "../cardFound";
+import { getCardDetails } from "./commonHelpers";
+import { CardDetails, EmbedObject } from "../../types/scryfall/Invoke";
 
 function getNextIndex(newIndex: number, max: number): number {
   if (newIndex === max) {

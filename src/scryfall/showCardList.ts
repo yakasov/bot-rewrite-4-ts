@@ -6,11 +6,11 @@ import {
   Interaction,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { scryfallGetCard } from "./scryfallInvoke";
+import { scryfallGetCard } from "./invoke";
 import { isSendableChannel } from "../util/typeGuards";
-import type { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke.d.ts";
-import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
-import { getCardDetails } from "./scryfallHelpers";
+import type { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
+import { getCardMessageObject } from "./embedObjectBuilder";
+import { getCardDetails } from "./helpers/commonHelpers";
 
 export async function scryfallShowCardList(
   message: Message,
