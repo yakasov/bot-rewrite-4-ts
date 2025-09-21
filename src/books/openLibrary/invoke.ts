@@ -4,7 +4,6 @@ import {
   BOOKS_SEARCH_OPENLIBRARY_URL,
   REGEX_BOOKS_PATTERN,
 } from "../../consts/constants";
-import type { BooksResponse } from "../../types/books/OpenLibraryResponse";
 import { openLibraryShowBookList } from "./showBookList";
 import { openBooksFound } from "./bookFound";
 
@@ -48,9 +47,18 @@ export async function openLibrarySearch(
     url += `&author:${encodeURIComponent(author)}`;
   }
 
-  const results = await fetch(url)
-    .then((response: Response) => response.json())
-    .then((json: BooksResponse) => json.docs);
+  const resultsText = await fetch(url).then((response: Response) =>
+    response.text()
+  );
+
+  if (resultsText[0] !== "{") {
+    await replyMessage.edit(
+      `Error fetching book :')\n\`\`\`${resultsText}\n\`\`\``
+    );
+    return;
+  }
+
+  const results = JSON.parse(resultsText).docs;
 
   if (!results || results.length === 0) {
     replyMessage.edit(
