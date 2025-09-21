@@ -117,7 +117,7 @@ async function getGoodreadsImage(
 
   const parsedHTML: HTMLElement = HTMLParser(await getGoodreadsPage(isbn));
   const imageUrl: string | undefined =
-    parsedHTML.querySelectorAll(".ResponsiveImage")?.[0].attributes?.["src"];
+    parsedHTML.querySelectorAll(".ResponsiveImage")?.[0]?.attributes?.["src"];
 
   return imageUrl;
 }
