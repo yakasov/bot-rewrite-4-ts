@@ -13,6 +13,9 @@ interface GoodreadsAttributes {
   name: string;
   author: string;
   imageURL: string;
+  description: string;
+  genres: string;
+  footer: string;
 }
 
 export async function goodreadsInvoke(message: Message): Promise<void> {
@@ -75,6 +78,9 @@ export async function goodreadsSearch(
     const bookURLInfo: HTMLElement | null =
       bookInfo.querySelector("a[itemprop='url']");
     const bookURL = `https://www.goodreads.com${bookURLInfo?.attributes["href"]}`;
+    const parsedPage: HTMLElement = HTMLParser(
+      await fetch(bookURL).then((response: Response) => response.text())
+    );
 
     const nameElements: HTMLElement[] = bookInfo.querySelectorAll(
       "span[itemprop='name']"
@@ -90,40 +96,62 @@ export async function goodreadsSearch(
       ? `https://images-na.ssl-images-amazon.com/${imageURLMatch[0]}.jpg`
       : compressedImageURL;
 
+    const description = `${parsedPage
+      .querySelectorAll(".DetailsLayoutRightParagraph__widthConstrained")
+      ?.find((element) => element.children[0]?.classNames.includes("Formatted"))
+      ?.innerText?.slice(0, 768)}...`;
+
+    const genres: string = parsedPage
+      .querySelectorAll("span[class='BookPageMetadataSection__genreButton']")
+      .map((e) => e.innerText)
+      .join(", ");
+
+    const footer: string =
+      parsedPage
+        .querySelector("div[class='FeaturedDetails']")
+        ?.children.map((e) => e.innerText)
+        .join("\n") ?? "";
+
     await goodreadsBookFound(replyMessage, {
       url: bookURL,
       name: nameElements[0].innerText,
       author: nameElements[1].innerText,
       imageURL,
+      description,
+      genres,
+      footer,
     });
   }
 }
 
-export async function getDescription(url: string): Promise<string> {
-  const parsedHTML: HTMLElement = HTMLParser(
-    await fetch(url).then((response: Response) => response.text())
-  );
-  const description: string | undefined = parsedHTML
-    .querySelectorAll(".DetailsLayoutRightParagraph__widthConstrained")
-    ?.find((element) => element.children[0]?.classNames.includes("Formatted"))
-    ?.innerText?.slice(0, 1024);
-
-  return description ?? "";
-}
-
 export async function goodreadsBookFound(
   replyMessage: Message,
-  { url, name, author, imageURL }: GoodreadsAttributes
+  {
+    url,
+    name,
+    author,
+    imageURL,
+    description,
+    genres,
+    footer,
+  }: GoodreadsAttributes
 ): Promise<void> {
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(name)
     .setURL(url)
     .setDescription(author)
     .setImage(imageURL)
-    .addFields({
-      name: "Description",
-      value: await getDescription(url),
-    });
+    .setFooter({ text: footer })
+    .addFields(
+      {
+        name: "Description",
+        value: description,
+      },
+      {
+        name: "Genres",
+        value: genres,
+      }
+    );
 
   await replyMessage.edit({
     content: null,
