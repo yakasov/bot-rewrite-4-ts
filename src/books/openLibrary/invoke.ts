@@ -47,7 +47,7 @@ export async function openLibrarySearch(
     url += `&author:${encodeURIComponent(author)}`;
   }
 
-  const resultsText = await fetch(url).then((response: Response) =>
+  const resultsText: string = await fetch(url).then((response: Response) =>
     response.text()
   );
 
