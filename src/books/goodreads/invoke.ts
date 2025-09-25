@@ -72,6 +72,12 @@ export async function goodreadsSearch(
         inputName.includes(name)
       );
     }) ?? bookItems[0];
+  if (!bookElement || !bookElement.children) {
+    await replyMessage.edit(
+      `Could not find any results for ${input}, ${author ?? "any author"}`
+    );
+    return;
+  }
   const bookInfo: HTMLElement = bookElement.children[1];
 
   if (bookInfo) {
