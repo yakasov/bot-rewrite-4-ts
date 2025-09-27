@@ -15,9 +15,17 @@ import {
   getTotalLegalCards,
 } from "./caching.js";
 import { TagLink } from "../types/scryfall/EDHRecResponse";
+import { Card } from "yakasov-scryfall-api";
 
 function getPercentileString(amount: number, total: number) {
   return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;
+}
+
+function getTypeLine(scry: Card) {
+  return (
+    scry.type_line ??
+    `${scry.card_faces?.[0].type_line} // ${scry.card_faces?.[1].type_line}`
+  );
 }
 
 export async function getCardMessageObject(
@@ -85,7 +93,7 @@ export async function getCardMessageObject(
     .addFields(
       {
         name: "Type",
-        value: `${cardDetails.scry.type_line}\n*${rarity}*`,
+        value: `${getTypeLine(cardDetails.scry)}\n*${rarity}*`,
         inline: true,
       },
       {
