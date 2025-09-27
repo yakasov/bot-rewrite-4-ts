@@ -26,10 +26,13 @@ export function pricesToGBPArray(prices: Prices): number[] {
 }
 
 export function getExactPrice(prices: Prices): number | string {
-  if (prices.usd) {
-    return (parseFloat(prices.usd) * 0.75).toFixed(2);
-  } else if (prices.eur) {
-    return (parseFloat(prices.eur) * 0.87).toFixed(2);
+  const priceUSD: string | null =
+    prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? null;
+  const priceEUR: string | null = prices.eur ?? prices.eur_foil ?? null;
+  if (priceUSD) {
+    return (parseFloat(priceUSD) * 0.75).toFixed(2);
+  } else if (priceEUR) {
+    return (parseFloat(priceEUR) * 0.87).toFixed(2);
   }
 
   return "???";
@@ -104,9 +107,10 @@ export async function getCardDetails(
       : Cards.byName(cardName, set, true);
   const cardDetails: Card | undefined = await cardDetailsPromise;
 
-  const isCommander: boolean = (await getCommanderRanks())[
-    cardDetails?.oracle_id ?? cardDetails?.id ?? ""
-  ] !== undefined;
+  const isCommander: boolean =
+    (await getCommanderRanks())[
+      cardDetails?.oracle_id ?? cardDetails?.id ?? ""
+    ] !== undefined;
   const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
     ? Promise.resolve(passthroughEDH)
     : getEDHRecDetails(cardName, isCommander);
@@ -120,10 +124,10 @@ export async function getEDHRecDetails(
   isCommander = false
 ): Promise<EDHRecResponse | undefined> {
   const EDHRecDetails: EDHRecResponse | undefined = await fetch(
-    (isCommander ? SCRYFALL_EDHREC_API_COMMANDER_SEARCH : SCRYFALL_EDHREC_API_SEARCH).replace(
-      "<<REPLACE>>",
-      encodeURIToBasic(cardName)
-    )
+    (isCommander
+      ? SCRYFALL_EDHREC_API_COMMANDER_SEARCH
+      : SCRYFALL_EDHREC_API_SEARCH
+    ).replace("<<REPLACE>>", encodeURIToBasic(cardName))
   )
     .then((response: Response) => response.text())
     .then((response: string) =>
