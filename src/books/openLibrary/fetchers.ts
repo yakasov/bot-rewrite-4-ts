@@ -1,5 +1,5 @@
-import { BOOKS_GOODREADS_SEARCH_URL } from "../consts/constants";
-import type { Edition, Work, WorksEditions } from "../types/books/OpenLibraryResponse.d.ts";
+import { BOOKS_GOODREADS_SEARCH_URL } from "../../consts/constants";
+import type { Edition, Work, WorksEditions } from "../../types/books/OpenLibraryResponse";
 
 const badResponses = ["not found", "404 Not Found"];
 const cachedResponses: {

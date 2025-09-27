@@ -5,10 +5,10 @@ import {
   SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS,
   SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
-import { Card, Cards } from "yakasov-scryfall-api";
-import { scryfallCardFound } from "./scryfallCardFound";
-import { scryfallNoCardFound } from "./scryfallNoCardFound";
-import { scryfallShowCardList } from "./scryfallShowCardList";
+import { Card, Cards, MagicPageResult } from "yakasov-scryfall-api";
+import { scryfallCardFound } from "./cardFound";
+import { scryfallNoCardFound } from "./noCardFound";
+import { scryfallShowCardList } from "./showCardList";
 import { isSendableChannel } from "../util/typeGuards";
 import type { Modifiers } from "../types/scryfall/Invoke.d.ts";
 
@@ -43,6 +43,7 @@ export async function scryfallInvoke(message: Message): Promise<void> {
 
     const modifiers: Modifiers = {
       isFuzzy: firstString.trim()[0] === "?",
+      isPrinting: firstString.trim()[0] === "!",
       isSyntax: firstString.trim()[0] === "*",
       isSpecificSet: match.groups?.set?.trim() ?? "",
       isSpecificNumber: parseInt(match.groups?.number?.trim() ?? "0"),
@@ -50,6 +51,7 @@ export async function scryfallInvoke(message: Message): Promise<void> {
     let cardName: string | undefined = firstString
       .trim()
       .substring(Number(modifiers.isFuzzy))
+      .substring(Number(modifiers.isPrinting))
       .substring(Number(modifiers.isSyntax));
 
     if (!cardName && !modifiers.isSpecificSet && !modifiers.isSpecificNumber)
@@ -84,9 +86,15 @@ export async function scryfallGetCard(
   let results: string[] = [""];
 
   if (modifiers.isSyntax) {
-    results = (await Cards.search(cardName).get(25)).map(
-      (card: Card) => card.name
-    );
+    const search: MagicPageResult<Card> = Cards.search(cardName);
+    const searchResults: Card[] = await search.get(25);
+    modifiers.syntaxInfo = {
+      totalCards: search.count,
+      searchURL: `https://scryfall.com/search?q=${encodeURIComponent(
+        cardName
+      )}`,
+    };
+    results = searchResults.map((card: Card) => card.name);
   } else if (cardName) {
     results = await Cards.autoCompleteName(cardName);
   }
@@ -114,8 +122,7 @@ export async function scryfallGetCard(
     await scryfallCardFound(
       message,
       results[0],
-      modifiers.isSpecificSet,
-      modifiers.isSpecificNumber
+      modifiers
     );
   } else {
     await scryfallShowCardList(message, results, modifiers);

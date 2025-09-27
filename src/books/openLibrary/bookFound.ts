@@ -1,10 +1,10 @@
 import { Message, EmbedBuilder } from "discord.js";
-import { REGEX_DISCORD_MESSAGE_LENGTH_SHORT } from "../consts/constants";
-import type { Book, Work } from "../types/books/OpenLibraryResponse.d.ts";
-import { wrapCodeBlockString } from "../util/commonFunctions";
-import { isSendableChannel } from "../util/typeGuards";
-import { getSourceImage, getSourceDescription } from "./openLibraryHelpers";
-import { getWork } from "./openLibraryFetchers";
+import { REGEX_DISCORD_MESSAGE_LENGTH_SHORT } from "../../consts/constants";
+import type { Book, Work } from "../../types/books/OpenLibraryResponse";
+import { wrapCodeBlockString } from "../../util/commonFunctions";
+import { isSendableChannel } from "../../util/typeGuards";
+import { getSourceImage, getSourceDescription } from "./helpers";
+import { getWork } from "./fetchers";
 
 export async function openBooksFound(
   message: Message,

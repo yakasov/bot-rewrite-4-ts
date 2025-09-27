@@ -1,6 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { URL_API_RULES } from "../../consts/constants";
-import type { APIResponse, Rules } from "../../types/responses/APIResponse.d.ts";
+import type {
+  APIResponse,
+  Rules,
+} from "../../types/responses/APIResponse.d.ts";
 
 module.exports = {
   data: new SlashCommandBuilder().setName("rules").setDescription("The rules."),
@@ -14,9 +17,30 @@ module.exports = {
       .then((response: Response) => response.json())
       .then((json: APIResponse) => json.data);
 
-    const output: string = Object.entries(rules)
-      .map(([ruleId, ruleValue]) => `**Rule ${ruleId}**: ${ruleValue}.`)
+    const rulesString: string = Object.entries(rules)
+      .filter(
+        ([ruleId, ruleValue]) =>
+          /^.*?[0-9]$/.test(ruleId[0]) && ruleValue !== ""
+      )
+      .map(
+        ([ruleId, ruleValue]) =>
+          `**Rule ${ruleId}**: ${ruleValue}${
+            ruleValue.slice(-1) !== "." ? "." : ""
+          }`
+      )
       .join("\n");
+    const lawsString: string = Object.entries(rules)
+      .filter(
+        ([lawName, lawValue]) => !/^.*?[0-9]$/.test(lawName[0]) && lawValue !== ""
+      )
+      .map(
+        ([lawName, lawValue]) =>
+          `**${lawName}**: ${lawValue}${
+            lawValue.slice(-1) !== "." ? "." : ""
+          }`
+      )
+      .join("\n");
+    const output = `# Rules\n${rulesString}\n\n# Laws\n${lawsString}`;
     interaction.reply(output);
   },
 };

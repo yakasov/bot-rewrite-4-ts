@@ -1,23 +1,12 @@
 import { Card } from "yakasov-scryfall-api";
-import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
 import { Message, ButtonInteraction, Interaction } from "discord.js";
-import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
-import { getActionButtonsRow } from "./scryfallCardFound";
-import { getCardDetails } from "./scryfallHelpers";
-
-const printCache: Record<string, Card[]> = {};
-
-export async function getPrintList(card: Card): Promise<Card[]> {
-  if (!card.oracle_id) return [];
-
-  if (!printCache[card.oracle_id]) {
-    printCache[card.oracle_id] = await fetch(card.prints_search_uri)
-      .then((response: Response) => response.json())
-      .then((response: OracleResponse) => response.data);
-  }
-
-  return printCache[card.oracle_id];
-}
+import { getCardMessageObject } from "../embedObjectBuilder";
+import {
+  getActionButtonsRow,
+  getPostActionButtonsRow,
+} from "../cardFound";
+import { getCardDetails } from "./commonHelpers";
+import { CardDetails, EmbedObject } from "../../types/scryfall/Invoke";
 
 function getNextIndex(newIndex: number, max: number): number {
   if (newIndex === max) {
@@ -31,13 +20,17 @@ function getNextIndex(newIndex: number, max: number): number {
 
 export async function handlePrintingChoice(
   message: Message,
-  originalAuthorId: string,
+  originalMessage: Message,
   printDetails: Card[],
-  cardDetails: Card
-) {
+  cardDetails: CardDetails
+): Promise<void> {
+  if (!cardDetails.scry) return;
+
   const filter: (interaction: Interaction) => boolean = (
     interaction: Interaction
-  ) => interaction.isButton() && interaction.user.id === originalAuthorId;
+  ) =>
+    interaction.isButton() && interaction.user.id === originalMessage.author.id;
+  const cardName = cardDetails.scry.name;
 
   try {
     const collected: ButtonInteraction = (await message.awaitMessageComponent({
@@ -47,21 +40,30 @@ export async function handlePrintingChoice(
 
     const currentIndex: number = printDetails
       .map((card: Card) => card.id)
-      .indexOf(cardDetails.id);
-    let nextIndex: number;
+      .indexOf(cardDetails.scry.id);
+    let nextIndex = 0;
 
     if (collected.customId === "previous") {
       nextIndex = getNextIndex(currentIndex - 1, printDetails.length);
-    } else {
+    } else if (collected.customId === "next") {
       nextIndex = getNextIndex(currentIndex + 1, printDetails.length);
+    } else {
+      await Promise.all([
+        message.delete().catch(() => {}),
+        originalMessage.delete().catch(() => {}),
+      ]);
+      return;
     }
 
-    const newCardDetails: Card = (await getCardDetails(
-      cardDetails.name,
-      printDetails[nextIndex].set,
-      parseInt(printDetails[nextIndex].collector_number)
-    )) as Card;
-    const cardObject = await getCardMessageObject(
+    const newCardDetails: CardDetails = (
+      await getCardDetails(
+        cardDetails.scry.name,
+        printDetails[nextIndex].set,
+        parseInt(printDetails[nextIndex].collector_number),
+        cardDetails.edh
+      )
+    );
+    const cardObject: EmbedObject | undefined = await getCardMessageObject(
       message,
       newCardDetails,
       `   |   Printing ${nextIndex + 1} / ${printDetails.length}`
@@ -72,12 +74,12 @@ export async function handlePrintingChoice(
 
     Promise.all([
       collected.update({
-        components: [getActionButtonsRow(newCardDetails.name).toJSON()],
+        components: [getActionButtonsRow(cardName).toJSON()],
         ...cardObject,
       }),
       handlePrintingChoice(
         message,
-        originalAuthorId,
+        originalMessage,
         printDetails,
         newCardDetails
       ),
@@ -85,7 +87,7 @@ export async function handlePrintingChoice(
   } catch {
     await message
       .edit({
-        components: [],
+        components: [getPostActionButtonsRow(cardName).toJSON()],
       })
       .catch((err) => console.error(err));
   }

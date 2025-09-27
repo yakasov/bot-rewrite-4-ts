@@ -1,4 +1,4 @@
-import * as TestModule from "../../src/scryfall/scryfallShowCardList";
+import * as TestModule from "../../src/scryfall/showCardList";
 import { mockMessage } from "../mocks/discord";
 
 describe("scryfallShowCardList", () => {

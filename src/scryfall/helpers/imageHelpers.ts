@@ -3,11 +3,7 @@ import { IncomingMessage } from "http";
 import https from "https";
 import joinImages from "join-images";
 import { Card } from "yakasov-scryfall-api";
-import sharp, { Sharp } from "sharp";
-import { SetResponse } from "../types/scryfall/SetResponse";
-import { SCRYFALL_SET_IMAGES_PATH } from "../consts/constants";
-
-const setImageCache: string[] = [];
+import { Sharp } from "sharp";
 
 export async function getImageUrl(
   cardDetails: Card
@@ -23,7 +19,7 @@ export async function getImageUrl(
 }
 
 export async function combineImages(card: Card): Promise<string> {
-  const baseFilePath: string = `./resources/scryfall/images/${card.id}`;
+  const baseFilePath = `./resources/scryfall/images/${card.id}`;
 
   const filePaths: string[] = await Promise.all([
     downloadImage(card, 0, baseFilePath),
@@ -86,43 +82,4 @@ export async function deleteFiles(filePaths: string[]): Promise<void> {
         })
     )
   );
-}
-
-export async function getSetImage(cardDetails: Card): Promise<boolean> {
-  if (setImageCache.length === 0) {
-    fs.readdir(
-      SCRYFALL_SET_IMAGES_PATH,
-      (_: NodeJS.ErrnoException | null, files: string[]) => {
-        if (files) {
-          files.map((file: string) => setImageCache.push(file));
-        }
-      }
-    );
-  }
-
-  if (setImageCache.includes(cardDetails.id)) return true;
-
-  const setInfo: SetResponse = await fetch(cardDetails.set_uri).then(
-    (response: Response) => response.json()
-  );
-  const setSvgBuffer: ArrayBuffer = await fetch(setInfo.icon_svg_uri).then(
-    (response: Response) => response.arrayBuffer()
-  );
-  const setIconPng: Sharp = sharp(setSvgBuffer, { density: 300 }).negate({
-    alpha: false,
-  });
-  const hasSaved: boolean = await setIconPng
-    .toFile(`${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.id}.png`)
-    .then((_: sharp.OutputInfo) => {
-      setImageCache.push(cardDetails.id);
-      return true;
-    })
-    .catch((err: unknown) => {
-      console.error(err);
-      return false;
-    });
-
-  setImageCache.push(cardDetails.id);
-
-  return hasSaved;
 }

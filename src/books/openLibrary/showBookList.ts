@@ -6,9 +6,9 @@ import {
   StringSelectMenuInteraction,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import type { Book } from "../types/books/OpenLibraryResponse.d.ts";
-import { isSendableChannel } from "../util/typeGuards";
-import { openBooksFound } from "./openLibraryBookFound";
+import type { Book } from "../../types/books/OpenLibraryResponse";
+import { isSendableChannel } from "../../util/typeGuards";
+import { openBooksFound } from "./bookFound";
 
 export async function openLibraryShowBookList(
   message: Message,

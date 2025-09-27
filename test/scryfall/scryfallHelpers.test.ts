@@ -1,4 +1,4 @@
-import * as TestModule from "../../src/scryfall/scryfallHelpers";
+import * as TestModule from "../../src/scryfall/helpers/commonHelpers";
 import { mockResponse } from "../mocks/responses";
 import { mockCard } from "../mocks/scryfall";
 

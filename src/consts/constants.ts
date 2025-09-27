@@ -35,7 +35,9 @@ export const REGEX_BOOKS_PATTERN =
   /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
+export const REGEX_GOODREADS_IMAGE_PATTERN = /(images\/S\/compressed\.photo\.goodreads\.com\/books\/\d+i\/\d+)/gu;
 export const REGEX_SANITIZE_STRING = /[^\x00-\x7F]/gu;
+export const REGEX_SCRYFALL_EDHREC_PATTERN = /[^ a-zA-Z0-9]/gu;
 export const REGEX_SCRYFALL_PATTERN =
   /\[\[\s*(?<card>[^|\]]*?)\s*(?:\|\s*(?<set>[^|\]]*?))?(?:\|\s*(?<number>[^|\]]+?))?\s*\]\]/gu;
 export const REGEX_STEAM_LINK = /https:\/\/steamcommunity\.com\S*/gu;
@@ -44,7 +46,19 @@ export const REGEX_YOUTUBE_URL_FULL =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
 export const REGEX_YOUTUBE_URL_SHORT = /^https?:\/\/youtu\.be\/*/gu;
 
-export const SCRYFALL_DEFAULT_QUERY: string = "https://api.scryfall.com/cards/search?q=f:edh";
+export const SCRYFALL_BANNED_QUERY =
+  "https://api.scryfall.com/cards/search?q=banned%3Acommander";
+export const SCRYFALL_DEFAULT_QUERY =
+  "https://api.scryfall.com/cards/search?q=order%3Aedhrec+game%3Apaper+direction%3Adesc+legal%3Acommander+-s%3Aunf+-s%3Asunf+-type%3Abasic+-is%3Ameld+&unique=cards&as=grid&order=name";
+export const SCRYFALL_DEFAULT_COMMANDER_QUERY =
+  "https://api.scryfall.com/cards/search?q=legal%3Acommander+is%3Acommander";
+  export const SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY =
+  "https://api.scryfall.com/cards/search?q=legal%3Acommander";
+export const SCRYFALL_EDHREC_API_SEARCH =
+  "https://json.edhrec.com/pages/cards/<<REPLACE>>.json";
+export const SCRYFALL_EDHREC_API_COMMANDER_SEARCH =
+  "https://json.edhrec.com/pages/commanders/<<REPLACE>>.json";
+export const SCRYFALL_EDHREC_SEARCH = "https://edhrec.com/cards/";
 export const SCRYFALL_HEX_COLOR_CODES: Record<BorderColor, number> = {
   // "black": 0x000000,
   black: 0x4c4d53, // Black looks a bit ugly so using default colour
@@ -74,6 +88,8 @@ export const SCRYFALL_MINOR_SPELLING_MISTAKE_RESPONSES: string[] = [
 export const SCRYFALL_PRINTINGS_SEARCH =
   "https://scryfall.com/search?as=grid&order=released&q=%21%22<<REPLACE>>%22+include%3Aextras&unique=prints";
 export const SCRYFALL_SET_IMAGES_PATH = "./resources/scryfall/sets";
+export const SCRYFALL_SPELLBOOK_URL =
+  "https://commanderspellbook.com/search/?q=";
 export const SCRYFALL_SYNTAX_PREFIX = "order:edhrec game:paper ";
 
 export const STEAM_URL_LINK =

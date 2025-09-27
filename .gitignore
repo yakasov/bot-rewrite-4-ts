@@ -5,3 +5,4 @@ coverage
 *.backup
 resources/scryfall/images/*
 resources/scryfall/sets/*
+resources/scryfall/commanders.json

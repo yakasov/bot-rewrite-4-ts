@@ -1,16 +1,16 @@
 import { EmbedBuilder, Message } from "discord.js";
 import HTMLParser from "node-html-parser";
 import ISBN from "isbn3";
-import { isSendableChannel } from "../util/typeGuards";
+import { isSendableChannel } from "../../util/typeGuards";
 import {
   BOOKS_GOODREADS_SEARCH_URL,
   BOOKS_INVALID_IMAGE_URL,
   BOOKS_SEARCH_GOOGLE_URL,
   REGEX_DISCORD_MESSAGE_LENGTH_SHORT,
   REGEX_BOOKS_PATTERN,
-} from "../consts/constants";
-import { wrapCodeBlockString } from "../util/commonFunctions";
-import type { Book, BooksResponse } from "../types/books/GoogleBooksResponse.d.ts";
+} from "../../consts/constants";
+import { wrapCodeBlockString } from "../../util/commonFunctions";
+import type { Book, BooksResponse } from "../../types/books/GoogleBooksResponse";
 
 export async function googleBooksInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;

@@ -1,13 +1,17 @@
-import type { PricingData } from "../types/scryfall/PricingData.d.ts";
-import type { OracleResponse } from "../types/scryfall/OracleResponse.d.ts";
+import type { PricingData } from "../../types/scryfall/PricingData";
+import type { OracleResponse } from "../../types/scryfall/OracleResponse";
 import { Card, Cards, Prices } from "yakasov-scryfall-api";
 import {
-  SCRYFALL_DEFAULT_QUERY,
+  SCRYFALL_EDHREC_API_COMMANDER_SEARCH,
+  SCRYFALL_EDHREC_API_SEARCH,
   URL_SCRYFALL_ORACLE,
-} from "../consts/constants";
+} from "../../consts/constants.js";
+import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
+import { encodeURIToBasic } from "../cardFound";
+import { CardDetails } from "../../types/scryfall/Invoke";
+import { getCommanderRanks } from "../caching";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
-let totalCards: number = 0;
 
 export function to2DP(number: number): string {
   return (Math.round(number * 100) / 100).toFixed(2);
@@ -19,6 +23,19 @@ export function pricesToGBPArray(prices: Prices): number[] {
     .map(
       ([key, value]) => parseFloat(value) * (key.includes("usd") ? 0.75 : 0.87)
     );
+}
+
+export function getExactPrice(prices: Prices): number | string {
+  const priceUSD: string | null =
+    prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? null;
+  const priceEUR: string | null = prices.eur ?? prices.eur_foil ?? null;
+  if (priceUSD) {
+    return (parseFloat(priceUSD) * 0.75).toFixed(2);
+  } else if (priceEUR) {
+    return (parseFloat(priceEUR) * 0.87).toFixed(2);
+  }
+
+  return "???";
 }
 
 export async function getLowestHighestData(
@@ -81,22 +98,42 @@ export async function getLowestHighestData(
 export async function getCardDetails(
   cardName: string,
   set: string | undefined = undefined,
-  number: number | undefined = undefined
-): Promise<Card | undefined> {
-  const cardDetails: Card | undefined =
+  number: number | undefined = undefined,
+  passthroughEDH: EDHRecResponse | undefined = undefined
+): Promise<CardDetails> {
+  const cardDetailsPromise: Promise<Card | undefined> =
     set && number
-      ? await Cards.bySet(set, number)
-      : await Cards.byName(cardName, set, true);
+      ? Cards.bySet(set, number)
+      : Cards.byName(cardName, set, true);
+  const cardDetails: Card | undefined = await cardDetailsPromise;
 
-  return cardDetails;
+  const isCommander: boolean =
+    (await getCommanderRanks())[
+      cardDetails?.oracle_id ?? cardDetails?.id ?? ""
+    ] !== undefined;
+  const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
+    ? Promise.resolve(passthroughEDH)
+    : getEDHRecDetails(cardName, isCommander);
+  const edhRecDetails: EDHRecResponse | undefined = await edhRecPromise;
+
+  return { scry: cardDetails, edh: edhRecDetails };
 }
 
-export async function getTotalCards() {
-  if (totalCards === 0) {
-    totalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
-      .then((response: Response) => response.json())
-      .then((response: OracleResponse) => response.total_cards);
-  }
+export async function getEDHRecDetails(
+  cardName: string,
+  isCommander = false
+): Promise<EDHRecResponse | undefined> {
+  const EDHRecDetails: EDHRecResponse | undefined = await fetch(
+    (isCommander
+      ? SCRYFALL_EDHREC_API_COMMANDER_SEARCH
+      : SCRYFALL_EDHREC_API_SEARCH
+    ).replace("<<REPLACE>>", encodeURIToBasic(cardName))
+  )
+    .then((response: Response) => response.text())
+    .then((response: string) =>
+      response[0] !== "<" ? JSON.parse(response) : undefined
+    )
+    .catch(() => undefined);
 
-  return totalCards;
+  return EDHRecDetails;
 }

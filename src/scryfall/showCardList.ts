@@ -6,12 +6,11 @@ import {
   Interaction,
   StringSelectMenuInteraction,
 } from "discord.js";
-import { scryfallGetCard } from "./scryfallInvoke";
+import { scryfallGetCard } from "./invoke";
 import { isSendableChannel } from "../util/typeGuards";
-import type { EmbedObject, Modifiers } from "../types/scryfall/Invoke.d.ts";
-import { getCardMessageObject } from "./scryfallEmbedObjectBuilder";
-import { getCardDetails } from "./scryfallHelpers";
-import { Card } from "yakasov-scryfall-api";
+import type { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
+import { getCardMessageObject } from "./embedObjectBuilder";
+import { getCardDetails } from "./helpers/commonHelpers";
 
 export async function scryfallShowCardList(
   message: Message,
@@ -37,13 +36,16 @@ export async function scryfallShowCardList(
     selectMenu
   );
 
-  const cardDetails: Card = (await getCardDetails(results[0])) as Card;
+  const cardDetails: CardDetails = (await getCardDetails(results[0]));
   const cardMessageObject: EmbedObject = (await getCardMessageObject(
     message,
     cardDetails
   )) as EmbedObject;
   const multipleCardsMessage: Message = await message.channel.send({
     components: [selectMenuRow.toJSON()],
+    content: modifiers.syntaxInfo
+      ? `[__Click here to see ${modifiers.syntaxInfo.totalCards} results on Scryfall!__](${modifiers.syntaxInfo.searchURL})`
+      : "",
     embeds: cardMessageObject.embeds,
     files: cardMessageObject.files,
   });
@@ -79,8 +81,6 @@ export async function scryfallShowCardList(
     await multipleCardsMessage
       .edit({
         components: [],
-        embeds: cardMessageObject.embeds,
-        files: cardMessageObject.files,
       })
       .catch((err) => console.error(err));
   }
