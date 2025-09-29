@@ -73,21 +73,38 @@ export async function getCommanderRanks(): Promise<Record<string, number>> {
     const cachedLength: number = await readWriteCommanderCache();
 
     if ((await getTotalCommanderCards()) !== cachedLength) {
-      console.warn("No commander cache found! Generating one now...");
-      const startTime = Date.now();
-      const commandersArray: Card[] = await Cards.search(
-        "legal:commander is:commander order:edhrec"
-      ).get(3000);
+      console.warn("No / expired commander cache found! Generating one now...");
+      const commandersArray: Card[] = [];
+      let currentPage = 1;
+
+      while (true) {
+        const queryResult: Card[] = await Cards.search(
+          "legal:commander is:commander order:edhrec",
+          {
+            page: currentPage,
+          }
+        ).get(175);
+        commandersArray.push(...queryResult);
+
+        if (queryResult.length !== 175) break;
+
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write(`Fetched ${commandersArray.length} commanders...`);
+
+        currentPage++;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
       for (const [index, card] of commandersArray.entries()) {
         commanderRanks[card.oracle_id ?? card.id] = index + 1;
       }
 
       await readWriteCommanderCache();
-      console.warn(
-        `Commander cache created after ${(
-          (Date.now() - startTime) /
-          1000
-        ).toPrecision(2)}s!`
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      process.stdout.write(
+        `Commander cache created! Total commanders: ${commandersArray.length}`
       );
     }
   }

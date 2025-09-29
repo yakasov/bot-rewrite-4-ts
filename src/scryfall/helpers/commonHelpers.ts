@@ -25,17 +25,19 @@ export function pricesToGBPArray(prices: Prices): number[] {
     );
 }
 
-export function getExactPrice(prices: Prices): number | string {
-  const priceUSD: string | null =
-    prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? null;
-  const priceEUR: string | null = prices.eur ?? prices.eur_foil ?? null;
-  if (priceUSD) {
-    return (parseFloat(priceUSD) * 0.75).toFixed(2);
-  } else if (priceEUR) {
-    return (parseFloat(priceEUR) * 0.87).toFixed(2);
+export function getExactPrice(prices: Prices): string {
+  const USDPriceString: string =
+    prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? "Infinity";
+  const EURPriceString: string = prices.eur ?? prices.eur_foil ?? "Infinity";
+
+  const USDPrice: number = parseFloat(USDPriceString) * 0.75;
+  const EURPrice: number = parseFloat(EURPriceString) * 0.87;
+
+  if (USDPrice === Infinity && EURPrice === Infinity) {
+    return "???";
   }
 
-  return "???";
+  return Math.min(USDPrice, EURPrice).toFixed(2);
 }
 
 export async function getLowestHighestData(
