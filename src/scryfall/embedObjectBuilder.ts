@@ -64,7 +64,9 @@ export async function getCardMessageObject(
         await getTotalCards()
       )}`
     : "";
-  const commanderRanks: Record<string, number> = await getCommanderRanks(message);
+  const commanderRanks: Record<string, number> = await getCommanderRanks(
+    message
+  );
   const commanderEdhrecRank: string = commanderRanks[
     cardDetails.scry.oracle_id ?? cardDetails.scry.id
   ]
@@ -146,8 +148,10 @@ export async function getCardMessageObject(
         "0"
       )}): £${getExactPrice(cardDetails.scry.prices)}` +
       indexString +
-      (cardDetails.edh && cardDetails.edh.container?.json_dict?.card.salt !== 0
-        ? `\nSalt ${cardDetails.edh.container?.json_dict.card.salt.toFixed(3)}`
+      (cardDetails.edh &&
+      cardDetails.edh.container?.json_dict?.card.salt &&
+      cardDetails.edh.container.json_dict.card.salt !== 0
+        ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(3)}`
         : ""),
     ...(cardDetails.scry.game_changer
       ? { iconURL: "attachment://diamond.png" }
