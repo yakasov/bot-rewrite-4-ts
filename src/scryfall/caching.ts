@@ -9,6 +9,7 @@ import {
   SCRYFALL_DEFAULT_QUERY,
   SCRYFALL_SET_IMAGES_PATH,
 } from "../consts/constants";
+import { Message } from "discord.js";
 
 const printCache: Record<string, Card[]> = {};
 const setImageCache: string[] = [];
@@ -68,12 +69,12 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   return hasSaved;
 }
 
-export async function getCommanderRanks(): Promise<Record<string, number>> {
+export async function getCommanderRanks(message?: Message): Promise<Record<string, number>> {
   if (Object.keys(commanderRanks).length === 0) {
     const cachedLength: number = await readWriteCommanderCache();
 
     if ((await getTotalCommanderCards()) !== cachedLength) {
-      console.warn("No / expired commander cache found! Generating one now...");
+      message?.reply("No / expired commander cache found! Generating one now...");
       const commandersArray: Card[] = [];
       let currentPage = 1;
 
@@ -104,7 +105,7 @@ export async function getCommanderRanks(): Promise<Record<string, number>> {
       process.stdout.clearLine(0);
       process.stdout.cursorTo(0);
       process.stdout.write(
-        `Commander cache created! Total commanders: ${commandersArray.length}`
+        `Commander cache created! Total commanders: ${commandersArray.length}\n`
       );
     }
   }

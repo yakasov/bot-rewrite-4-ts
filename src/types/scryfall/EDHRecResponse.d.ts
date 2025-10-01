@@ -13,7 +13,7 @@ export interface EDHRecResponse {
   header: string;
   panels?: Panels;
   description: string;
-  container: Container;
+  container?: Container;
 }
 
 export interface Panels {
