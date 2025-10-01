@@ -128,9 +128,9 @@ export async function getCardMessageObject(
     });
   }
 
-  if (cardDetails.edh?.panels.taglinks) {
+  if (cardDetails.edh?.panels?.taglinks) {
     embed.setDescription(
-      cardDetails.edh?.panels.taglinks
+      cardDetails.edh.panels.taglinks
         .slice(0, 4)
         .map((tag: TagLink) => tag.value)
         .join(", ")

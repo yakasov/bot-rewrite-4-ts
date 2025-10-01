@@ -11,7 +11,7 @@ export interface EDHRecResponse {
   nonbasic: number;
   similar: EDHRecCard[];
   header: string;
-  panels: Panels;
+  panels?: Panels;
   description: string;
   container: Container;
 }

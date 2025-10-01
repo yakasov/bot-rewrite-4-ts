@@ -93,7 +93,7 @@ export async function getCommanderRanks(): Promise<Record<string, number>> {
         process.stdout.write(`Fetched ${commandersArray.length} commanders...`);
 
         currentPage++;
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
 
       for (const [index, card] of commandersArray.entries()) {
