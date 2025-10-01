@@ -28,7 +28,9 @@ export async function scryfallCardFound(
   const cardDetails: CardDetails = await getCardDetails(
     cardName,
     modifiers.isSpecificSet,
-    modifiers.isSpecificNumber
+    modifiers.isSpecificNumber,
+    undefined,
+    message
   );
 
   if (!cardDetails.scry) {

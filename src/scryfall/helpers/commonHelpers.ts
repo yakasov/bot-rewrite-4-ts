@@ -10,6 +10,7 @@ import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
 import { encodeURIToBasic } from "../cardFound";
 import { CardDetails } from "../../types/scryfall/Invoke";
 import { getCommanderRanks } from "../caching";
+import { Message } from "discord.js";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -101,7 +102,8 @@ export async function getCardDetails(
   cardName: string,
   set: string | undefined = undefined,
   number: number | undefined = undefined,
-  passthroughEDH: EDHRecResponse | undefined = undefined
+  passthroughEDH: EDHRecResponse | undefined = undefined,
+  message: Message | undefined = undefined
 ): Promise<CardDetails> {
   const cardDetailsPromise: Promise<Card | undefined> =
     set && number
@@ -110,7 +112,7 @@ export async function getCardDetails(
   const cardDetails: Card | undefined = await cardDetailsPromise;
 
   const isCommander: boolean =
-    (await getCommanderRanks())[
+    (await getCommanderRanks(message))[
       cardDetails?.oracle_id ?? cardDetails?.id ?? ""
     ] !== undefined;
   const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
