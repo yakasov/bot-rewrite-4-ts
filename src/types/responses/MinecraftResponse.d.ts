@@ -50,7 +50,7 @@ export interface NeatResponse {
   host: string;
   ip: string | null;
   port: number;
-  motd: string;
+  motd?: string;
   players: {
     count: string;
     online: string;
