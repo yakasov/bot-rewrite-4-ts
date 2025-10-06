@@ -1,6 +1,6 @@
 import type { PricingData } from "../../types/scryfall/PricingData";
 import type { OracleResponse } from "../../types/scryfall/OracleResponse";
-import { Card, Cards, Prices } from "yakasov-scryfall-api";
+import { Card, Cards, Prices } from "scryfall-api";
 import {
   SCRYFALL_EDHREC_API_COMMANDER_SEARCH,
   SCRYFALL_EDHREC_API_SEARCH,

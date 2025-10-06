@@ -7,7 +7,7 @@ import {
 import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./embedObjectBuilder";
 import { handlePrintingChoice } from "./helpers/printHelpers";
-import { Card } from "yakasov-scryfall-api";
+import { Card } from "scryfall-api";
 import { getCardDetails } from "./helpers/commonHelpers";
 import {
   REGEX_SCRYFALL_EDHREC_PATTERN,

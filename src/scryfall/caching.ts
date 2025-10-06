@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Cards, type Card } from "yakasov-scryfall-api";
+import { Cards, type Card } from "scryfall-api";
 import type { OracleResponse } from "../types/scryfall/OracleResponse";
 import type { SetResponse } from "../types/scryfall/SetResponse";
 import sharp, { Sharp } from "sharp";

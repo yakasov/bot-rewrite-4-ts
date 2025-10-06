@@ -15,7 +15,7 @@ import {
   getTotalLegalCards,
 } from "./caching.js";
 import { TagLink } from "../types/scryfall/EDHRecResponse";
-import { Card } from "yakasov-scryfall-api";
+import { Card } from "scryfall-api";
 
 function getPercentileString(amount: number, total: number) {
   return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;

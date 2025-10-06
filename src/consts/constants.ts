@@ -1,4 +1,4 @@
-import { BorderColor } from "yakasov-scryfall-api";
+import { BorderColor } from "scryfall-api";
 
 export const AI_DEFAULT_TEMP = 0.9;
 export const AI_MAX_TOKENS = 4096;
