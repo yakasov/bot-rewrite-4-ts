@@ -147,7 +147,6 @@ export async function goodreadsBookFound(
     .setURL(url)
     .setDescription(author)
     .setImage(imageURL)
-    .setFooter({ text: footer })
     .addFields(
       {
         name: "Description",
@@ -158,6 +157,10 @@ export async function goodreadsBookFound(
         value: genres,
       }
     );
+
+  if (footer.length > 0) {
+    embed.setFooter({ text: footer });
+  }
 
   await replyMessage.edit({
     content: null,
