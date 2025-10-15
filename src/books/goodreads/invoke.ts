@@ -84,9 +84,26 @@ export async function goodreadsSearch(
     const bookURLInfo: HTMLElement | null =
       bookInfo.querySelector("a[itemprop='url']");
     const bookURL = `https://www.goodreads.com${bookURLInfo?.attributes["href"]}`;
-    const parsedPage: HTMLElement = HTMLParser(
-      await fetch(bookURL).then((response: Response) => response.text())
+    const pageText: string = await fetch(bookURL).then((response: Response) =>
+      response.text()
     );
+    const parsedPage: HTMLElement = HTMLParser(pageText);
+
+    let pageProps = null;
+    const regex =
+      /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s;
+    const match = pageText.match(regex);
+    if (match) {
+      try {
+        const jsonData = JSON.parse(match[1]);
+        const bookKey = Object.keys(
+          jsonData.props.pageProps.apolloState
+        ).filter((k) => k.startsWith("Book"))[0];
+        pageProps = jsonData.props.pageProps.apolloState[bookKey];
+      } catch (error) {
+        console.error("Failed to parse JSON:", error);
+      }
+    }
 
     const nameElements: HTMLElement[] = bookInfo.querySelectorAll(
       "span[itemprop='name']"
@@ -102,15 +119,25 @@ export async function goodreadsSearch(
       ? `https://images-na.ssl-images-amazon.com/${imageURLMatch[0]}.jpg`
       : compressedImageURL;
 
-    const description = `${parsedPage
-      .querySelectorAll(".DetailsLayoutRightParagraph__widthConstrained")
-      ?.find((element) => element.children[0]?.classNames.includes("Formatted"))
-      ?.innerText?.slice(0, 768)}...`;
+    const description =
+      (pageProps
+        ? pageProps['description({"stripped":true})']
+        : parsedPage
+            .querySelectorAll(".DetailsLayoutRightParagraph__widthConstrained")
+            ?.find((element) =>
+              element.children[0]?.classList.contains("Formatted")
+            )?.innerText ?? ""
+      ).slice(0, 768) + "...";
 
-    const genres: string = parsedPage
-      .querySelectorAll("span[class='BookPageMetadataSection__genreButton']")
-      .map((e) => e.innerText)
-      .join(", ");
+    const genres: string = (
+      pageProps
+        ? pageProps.bookGenres.map((g) => g.genre.name)
+        : parsedPage
+            .querySelectorAll(
+              "span[class='BookPageMetadataSection__genreButton']"
+            )
+            .map((e) => e.innerText)
+    ).join(", ");
 
     const footer: string =
       parsedPage
