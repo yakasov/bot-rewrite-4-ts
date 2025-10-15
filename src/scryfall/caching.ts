@@ -17,6 +17,7 @@ const commanderRanks: Record<string, number> = {};
 let commanderCards = 0;
 let totalLegalCards = 0;
 let totalCards = 0;
+let rebuildingCache = false;
 
 export async function getPrintList(card: Card): Promise<Card[]> {
   if (!card.oracle_id) return [];
@@ -69,48 +70,58 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   return hasSaved;
 }
 
-export async function getCommanderRanks(message?: Message): Promise<Record<string, number>> {
+export async function getCommanderRanks(
+  message?: Message
+): Promise<Record<string, number>> {
   if (Object.keys(commanderRanks).length === 0) {
     const cachedLength: number = await readWriteCommanderCache();
 
-    if ((await getTotalCommanderCards()) !== cachedLength) {
-      message?.reply("No / expired commander cache found! Generating one now...");
-      const commandersArray: Card[] = [];
-      let currentPage = 1;
-
-      while (true) {
-        const queryResult: Card[] = await Cards.search(
-          "legal:commander is:commander order:edhrec",
-          {
-            page: currentPage,
-          }
-        ).get(175);
-        commandersArray.push(...queryResult);
-
-        if (queryResult.length !== 175) break;
-
-        process.stdout.clearLine(0);
-        process.stdout.cursorTo(0);
-        process.stdout.write(`Fetched ${commandersArray.length} commanders...`);
-
-        currentPage++;
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-
-      for (const [index, card] of commandersArray.entries()) {
-        commanderRanks[card.oracle_id ?? card.id] = index + 1;
-      }
-
-      await readWriteCommanderCache();
-      process.stdout.clearLine(0);
-      process.stdout.cursorTo(0);
-      process.stdout.write(
-        `Commander cache created! Total commanders: ${commandersArray.length}\n`
-      );
+    if ((await getTotalCommanderCards()) !== cachedLength && !rebuildingCache) {
+      rebuildCommanderCache(message);
     }
   }
 
   return commanderRanks;
+}
+
+async function rebuildCommanderCache(message?: Message) {
+  rebuildingCache = true;
+
+  message?.reply("No / expired commander cache found! Generating one now...");
+  const commandersArray: Card[] = [];
+  let currentPage = 1;
+
+  while (true) {
+    const queryResult: Card[] = await Cards.search(
+      "legal:commander is:commander order:edhrec",
+      {
+        page: currentPage,
+      }
+    ).get(175);
+    commandersArray.push(...queryResult);
+
+    if (queryResult.length !== 175) break;
+
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write(`Fetched ${commandersArray.length} commanders...`);
+
+    currentPage++;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  for (const [index, card] of commandersArray.entries()) {
+    commanderRanks[card.oracle_id ?? card.id] = index + 1;
+  }
+
+  await readWriteCommanderCache();
+  process.stdout.clearLine(0);
+  process.stdout.cursorTo(0);
+  process.stdout.write(
+    `Commander cache created! Total commanders: ${commandersArray.length}\n`
+  );
+
+  rebuildingCache = false;
 }
 
 export async function readWriteCommanderCache(): Promise<number> {
