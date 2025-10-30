@@ -23,7 +23,7 @@ export async function getFortniteShop(): Promise<
   try {
     const response: Response = await fetch(URL_FORTNITE_API);
     if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
+      console.error(`HTTP error! Status: ${response.status} for getFortniteShop`);
       return undefined;
     }
 
@@ -41,7 +41,7 @@ export async function getFestivalData(): Promise<
   try {
     const response: Response = await fetch(URL_FORTNITE_SONGS);
     if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
+      console.error(`HTTP error! Status: ${response.status} for getFestivalData`);
       return undefined;
     }
 
