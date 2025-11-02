@@ -9,7 +9,11 @@ import {
 } from "../../consts/constants";
 import { encodeURIToBasic } from "../../scryfall/cardFound";
 import moment from "moment-timezone";
-import { BookHeader, NextData } from "../../types/books/GoodreadsNextData";
+import {
+  ApolloState,
+  BookHeader,
+  NextData,
+} from "../../types/books/GoodreadsNextData";
 
 interface GoodreadsAttributes {
   url: string;
@@ -100,9 +104,16 @@ export async function goodreadsSearch(
             .replace('<script id="__NEXT_DATA__" type="application/json">', "")
             .replace("</script>", "")
         );
+        // This filter sucks!!!
         const bookKey: `Book:${string}` = Object.keys(
           jsonData.props.pageProps.apolloState
-        ).filter((k) => k.startsWith("Book"))[0] as `Book:${string}`;
+        ).filter(
+          (k) =>
+            k.startsWith("Book") &&
+            (jsonData.props.pageProps.apolloState as ApolloState)[
+              k as `Book:${string}`
+            ].bookGenres
+        )[0] as `Book:${string}`;
         bookHeader = jsonData.props.pageProps.apolloState[bookKey];
       } catch (error) {
         await replyMessage.edit(
