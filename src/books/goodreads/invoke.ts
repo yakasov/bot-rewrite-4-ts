@@ -13,6 +13,7 @@ import {
   ApolloState,
   BookHeader,
   NextData,
+  WorkHeader,
 } from "../../types/books/GoodreadsNextData";
 
 interface GoodreadsAttributes {
@@ -22,6 +23,7 @@ interface GoodreadsAttributes {
   imageURL: string;
   description: string;
   genres: string;
+  ratings: string;
   footer: string;
 }
 
@@ -96,6 +98,7 @@ export async function goodreadsSearch(
     );
 
     let bookHeader: BookHeader;
+    let workHeader: WorkHeader;
     const match = pageText.match(REGEX_GOODREADS_DATA_PATTERN);
     if (match) {
       try {
@@ -115,6 +118,17 @@ export async function goodreadsSearch(
             ].bookGenres
         )[0] as `Book:${string}`;
         bookHeader = jsonData.props.pageProps.apolloState[bookKey];
+
+        const workKey: `Work:${string}` = Object.keys(
+          jsonData.props.pageProps.apolloState
+        ).filter(
+          (k) =>
+            k.startsWith("Work") &&
+            (jsonData.props.pageProps.apolloState as ApolloState)[
+              k as `Work:${string}`
+            ].stats
+        )[0] as `Work:${string}`;
+        workHeader = jsonData.props.pageProps.apolloState[workKey];
       } catch (error) {
         await replyMessage.edit(
           `Failed to parse JSON for ${bookURL}: \`\`\`\n${error}\`\`\``
@@ -145,6 +159,7 @@ export async function goodreadsSearch(
     const genres: string = bookHeader.bookGenres
       .map((g) => g.genre.name)
       .join(", ");
+    const ratings = `${workHeader.stats.averageRating} / 5.00 (${workHeader.stats.ratingsCount} ratings)`;
     const footer = `${bookHeader.details.numPages} pages, ${
       bookHeader.details.format
     }\nFirst published ${moment(bookHeader.details.publicationTime).format(
@@ -158,6 +173,7 @@ export async function goodreadsSearch(
       imageURL,
       description,
       genres,
+      ratings,
       footer,
     });
   }
@@ -172,6 +188,7 @@ export async function goodreadsBookFound(
     imageURL,
     description,
     genres,
+    ratings,
     footer,
   }: GoodreadsAttributes
 ): Promise<void> {
@@ -188,6 +205,10 @@ export async function goodreadsBookFound(
       {
         name: "Genres",
         value: genres,
+      },
+      {
+        name: "Ratings",
+        value: ratings,
       }
     );
 

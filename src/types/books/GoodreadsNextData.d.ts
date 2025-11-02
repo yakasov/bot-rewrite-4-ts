@@ -235,6 +235,15 @@ export interface WorkHeader {
   bestBook: Ref;
   choiceAwards: [unknown];
   details: WorkDetails;
+  stats: BookOrWorkStats;
+  [k: `quotes(${string})`]: ResourceQuotesConnection;
+  [k: `questions(${string})`]: ResourceQuestionsConnection;
+  [k: `topics(${string})`]: ResourceTopicsConnection;
+  viewerShelvings: unknown;
+  viewerShelvingsUrl: string;
+  featuredKNH: FeaturedKNHCollectionConnection;
+  giveaways: unknown;
+  editions: BooksConnection;
 }
 
 export interface WorkDetails {
@@ -246,15 +255,6 @@ export interface WorkDetails {
   awardsWon: [Award];
   places: [unknown];
   characters: [Character];
-  stats: BookOrWorkStats;
-  [k: `quotes(${string})`]: ResourceQuotesConnection;
-  [k: `questions(${string})`]: ResourceQuestionsConnection;
-  [k: `topics(${string})`]: ResourceTopicsConnection;
-  viewerShelvings: unknown;
-  viewerShelvingsUrl: string;
-  featuredKNH: FeaturedKNHCollectionConnection;
-  giveaways: unknown;
-  editions: BooksConnection;
 }
 
 export interface Award {
@@ -275,7 +275,7 @@ export interface Character {
 export interface BookOrWorkStats {
   __typename: "BookOrWorkStats";
   averageRating: number;
-  ratingsCounts: number;
+  ratingsCount: number;
   ratingsCountDist: [number];
   textReviewsCount: number;
   textReviewsLanguageCounts: [TextReviewLanguageCount];
