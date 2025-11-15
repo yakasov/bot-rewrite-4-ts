@@ -137,6 +137,7 @@ export function getNicknameFromInteraction(
 }
 
 export function formatTime(seconds: number): string {
+  const f = (n: number) => `${n < 10 ? "0" : ""}${n}`;
   const totalSeconds = seconds;
   const months = Math.floor(totalSeconds / (30 * 24 * 60 * 60));
   const days = Math.floor((totalSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
@@ -144,5 +145,5 @@ export function formatTime(seconds: number): string {
   const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
   const secs = totalSeconds % 60;
   
-  return `${months}m ${days}d ${hours}h ${minutes}m ${secs}s`;
+  return `${months}m ${f(days)}d ${f(hours)}h ${f(minutes)}m ${f(secs)}s`;
 }
