@@ -1,4 +1,4 @@
-import { BorderColor } from "yakasov-scryfall-api";
+import { BorderColor } from "scryfall-api";
 
 export const AI_DEFAULT_TEMP = 0.9;
 export const AI_MAX_TOKENS = 4096;
@@ -35,6 +35,7 @@ export const REGEX_BOOKS_PATTERN =
   /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
+export const REGEX_GOODREADS_DATA_PATTERN = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/gu;
 export const REGEX_GOODREADS_IMAGE_PATTERN = /(images\/S\/compressed\.photo\.goodreads\.com\/books\/\d+i\/\d+)/gu;
 export const REGEX_SANITIZE_STRING = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_EDHREC_PATTERN = /[^ a-zA-Z0-9]/gu;

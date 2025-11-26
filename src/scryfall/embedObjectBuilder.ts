@@ -15,7 +15,7 @@ import {
   getTotalLegalCards,
 } from "./caching.js";
 import { TagLink } from "../types/scryfall/EDHRecResponse";
-import { Card } from "yakasov-scryfall-api";
+import { Card } from "scryfall-api";
 
 function getPercentileString(amount: number, total: number) {
   return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;
@@ -64,7 +64,9 @@ export async function getCardMessageObject(
         await getTotalCards()
       )}`
     : "";
-  const commanderRanks: Record<string, number> = await getCommanderRanks();
+  const commanderRanks: Record<string, number> = await getCommanderRanks(
+    message
+  );
   const commanderEdhrecRank: string = commanderRanks[
     cardDetails.scry.oracle_id ?? cardDetails.scry.id
   ]
@@ -128,9 +130,9 @@ export async function getCardMessageObject(
     });
   }
 
-  if (cardDetails.edh?.panels.taglinks) {
+  if (cardDetails.edh?.panels?.taglinks) {
     embed.setDescription(
-      cardDetails.edh?.panels.taglinks
+      cardDetails.edh.panels.taglinks
         .slice(0, 4)
         .map((tag: TagLink) => tag.value)
         .join(", ")
@@ -146,7 +148,9 @@ export async function getCardMessageObject(
         "0"
       )}): £${getExactPrice(cardDetails.scry.prices)}` +
       indexString +
-      (cardDetails.edh && cardDetails.edh.container.json_dict.card.salt !== 0
+      (cardDetails.edh &&
+      cardDetails.edh.container?.json_dict?.card.salt &&
+      cardDetails.edh.container.json_dict.card.salt !== 0
         ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(3)}`
         : ""),
     ...(cardDetails.scry.game_changer

@@ -1,6 +1,6 @@
 import type { PricingData } from "../../types/scryfall/PricingData";
 import type { OracleResponse } from "../../types/scryfall/OracleResponse";
-import { Card, Cards, Prices } from "yakasov-scryfall-api";
+import { Card, Cards, Prices } from "scryfall-api";
 import {
   SCRYFALL_EDHREC_API_COMMANDER_SEARCH,
   SCRYFALL_EDHREC_API_SEARCH,
@@ -10,6 +10,7 @@ import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
 import { encodeURIToBasic } from "../cardFound";
 import { CardDetails } from "../../types/scryfall/Invoke";
 import { getCommanderRanks } from "../caching";
+import { Message } from "discord.js";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -25,17 +26,19 @@ export function pricesToGBPArray(prices: Prices): number[] {
     );
 }
 
-export function getExactPrice(prices: Prices): number | string {
-  const priceUSD: string | null =
-    prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? null;
-  const priceEUR: string | null = prices.eur ?? prices.eur_foil ?? null;
-  if (priceUSD) {
-    return (parseFloat(priceUSD) * 0.75).toFixed(2);
-  } else if (priceEUR) {
-    return (parseFloat(priceEUR) * 0.87).toFixed(2);
+export function getExactPrice(prices: Prices): string {
+  const USDPriceString: string =
+    prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? "Infinity";
+  const EURPriceString: string = prices.eur ?? prices.eur_foil ?? "Infinity";
+
+  const USDPrice: number = parseFloat(USDPriceString) * 0.75;
+  const EURPrice: number = parseFloat(EURPriceString) * 0.87;
+
+  if (USDPrice === Infinity && EURPrice === Infinity) {
+    return "???";
   }
 
-  return "???";
+  return Math.min(USDPrice, EURPrice).toFixed(2);
 }
 
 export async function getLowestHighestData(
@@ -99,7 +102,8 @@ export async function getCardDetails(
   cardName: string,
   set: string | undefined = undefined,
   number: number | undefined = undefined,
-  passthroughEDH: EDHRecResponse | undefined = undefined
+  passthroughEDH: EDHRecResponse | undefined = undefined,
+  message: Message | undefined = undefined
 ): Promise<CardDetails> {
   const cardDetailsPromise: Promise<Card | undefined> =
     set && number
@@ -108,7 +112,7 @@ export async function getCardDetails(
   const cardDetails: Card | undefined = await cardDetailsPromise;
 
   const isCommander: boolean =
-    (await getCommanderRanks())[
+    (await getCommanderRanks(message))[
       cardDetails?.oracle_id ?? cardDetails?.id ?? ""
     ] !== undefined;
   const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH

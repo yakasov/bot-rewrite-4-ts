@@ -7,7 +7,7 @@ import {
 import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./embedObjectBuilder";
 import { handlePrintingChoice } from "./helpers/printHelpers";
-import { Card } from "yakasov-scryfall-api";
+import { Card } from "scryfall-api";
 import { getCardDetails } from "./helpers/commonHelpers";
 import {
   REGEX_SCRYFALL_EDHREC_PATTERN,
@@ -28,7 +28,9 @@ export async function scryfallCardFound(
   const cardDetails: CardDetails = await getCardDetails(
     cardName,
     modifiers.isSpecificSet,
-    modifiers.isSpecificNumber
+    modifiers.isSpecificNumber,
+    undefined,
+    message
   );
 
   if (!cardDetails.scry) {

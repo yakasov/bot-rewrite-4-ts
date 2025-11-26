@@ -1,34 +1,48 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  SlashCommandBooleanOption,
+  SlashCommandBuilder,
+} from "discord.js";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
 import type { BotContext } from "../../types/BotContext.d.ts";
 import { getMCStatus } from "../../tasks/checkMinecraftServer";
-import type { MinecraftResponse, NeatResponse } from "../../types/responses/MinecraftResponse.d.ts";
+import type {
+  MinecraftResponse,
+  NeatResponse,
+} from "../../types/responses/MinecraftResponse.d.ts";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("mcstatus")
-    .setDescription("Get information about the current Minecraft server"),
+    .setDescription("Get information about the current Minecraft server")
+    .addBooleanOption((opt: SlashCommandBooleanOption) =>
+      opt.setName("debug").setDescription("Whether to print the raw response")
+    ),
   async execute(
     interaction: ChatInputCommandInteraction,
     context: BotContext
   ): Promise<void> {
-    if (
-      !(
-        context.config.minecraft.serverIp && context.config.minecraft.serverPort
-      )
-    ) {
+    if (!context.config.minecraft.serverIp) {
       await interaction.reply("There is no current Minecraft server set up!");
       return;
     }
 
+    const debug = interaction.options.getBoolean("debug") ?? false;
     const response: MinecraftResponse | null = await getMCStatus(context);
     if (response === null) return;
+
+    if (debug) {
+      await interaction.reply(
+        wrapCodeBlockString(JSON.stringify(response, null, 4))
+      );
+      return;
+    }
 
     const mappedResponse: NeatResponse = {
       host: response.host,
       ip: response.ip_address,
       port: response.port,
-      motd: response.motd.clean,
+      motd: response.motd?.clean,
       players: {
         count: `${response.players.online}/${response.players.max}`,
         online: response.players.list

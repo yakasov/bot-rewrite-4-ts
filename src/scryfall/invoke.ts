@@ -5,7 +5,7 @@ import {
   SCRYFALL_MINOR_SPELLING_MISTAKE_STRINGS,
   SCRYFALL_SYNTAX_PREFIX,
 } from "../consts/constants";
-import { Card, Cards, MagicPageResult } from "yakasov-scryfall-api";
+import { Card, Cards, MagicPageResult } from "scryfall-api";
 import { scryfallCardFound } from "./cardFound";
 import { scryfallNoCardFound } from "./noCardFound";
 import { scryfallShowCardList } from "./showCardList";

@@ -43,9 +43,9 @@ export async function checkMinecraftServer(
   }
 
   if (
-    !(context.config.minecraft.serverIp && context.config.minecraft.serverPort)
+    !(context.config.minecraft.serverIp)
   ) {
-    console.error("\nNo IP and/or Port for Minecraft server query!\n");
+    console.error("\nNo IP provided for Minecraft server query!\n");
     context.runState.minecraft = MinecraftQueryStates.ERROR_STOP;
     return;
   }
@@ -69,7 +69,7 @@ export async function checkMinecraftServer(
     const players: string[] = response.players.list.map(
       (player: User) => player.name_raw
     );
-    activityString = `(${players.length}) ${players.join(", ")}`;
+    activityString = `(${players.length}) ${players.sort().join(", ")}`;
   } else {
     if (context.client.user?.presence.activities[0]?.name === context.splash) {
       return;

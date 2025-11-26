@@ -1,4 +1,4 @@
-import { Card } from "yakasov-scryfall-api";
+import { Card } from "scryfall-api";
 import { Message, ButtonInteraction, Interaction } from "discord.js";
 import { getCardMessageObject } from "../embedObjectBuilder";
 import {

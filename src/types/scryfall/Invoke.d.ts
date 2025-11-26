@@ -1,4 +1,4 @@
-import { Card } from "yakasov-scryfall-api";
+import { Card } from "scryfall-api";
 import { EDHRecResponse } from "./EDHRecResponse";
 
 export interface Modifiers {

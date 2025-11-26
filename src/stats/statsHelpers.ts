@@ -137,11 +137,13 @@ export function getNicknameFromInteraction(
 }
 
 export function formatTime(seconds: number): string {
-  const date: Date = new Date(0);
-  date.setSeconds(seconds);
-  const unitArray: string[] = date.toISOString().substr(8, 11).split(/:|T/u);
-  const days: number = parseInt(unitArray[0], 10) - 1;
-  return `${days < 10 ? " " : ""}${days}d ${unitArray[1]}h ${unitArray[2]}m ${
-    unitArray[3]
-  }s`;
+  const f = (n: number) => `${n < 10 ? "0" : ""}${n}`;
+  const totalSeconds = seconds;
+  const months = Math.floor(totalSeconds / (30 * 24 * 60 * 60));
+  const days = Math.floor((totalSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
+  const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+  const secs = totalSeconds % 60;
+  
+  return `${months}m ${f(days)}d ${f(hours)}h ${f(minutes)}m ${f(secs)}s`;
 }

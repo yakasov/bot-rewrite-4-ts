@@ -4,9 +4,17 @@ import { isSendableChannel } from "../../util/typeGuards";
 import {
   BOOKS_GOODREADS_SEARCH_URL,
   REGEX_BOOKS_PATTERN,
+  REGEX_GOODREADS_DATA_PATTERN,
   REGEX_GOODREADS_IMAGE_PATTERN,
 } from "../../consts/constants";
 import { encodeURIToBasic } from "../../scryfall/cardFound";
+import moment from "moment-timezone";
+import {
+  ApolloState,
+  BookHeader,
+  NextData,
+  WorkHeader,
+} from "../../types/books/GoodreadsNextData";
 
 interface GoodreadsAttributes {
   url: string;
@@ -15,6 +23,7 @@ interface GoodreadsAttributes {
   imageURL: string;
   description: string;
   genres: string;
+  ratings: string;
   footer: string;
 }
 
@@ -84,9 +93,52 @@ export async function goodreadsSearch(
     const bookURLInfo: HTMLElement | null =
       bookInfo.querySelector("a[itemprop='url']");
     const bookURL = `https://www.goodreads.com${bookURLInfo?.attributes["href"]}`;
-    const parsedPage: HTMLElement = HTMLParser(
-      await fetch(bookURL).then((response: Response) => response.text())
+    const pageText: string = await fetch(bookURL).then((response: Response) =>
+      response.text()
     );
+
+    let bookHeader: BookHeader;
+    let workHeader: WorkHeader;
+    const match = pageText.match(REGEX_GOODREADS_DATA_PATTERN);
+    if (match) {
+      try {
+        const jsonData: NextData = JSON.parse(
+          match[0]
+            .replace('<script id="__NEXT_DATA__" type="application/json">', "")
+            .replace("</script>", "")
+        );
+        // This filter sucks!!!
+        const bookKey: `Book:${string}` = Object.keys(
+          jsonData.props.pageProps.apolloState
+        ).filter(
+          (k) =>
+            k.startsWith("Book") &&
+            (jsonData.props.pageProps.apolloState as ApolloState)[
+              k as `Book:${string}`
+            ].bookGenres
+        )[0] as `Book:${string}`;
+        bookHeader = jsonData.props.pageProps.apolloState[bookKey];
+
+        const workKey: `Work:${string}` = Object.keys(
+          jsonData.props.pageProps.apolloState
+        ).filter(
+          (k) =>
+            k.startsWith("Work") &&
+            (jsonData.props.pageProps.apolloState as ApolloState)[
+              k as `Work:${string}`
+            ].stats
+        )[0] as `Work:${string}`;
+        workHeader = jsonData.props.pageProps.apolloState[workKey];
+      } catch (error) {
+        await replyMessage.edit(
+          `Failed to parse JSON for ${bookURL}: \`\`\`\n${error}\`\`\``
+        );
+        return;
+      }
+    } else {
+      await replyMessage.edit(`Couldn't find __NEXT_DATA__, oops!`);
+      return;
+    }
 
     const nameElements: HTMLElement[] = bookInfo.querySelectorAll(
       "span[itemprop='name']"
@@ -102,21 +154,17 @@ export async function goodreadsSearch(
       ? `https://images-na.ssl-images-amazon.com/${imageURLMatch[0]}.jpg`
       : compressedImageURL;
 
-    const description = `${parsedPage
-      .querySelectorAll(".DetailsLayoutRightParagraph__widthConstrained")
-      ?.find((element) => element.children[0]?.classNames.includes("Formatted"))
-      ?.innerText?.slice(0, 768)}...`;
-
-    const genres: string = parsedPage
-      .querySelectorAll("span[class='BookPageMetadataSection__genreButton']")
-      .map((e) => e.innerText)
+    const description =
+      bookHeader['description({"stripped":true})'].slice(0, 768) + "...";
+    const genres: string = bookHeader.bookGenres
+      .map((g) => g.genre.name)
       .join(", ");
-
-    const footer: string =
-      parsedPage
-        .querySelector("div[class='FeaturedDetails']")
-        ?.children.map((e) => e.innerText)
-        .join("\n") ?? "";
+    const ratings = `${workHeader.stats.averageRating} / 5.00 (${workHeader.stats.ratingsCount} ratings)`;
+    const footer = `${bookHeader.details.numPages} pages, ${
+      bookHeader.details.format
+    }\nFirst published ${moment(bookHeader.details.publicationTime).format(
+      "LL"
+    )}`;
 
     await goodreadsBookFound(replyMessage, {
       url: bookURL,
@@ -125,6 +173,7 @@ export async function goodreadsSearch(
       imageURL,
       description,
       genres,
+      ratings,
       footer,
     });
   }
@@ -139,6 +188,7 @@ export async function goodreadsBookFound(
     imageURL,
     description,
     genres,
+    ratings,
     footer,
   }: GoodreadsAttributes
 ): Promise<void> {
@@ -147,7 +197,6 @@ export async function goodreadsBookFound(
     .setURL(url)
     .setDescription(author)
     .setImage(imageURL)
-    .setFooter({ text: footer })
     .addFields(
       {
         name: "Description",
@@ -156,8 +205,16 @@ export async function goodreadsBookFound(
       {
         name: "Genres",
         value: genres,
+      },
+      {
+        name: "Ratings",
+        value: ratings,
       }
     );
+
+  if (footer.length > 0) {
+    embed.setFooter({ text: footer });
+  }
 
   await replyMessage.edit({
     content: null,
