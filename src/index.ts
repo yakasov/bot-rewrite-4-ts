@@ -10,7 +10,7 @@ import { handleInteractionCreate } from "./events/handleInteractionCreate";
 import { handleMessageCreate } from "./events/handleMessageCreate";
 import { handleVoiceStateUpdate } from "./events/handleVoiceStateUpdate";
 import { loadStatsFromDatabase } from "./database/loadFromDatabase";
-import { databaseKeysPresent } from "./keys";
+import { DATABASE_KEYS_PRESENT } from "./keys";
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled error:", error);
@@ -22,7 +22,9 @@ const botContext: BotContext = createBotContext(config);
 botContext.client.once(Events.ClientReady, async () => {
   await loadCommands(botContext.client);
 
-  botContext.stats = databaseKeysPresent ? await loadStatsFromDatabase() : undefined;
+  botContext.stats = DATABASE_KEYS_PRESENT
+    ? await loadStatsFromDatabase()
+    : undefined;
   if (!botContext.stats) botContext.isStatsEnabled = false;
 
   handleClientReady(botContext);

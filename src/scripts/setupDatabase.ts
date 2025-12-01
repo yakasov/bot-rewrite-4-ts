@@ -1,13 +1,13 @@
 import { setupDatabase } from "../database/setupDatabase";
-import { database } from "../keys";
+import { DATABASE } from "../keys";
 
 (async () => {
   if (
-    !database.host ||
-    !database.port ||
-    !database.user ||
-    !database.password ||
-    !database.database
+    !DATABASE.host ||
+    !DATABASE.port ||
+    !DATABASE.user ||
+    !DATABASE.password ||
+    !DATABASE.database
   ) {
     throw new Error("Cannot setup database without required .env information!");
   }

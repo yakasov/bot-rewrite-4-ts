@@ -15,7 +15,7 @@ import {
 } from "../../consts/constants";
 import type { BotContext } from "../../types/BotContext.d.ts";
 import OpenAI from "openai";
-import { keys } from "../../keys";
+import { KEYS } from "../../keys";
 import {
   ChatCompletion,
   ChatCompletionMessage,
@@ -23,9 +23,11 @@ import {
 } from "openai/resources/index";
 import type { OpenAIConversation } from "../../types/OpenAI.d.ts";
 
-const openai: OpenAI | undefined = keys.OPENAI_TOKEN ? new OpenAI({
-  apiKey: keys.OPENAI_TOKEN,
-}) : undefined;
+const openai: OpenAI | undefined = KEYS.OPENAI_TOKEN
+  ? new OpenAI({
+      apiKey: KEYS.OPENAI_TOKEN,
+    })
+  : undefined;
 const initialMessage: OpenAIConversation = {
   content: `You are a casual Discord chatting bot chatting in my personal 
   Discord server. Your name is 'outputbot'. Others may ask for you to act or 

@@ -10,6 +10,7 @@ import {
   SCRYFALL_SET_IMAGES_PATH,
 } from "../consts/constants";
 import { Message } from "discord.js";
+import { DATABASE_KEYS_PRESENT } from "../keys";
 
 const printCache: Record<string, Card[]> = {};
 const setImageCache: string[] = [];
@@ -48,9 +49,12 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   const setInfo: SetResponse = await fetch(cardDetails.set_uri).then(
     (response: Response) => response.json()
   );
-  const setSvgBuffer: ArrayBuffer = await fetch(setInfo.icon_svg_uri).then(
-    (response: Response) => response.arrayBuffer()
-  );
+  const setSvgBuffer: ArrayBuffer | void = await fetch(setInfo.icon_svg_uri)
+    .then((response: Response) => response.arrayBuffer())
+    .catch((err: unknown) => console.error(err));
+
+  if (!setSvgBuffer) return false;
+
   const setIconPng: Sharp = sharp(setSvgBuffer, { density: 300 }).negate({
     alpha: false,
   });
@@ -73,7 +77,8 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
 export async function getCommanderRanks(
   message?: Message
 ): Promise<Record<string, number>> {
-  if (Object.keys(commanderRanks).length === 0) {
+  // Skip commander cache if no database is present (since it's probably a local build)
+  if (Object.keys(commanderRanks).length === 0 && DATABASE_KEYS_PRESENT) {
     const cachedLength: number = await readWriteCommanderCache();
 
     if ((await getTotalCommanderCards()) !== cachedLength && !rebuildingCache) {

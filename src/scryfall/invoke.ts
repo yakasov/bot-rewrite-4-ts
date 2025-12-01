@@ -85,7 +85,11 @@ export async function scryfallGetCard(
 ): Promise<void> {
   let results: string[] = [""];
 
-  if (modifiers.isSyntax) {
+  if (cardName && !modifiers.isSyntax) {
+    results = await Cards.autoCompleteName(cardName);
+  }
+
+  if (modifiers.isSyntax || results.length === 0) {
     const search: MagicPageResult<Card> = Cards.search(cardName);
     const searchResults: Card[] = await search.get(25);
     modifiers.syntaxInfo = {
@@ -94,10 +98,10 @@ export async function scryfallGetCard(
         cardName
       )}`,
     };
-    results = searchResults.map((card: Card) => card.name);
-  } else if (cardName) {
-    results = await Cards.autoCompleteName(cardName);
+    results = searchResults.map((card: Card) => card.flavor_name ?? card.name);
   }
+
+  // debugger;
 
   /*
    * An explanation for 'fromSelectMenu':
@@ -119,11 +123,7 @@ export async function scryfallGetCard(
       !modifiers.isFuzzy) ||
     fromSelectMenu
   ) {
-    await scryfallCardFound(
-      message,
-      results[0],
-      modifiers
-    );
+    await scryfallCardFound(message, results[0], modifiers);
   } else {
     await scryfallShowCardList(message, results, modifiers);
   }
