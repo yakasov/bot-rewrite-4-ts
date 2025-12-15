@@ -23,7 +23,7 @@ export async function scryfallShowCardList(
     .setCustomId("scryfall_list_select")
     .setPlaceholder("Select other cards...")
     .addOptions(
-      results
+      [... new Set(results)]
         .slice(1)
         .map((card: string, i: number) =>
           new StringSelectMenuOptionBuilder()
