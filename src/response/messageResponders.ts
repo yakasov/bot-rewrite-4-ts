@@ -8,15 +8,14 @@ import { isSendableChannel } from "../util/typeGuards";
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJson as Record<string, ChanceResponse>;
 
-export async function replyWithHypeMessage(message: Message): Promise<void> {
-  if (!isSendableChannel(message.channel)) return;
-
-  const hypeEntries: [string, ChanceResponse][] = Object.entries(
+export function getRandomResponse(filter: string = "hype"): string {
+  const responses: [string, ChanceResponse][] = Object.entries(
     chanceResponses
-  ).filter(([key]) => key.startsWith("hype"));
+  ).filter(([key]) => (filter.length !== 0 ? key.startsWith(filter) : true));
   const randomEntry: string =
-    hypeEntries[Math.floor(Math.random() * hypeEntries.length)][1].string;
-  await message.channel.send(randomEntry);
+    responses[Math.floor(Math.random() * responses.length)][1].string;
+
+  return randomEntry;
 }
 
 export async function sendCustomResponse(
@@ -90,7 +89,8 @@ export async function checkMessageReactions(
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
     for (const response of context.rollTable) {
       if (roll < response.chance) {
-        if (response.targetUserId && response.targetUserId != message.author.id) continue;
+        if (response.targetUserId && response.targetUserId != message.author.id)
+          continue;
 
         try {
           switch (response.type) {

@@ -10,11 +10,14 @@ import responsesJson from "../../resources/responses.json";
 import { sendSteamDirectLink, swapTwitterLinks } from "./messageReplacements";
 import {
   checkMessageReactions,
-  replyWithHypeMessage,
+  getRandomResponse,
   sendCustomResponse,
 } from "./messageResponders";
 
-const responses: Record<string, string> = responsesJson as Record<string, string>;
+const responses: Record<string, string> = responsesJson as Record<
+  string,
+  string
+>;
 
 export async function checkMessageInvoke(
   message: Message,
@@ -41,7 +44,7 @@ export async function checkMessageInvoke(
     message.author.id === THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF &&
     message.content.match(REGEX_TIME_MATCH)
   ) {
-    replyWithHypeMessage(message);
+    await message.reply(getRandomResponse());
     return;
   }
 

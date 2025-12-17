@@ -5,7 +5,7 @@ import type {
   Rules,
 } from "../../types/responses/APIResponse.d.ts";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder().setName("rules").setDescription("The rules."),
   async execute(interaction: ChatInputCommandInteraction) {
     const rules: Rules = await fetch(URL_API_RULES, {
@@ -31,13 +31,12 @@ module.exports = {
       .join("\n");
     const lawsString: string = Object.entries(rules)
       .filter(
-        ([lawName, lawValue]) => !/^.*?[0-9]$/.test(lawName[0]) && lawValue !== ""
+        ([lawName, lawValue]) =>
+          !/^.*?[0-9]$/.test(lawName[0]) && lawValue !== ""
       )
       .map(
         ([lawName, lawValue]) =>
-          `**${lawName}**: ${lawValue}${
-            lawValue.slice(-1) !== "." ? "." : ""
-          }`
+          `**${lawName}**: ${lawValue}${lawValue.slice(-1) !== "." ? "." : ""}`
       )
       .join("\n");
     const output = `# Rules\n${rulesString}\n\n# Laws\n${lawsString}`;
