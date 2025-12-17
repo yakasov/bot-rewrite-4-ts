@@ -94,7 +94,7 @@ export const SCRYFALL_SPELLBOOK_URL =
 export const SCRYFALL_SYNTAX_PREFIX = "order:edhrec game:paper ";
 
 export const STEAM_URL_LINK =
-  "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
+  "https://yakasov.github.io/util/steam_direct.html?page=";
 
 export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF = "135410033524604928";
 
