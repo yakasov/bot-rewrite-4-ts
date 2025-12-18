@@ -112,7 +112,7 @@ export const STATS_TOP_SCORES_N = 10;
 export const URL_API_RULES = "https://jmcd.uk/bot/getRules";
 export const URL_FORTNITE_API = "https://fortnite-api.com/v2/shop";
 export const URL_FORTNITE_SONGS =
-  "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/jam_tracks.json";
+  "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/tracks.json";
 export const URL_MINECRAFT_STATUS = "https://api.mcstatus.io/v2/status/java";
 export const URL_SCRYFALL_ORACLE =
   "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A<<ORACLE_ID>>&unique=prints";
