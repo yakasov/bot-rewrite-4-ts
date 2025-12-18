@@ -3,6 +3,7 @@ import type { BotContext } from "../types/BotContext.d.ts";
 import {
   REGEX_STEAM_LINK,
   REGEX_TIME_MATCH,
+  THIS_ID_IS_A_PINGING_BOZO,
   THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF,
   TWITTER_LINKS,
 } from "../consts/constants";
@@ -10,6 +11,7 @@ import responsesJson from "../../resources/responses.json";
 import { sendSteamDirectLink, swapTwitterLinks } from "./messageReplacements";
 import {
   checkMessageReactions,
+  checkMoMessage,
   getRandomResponse,
   sendCustomResponse,
 } from "./messageResponders";
@@ -40,10 +42,14 @@ export async function checkMessageInvoke(
     return;
   }
 
-  if (
+  const yemsCheck =
     message.author.id === THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF &&
-    message.content.match(REGEX_TIME_MATCH)
-  ) {
+    message.content.match(REGEX_TIME_MATCH);
+  const moCheck =
+    message.author.id === THIS_ID_IS_A_PINGING_BOZO &&
+    (await checkMoMessage(message));
+
+  if (yemsCheck || moCheck) {
     await message.reply(getRandomResponse());
     return;
   }

@@ -4,6 +4,7 @@ import type { ChanceResponse } from "../types/JSON.d.ts";
 import { getNicknameFromMessage } from "./responseHelpers";
 import type { BotContext } from "../types/BotContext.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
+import moment from "moment-timezone";
 
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJson as Record<string, ChanceResponse>;
@@ -112,4 +113,54 @@ export async function checkMessageReactions(
       }
     }
   }
+}
+
+export async function checkMoMessage(message: Message): Promise<boolean> {
+  /*
+   * This function should return true if:
+   * - a ping is sent and the time is before 9am
+   * - a reply to a ping is sent, and at least an hour has passed since the ping
+   *
+   * There is extra handling in the case the replied-to ping message has a time inside it
+   * eg <@&1234567890> 12
+   * This handling is pretty rough, it just checks each string (surrounded by spaces)
+   * and sees if it can be parsed as a number. It won't work for '12pm' or '12:30' but
+   * hopefully it's good enough. Worst case it fires by accident
+   */
+  const isPing = (testMessage: Message) => testMessage.content.includes("<@&");
+  const isReply =
+    message.reference &&
+    message.reference.messageId &&
+    message.reference.channelId === message.channel.id;
+
+  const messageMoment: moment.Moment = moment(message.createdTimestamp * 1000);
+  const pingTimeCheck = messageMoment.hour() <= 9;
+
+  const replyToPingCheck = async () => {
+    if (!isReply) return false;
+
+    const replyMessage: Message = await message.channel.messages.fetch(
+      message.reference!.messageId!
+    );
+
+    if (isPing(replyMessage)) {
+      const replyMessageMoment: moment.Moment = moment(
+        replyMessage.createdTimestamp * 1000
+      );
+
+      const replyMessageParts: string[] = replyMessage.content.split(" ");
+      const replyMessageTime: string | undefined = replyMessageParts.find(
+        (s) => !Number.isNaN(s)
+      );
+      const replyMessageTimeHour: number = replyMessageTime
+        ? parseInt(replyMessageTime)
+        : replyMessageMoment.hour();
+
+      return messageMoment.hour() >= replyMessageTimeHour + 1;
+    }
+
+    return false;
+  };
+
+  return (isPing(message) && pingTimeCheck) || (await replyToPingCheck());
 }
