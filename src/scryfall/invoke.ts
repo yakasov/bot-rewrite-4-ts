@@ -101,8 +101,6 @@ export async function scryfallGetCard(
     results = searchResults.map((card: Card) => card.flavor_name ?? card.name);
   }
 
-  // debugger;
-
   /*
    * An explanation for 'fromSelectMenu':
    * basically, if we get multiple cards from Scryfall (eg when searching 'pan')
