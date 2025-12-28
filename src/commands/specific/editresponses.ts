@@ -33,7 +33,7 @@ export default {
         .setDescription("The chance to reply to a given message")
     )
     .addStringOption((opt: SlashCommandStringOption) =>
-      opt.setName("type").setDescription("Message or react")
+      opt.setName("type").setDescription("Message or reaction")
     )
     .addStringOption((opt: SlashCommandStringOption) =>
       opt.setName("target").setDescription("Target user ID")

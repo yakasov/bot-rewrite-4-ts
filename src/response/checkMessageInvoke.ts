@@ -15,11 +15,9 @@ import {
   getRandomResponse,
   sendCustomResponse,
 } from "./messageResponders";
+import { GenericStringObject } from "../types/Generic.js";
 
-const responses: Record<string, string> = responsesJson as Record<
-  string,
-  string
->;
+const responses: GenericStringObject = responsesJson as GenericStringObject;
 
 export async function checkMessageInvoke(
   message: Message,
