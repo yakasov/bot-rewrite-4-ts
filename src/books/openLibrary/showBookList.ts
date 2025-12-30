@@ -80,7 +80,7 @@ export async function openLibraryShowBookList(
       replyMessage,
       uniqueResults.find((result) => result.key === selectedValue) as Book
     );
-    await multipleBooksMessage.delete().catch((err) => console.error(err));
+    await multipleBooksMessage.delete().catch(console.error);
   } catch {
     await multipleBooksMessage.edit({
       components: [],

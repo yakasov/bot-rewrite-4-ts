@@ -49,8 +49,8 @@ export async function handlePrintingChoice(
       nextIndex = getNextIndex(currentIndex + 1, printDetails.length);
     } else {
       await Promise.all([
-        message.delete().catch(() => {}),
-        originalMessage.delete().catch(() => {}),
+        message.delete().catch(console.error),
+        originalMessage.delete().catch(console.error),
       ]);
       return;
     }

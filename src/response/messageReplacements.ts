@@ -83,5 +83,11 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
     return;
   }
 
-  await message.delete().catch(console.error);
+  await message
+    .delete()
+    .catch(() =>
+      console.error(
+        "Could not delete Twitter message, probably due to missing permissions"
+      )
+    );
 }
