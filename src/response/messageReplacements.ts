@@ -14,7 +14,7 @@ export async function sendSteamDirectLink(message: Message): Promise<void> {
     message.content.split(" ").find((word) => REGEX_STEAM_LINK.test(word)) ??
     message.content;
   await message.reply(
-    `[Open in Steam(${STEAM_URL_LINK}${encodeURIComponent(steamLink)})`
+    `[Open in Steam](${STEAM_URL_LINK}${encodeURIComponent(steamLink)})`
   );
 }
 
