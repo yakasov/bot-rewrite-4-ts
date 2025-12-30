@@ -23,10 +23,6 @@ export async function checkMessageInvoke(
   message: Message,
   context: BotContext
 ): Promise<void> {
-  if (context.config.bot.allowResponses) {
-    await checkMessageReactions(message, context);
-  }
-
   if (REGEX_STEAM_LINK.test(message.content)) {
     await sendSteamDirectLink(message);
     return;
@@ -57,5 +53,9 @@ export async function checkMessageInvoke(
       await sendCustomResponse(message, key, value);
       return;
     }
+  }
+
+  if (context.config.bot.allowResponses) {
+    await checkMessageReactions(message, context);
   }
 }

@@ -9,7 +9,7 @@ import moment from "moment-timezone";
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJson as Record<string, ChanceResponse>;
 
-export function getRandomResponse(filter: string = "hype"): string {
+export function getRandomResponse(filter = "hype"): string {
   const responses: [string, ChanceResponse][] = Object.entries(
     chanceResponses
   ).filter(([key]) => (filter.length !== 0 ? key.startsWith(filter) : true));
@@ -137,10 +137,10 @@ export async function checkMoMessage(message: Message): Promise<boolean> {
   const pingTimeCheck = messageMoment.hour() <= 9;
 
   const replyToPingCheck = async () => {
-    if (!isReply) return false;
+    if (!isReply || !message.reference?.messageId) return false;
 
     const replyMessage: Message = await message.channel.messages.fetch(
-      message.reference!.messageId!
+      message.reference.messageId
     );
 
     if (isPing(replyMessage)) {
