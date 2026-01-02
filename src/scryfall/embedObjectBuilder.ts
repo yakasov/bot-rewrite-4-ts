@@ -88,8 +88,12 @@ export async function getCardMessageObject(
       : null
   );
 
+  const title: string = cardDetails.scry.flavor_name
+    ? `${cardDetails.scry.flavor_name} (${cardDetails.scry.name})`
+    : cardDetails.scry.name;
+
   const embed: EmbedBuilder = new EmbedBuilder()
-    .setTitle(cardDetails.scry.name)
+    .setTitle(title)
     .setColor(SCRYFALL_HEX_COLOR_CODES[cardDetails.scry.border_color])
     .setURL(cardDetails.scry.scryfall_uri)
     .addFields(

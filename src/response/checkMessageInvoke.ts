@@ -3,6 +3,7 @@ import type { BotContext } from "../types/BotContext.d.ts";
 import {
   REGEX_STEAM_LINK,
   REGEX_TIME_MATCH,
+  THIS_ID_IS_A_PINGING_BOZO,
   THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF,
   TWITTER_LINKS,
 } from "../consts/constants";
@@ -10,20 +11,18 @@ import responsesJson from "../../resources/responses.json";
 import { sendSteamDirectLink, swapTwitterLinks } from "./messageReplacements";
 import {
   checkMessageReactions,
-  replyWithHypeMessage,
+  checkMoMessage,
+  getRandomResponse,
   sendCustomResponse,
 } from "./messageResponders";
+import { GenericStringObject } from "../types/Generic.js";
 
-const responses: Record<string, string> = responsesJson as Record<string, string>;
+const responses: GenericStringObject = responsesJson as GenericStringObject;
 
 export async function checkMessageInvoke(
   message: Message,
   context: BotContext
 ): Promise<void> {
-  if (context.config.bot.allowResponses) {
-    await checkMessageReactions(message, context);
-  }
-
   if (REGEX_STEAM_LINK.test(message.content)) {
     await sendSteamDirectLink(message);
     return;
@@ -37,11 +36,15 @@ export async function checkMessageInvoke(
     return;
   }
 
-  if (
+  const yemsCheck =
     message.author.id === THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF &&
-    message.content.match(REGEX_TIME_MATCH)
-  ) {
-    replyWithHypeMessage(message);
+    message.content.match(REGEX_TIME_MATCH);
+  const moCheck =
+    message.author.id === THIS_ID_IS_A_PINGING_BOZO &&
+    (await checkMoMessage(message));
+
+  if (yemsCheck || moCheck) {
+    await message.reply(getRandomResponse());
     return;
   }
 
@@ -50,5 +53,9 @@ export async function checkMessageInvoke(
       await sendCustomResponse(message, key, value);
       return;
     }
+  }
+
+  if (context.config.bot.allowResponses) {
+    await checkMessageReactions(message, context);
   }
 }

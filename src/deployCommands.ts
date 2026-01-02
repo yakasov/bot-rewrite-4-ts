@@ -4,7 +4,7 @@ import { REST, Routes } from "discord.js";
 import path from "node:path";
 import configJSON from "../resources/config.json";
 import { getCommandFiles } from "./util/getCommandFiles";
-import { keys } from "./keys";
+import { KEYS } from "./keys";
 import type { Config } from "./types/Config.d.ts";
 
 const config: Config = configJSON;
@@ -28,7 +28,7 @@ async function deployCommands() {
     }
   }
 
-  const rest: REST = new REST().setToken(keys.DISCORD_TOKEN);
+  const rest: REST = new REST().setToken(KEYS.DISCORD_TOKEN);
 
   try {
     console.log(
@@ -37,7 +37,7 @@ async function deployCommands() {
 
     const data: any = await rest.put(
       Routes.applicationGuildCommands(
-        keys.DISCORD_CLIENT_ID,
+        KEYS.DISCORD_CLIENT_ID,
         config.ids.mainGuild
       ),
       { body: commands }

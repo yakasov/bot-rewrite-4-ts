@@ -23,7 +23,7 @@ export async function scryfallShowCardList(
     .setCustomId("scryfall_list_select")
     .setPlaceholder("Select other cards...")
     .addOptions(
-      results
+      [... new Set(results)]
         .slice(1)
         .map((card: string, i: number) =>
           new StringSelectMenuOptionBuilder()
@@ -75,13 +75,13 @@ export async function scryfallShowCardList(
 
     await Promise.all([
       scryfallGetCard(message, selectedValue, modifiers, true),
-      multipleCardsMessage.delete().catch((err) => console.error(err)),
+      multipleCardsMessage.delete().catch(console.error),
     ]);
   } catch {
     await multipleCardsMessage
       .edit({
         components: [],
       })
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }
 }

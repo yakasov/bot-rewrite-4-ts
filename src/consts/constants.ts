@@ -35,8 +35,10 @@ export const REGEX_BOOKS_PATTERN =
   /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
-export const REGEX_GOODREADS_DATA_PATTERN = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/gu;
-export const REGEX_GOODREADS_IMAGE_PATTERN = /(images\/S\/compressed\.photo\.goodreads\.com\/books\/\d+i\/\d+)/gu;
+export const REGEX_GOODREADS_DATA_PATTERN =
+  /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/gu;
+export const REGEX_GOODREADS_IMAGE_PATTERN =
+  /(images\/S\/compressed\.photo\.goodreads\.com\/books\/\d+i\/\d+)/gu;
 export const REGEX_SANITIZE_STRING = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_EDHREC_PATTERN = /[^ a-zA-Z0-9]/gu;
 export const REGEX_SCRYFALL_PATTERN =
@@ -53,7 +55,7 @@ export const SCRYFALL_DEFAULT_QUERY =
   "https://api.scryfall.com/cards/search?q=order%3Aedhrec+game%3Apaper+direction%3Adesc+legal%3Acommander+-s%3Aunf+-s%3Asunf+-type%3Abasic+-is%3Ameld+&unique=cards&as=grid&order=name";
 export const SCRYFALL_DEFAULT_COMMANDER_QUERY =
   "https://api.scryfall.com/cards/search?q=legal%3Acommander+is%3Acommander";
-  export const SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY =
+export const SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY =
   "https://api.scryfall.com/cards/search?q=legal%3Acommander";
 export const SCRYFALL_EDHREC_API_SEARCH =
   "https://json.edhrec.com/pages/cards/<<REPLACE>>.json";
@@ -94,9 +96,10 @@ export const SCRYFALL_SPELLBOOK_URL =
 export const SCRYFALL_SYNTAX_PREFIX = "order:edhrec game:paper ";
 
 export const STEAM_URL_LINK =
-  "https://yakasov.github.io/pages/miscellaneous/steam_direct.html?page=";
+  "https://yakasov.github.io/util/steam_direct.html?page=";
 
 export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF = "135410033524604928";
+export const THIS_ID_IS_A_PINGING_BOZO = "214404843442274304";
 
 export const TWITTER_LINKS: Record<string, RegExp> = {
   "https://fixupx.com/": /https:\/\/x\.com\//u,
@@ -109,7 +112,7 @@ export const STATS_TOP_SCORES_N = 10;
 export const URL_API_RULES = "https://jmcd.uk/bot/getRules";
 export const URL_FORTNITE_API = "https://fortnite-api.com/v2/shop";
 export const URL_FORTNITE_SONGS =
-  "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/jam_tracks.json";
+  "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/tracks.json";
 export const URL_MINECRAFT_STATUS = "https://api.mcstatus.io/v2/status/java";
 export const URL_SCRYFALL_ORACLE =
   "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A<<ORACLE_ID>>&unique=prints";

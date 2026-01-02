@@ -1,11 +1,12 @@
 import { BOOKS_GOODREADS_SEARCH_URL } from "../../consts/constants";
 import type { Edition, Work, WorksEditions } from "../../types/books/OpenLibraryResponse";
+import { GenericStringObject } from "../../types/Generic";
 
 const badResponses = ["not found", "404 Not Found"];
 const cachedResponses: {
   covers: Record<string, string | undefined>;
   editions: Record<string, Edition[]>;
-  goodreads: Record<string, string>;
+  goodreads: GenericStringObject;
   works: Record<string, Work>;
 } = {
   covers: {},

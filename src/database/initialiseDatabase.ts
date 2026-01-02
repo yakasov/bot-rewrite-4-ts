@@ -1,5 +1,5 @@
 import mariadb, { Pool } from "mariadb";
-import { database } from "../keys";
+import { DATABASE } from "../keys";
 import { GUILD_CREATE_QUERY, USER_CREATE_QUERY } from "./queries";
 
 let pool: Pool | null = null;
@@ -9,11 +9,11 @@ export function initialiseDatabase(): void {
 
   try {
     pool = mariadb.createPool({
-      host: database.host,
-      port: database.port,
-      user: database.user,
-      password: database.password,
-      database: database.database,
+      host: DATABASE.host,
+      port: DATABASE.port,
+      user: DATABASE.user,
+      password: DATABASE.password,
+      database: DATABASE.database,
       connectionLimit: 5,
       acquireTimeout: 10000,
     });

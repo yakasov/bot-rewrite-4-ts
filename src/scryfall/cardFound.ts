@@ -61,8 +61,16 @@ export async function scryfallCardFound(
   const cardFoundMessage: Message = await message.channel.send({
     components:
       printDetails.length > 1
-        ? [getActionButtonsRow(cardName).toJSON()]
-        : [getPostActionButtonsRow(cardName).toJSON()],
+        ? [
+            getActionButtonsRow(
+              cardDetails.scry.flavor_name ?? cardDetails.scry.name
+            ).toJSON(),
+          ]
+        : [
+            getPostActionButtonsRow(
+              cardDetails.scry.flavor_name ?? cardDetails.scry.name
+            ).toJSON(),
+          ],
     ...cardObject,
   });
 
