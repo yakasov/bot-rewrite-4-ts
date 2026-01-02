@@ -8,11 +8,11 @@ import {
 } from "./experienceHelpers";
 import { REGEX_SANITIZE_STRING } from "../consts/constants";
 
-export function addToStats(event: StatsEvent, context: BotContext): void {
+export function addToStats(event: StatsEvent, context: BotContext, forceReset = false): void {
   if (!context.isStatsEnabled || !context.stats) return;
 
   let guildStats: GuildStats | undefined = context.stats[event.guildId];
-  if (!guildStats) {
+  if (!guildStats || forceReset) {
     guildStats = {
       guild: {
         allowResponses: true,
