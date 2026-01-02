@@ -26,8 +26,12 @@ export default {
           type: "guildInit",
           userId: "",
         },
-        context
+        context,
+        true
       );
+
+      await interaction.reply("🦀 🦀 🦀 STATS ARE OVER PARTY 🦀 🦀 🦀");
+      return;
     }
 
     await interaction.reply({
