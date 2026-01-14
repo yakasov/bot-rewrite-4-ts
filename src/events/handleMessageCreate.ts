@@ -4,6 +4,7 @@ import { scryfallInvoke } from "../scryfall/invoke";
 import { addToStats } from "../stats/statsHelpers";
 import { checkMessageInvoke } from "../response/checkMessageInvoke";
 import { goodreadsInvoke } from "../books/goodreads/invoke";
+import { movieInvoke } from "../movies/invoke";
 
 export async function handleMessageCreate(
   message: Message,
@@ -13,6 +14,7 @@ export async function handleMessageCreate(
 
   await scryfallInvoke(message);
   await goodreadsInvoke(message);
+  await movieInvoke(message);
   await checkMessageInvoke(message, context);
 
   addToStats(
