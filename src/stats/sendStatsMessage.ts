@@ -13,7 +13,7 @@ export async function sendMessage(
   )?.user;
   const guildStats: GuildStats | undefined = context.stats?.[guild.id];
 
-  if (!guild || !user || !guildStats) {
+  if (!guild || !user || !guildStats || !guildStats.guild.rankUpChannel) {
     console.error(
       `Guild, user, or guild stats not found for guildId: ${messageEvent.guildId}, userId: ${messageEvent.userId}`
     );
