@@ -30,6 +30,7 @@ export const DISCORD_ID_LENGTH = 18;
 export const DISCORD_VOICE_CHANNEL_TYPE = 2;
 
 export const MOVIES_IMAGES_BASE_URL = "https://image.tmdb.org/t/p/original/";
+export const MOVIES_RT_BASE_URL = "https://www.rottentomatoes.com/";
 
 export const MTG_PACK_SIZE = 12;
 

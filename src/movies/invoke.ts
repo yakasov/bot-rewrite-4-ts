@@ -16,6 +16,7 @@ import {
   TVShowItem,
 } from "@leandrowkz/tmdb";
 import { KEYS } from "../keys";
+import { getRTRating } from "./rottenTomatoesScores";
 
 interface Genres {
   movie: GenresResponse | undefined;
@@ -119,7 +120,8 @@ async function handleMovieResult(
 ): Promise<void> {
   const imageUrl = `${MOVIES_IMAGES_BASE_URL}${item.poster_path}`;
   const genres: string = prettifyGenres(GENRES.movie, item.genre_ids);
-  const ratings = `${item.vote_average} / 10.0 (${item.vote_count} ratings)`;
+  const RTRatings = await getRTRating(item.title, false);
+  const ratings = `${item.vote_average} / 10.0 (${item.vote_count} ratings)\n${RTRatings}`;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(item.title)
@@ -169,7 +171,8 @@ async function handleTVShowResult(
 
   const imageUrl = `${MOVIES_IMAGES_BASE_URL}${item.poster_path}`;
   const genres: string = prettifyGenres(GENRES.tv, item.genre_ids);
-  const ratings = `${item.vote_average} / 10.0 (${item.vote_count} ratings)`;
+  const RTRatings = await getRTRating(item.name, true);
+  const ratings = `${item.vote_average} / 10.0 (${item.vote_count} ratings)\n${RTRatings}`;
   const footer = `Released on ${item.first_air_date}`;
 
   const embed: EmbedBuilder = new EmbedBuilder()
