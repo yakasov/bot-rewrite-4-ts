@@ -128,7 +128,7 @@ export async function goodreadsSearch(
         return;
       }
     } else {
-      await replyMessage.edit(`Couldn't find __NEXT_DATA__, oops!`);
+      await replyMessage.edit(`Couldn't find \`__NEXT_DATA__\`, oops!`);
       return;
     }
 
@@ -161,7 +161,7 @@ export async function goodreadsSearch(
     await goodreadsBookFound(replyMessage, {
       url: bookURL,
       name: nameElements[0].innerText,
-      author: nameElements[1].innerText,
+      author: concatAuthorNames(nameElements),
       imageURL,
       description,
       genres,
@@ -169,6 +169,16 @@ export async function goodreadsSearch(
       footer,
     });
   }
+}
+
+function concatAuthorNames(elements: HTMLElement[]) {
+  const endElement = elements.find((e, i) => i !== 0 && e.hasAttribute("role"));
+  const endIndex = endElement ? elements.indexOf(endElement) : elements.length;
+
+  return elements
+    .slice(1, endIndex)
+    .map((e) => e.innerText)
+    .join(", ");
 }
 
 export async function goodreadsBookFound(
