@@ -50,7 +50,7 @@ export async function goodreadsSearch(
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  const replyMessage: Message = await message.reply(`Fetching \`${input}...`);
+  const replyMessage: Message = await message.reply(`Fetching \`${input}\`...`);
 
   const url = `${BOOKS_GOODREADS_SEARCH_URL}${encodeURIToBasic(input)}`;
   const resultsText: string = await fetch(url).then((response: Response) =>

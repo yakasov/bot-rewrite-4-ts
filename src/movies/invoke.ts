@@ -291,7 +291,7 @@ async function getIMDBURL(
 ): Promise<string> {
   const item = await searchFunc();
 
-  if ("media_type" in item && item.media_type === "tv") {
+  if ("seasons" in item) {
     return item.homepage ?? MOVIES_IMDB_BASE_URL;
   }
 
