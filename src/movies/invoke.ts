@@ -2,17 +2,21 @@ import { EmbedBuilder, Message } from "discord.js";
 import { isSendableChannel } from "../util/typeGuards";
 import {
   MOVIES_IMAGES_BASE_URL,
+  MOVIES_IMDB_BASE_URL,
   REGEX_MOVIES_PATTERN,
 } from "../consts/constants";
 import {
   GenreCode,
   GenresResponse,
+  Movie,
   MovieItem,
+  Person,
   PersonItem,
   SearchMultiSearchResponse,
   TMDB,
   TVEpisode,
   TVSeason,
+  TVShow,
   TVShowItem,
 } from "@leandrowkz/tmdb";
 import { KEYS } from "../keys";
@@ -120,13 +124,17 @@ async function handleMovieResult(
 ): Promise<void> {
   const imageUrl = `${MOVIES_IMAGES_BASE_URL}${item.poster_path}`;
   const genres: string = prettifyGenres(GENRES.movie, item.genre_ids);
-  const RTRatings = await getRTRating(item.title, false);
+  const [RTRatings, url] = await Promise.all([
+    getRTRating(item.title, false),
+    getIMDBURL(async () => tmdb.movies.details(item.id), "title"),
+  ]);
   const ratings = `${item.vote_average} / 10.0 (${item.vote_count} ratings)\n${RTRatings}`;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(item.title)
     .setDescription(item.overview)
     .setImage(imageUrl)
+    .setURL(url)
     .addFields(
       {
         name: "Genres",
@@ -171,7 +179,10 @@ async function handleTVShowResult(
 
   const imageUrl = `${MOVIES_IMAGES_BASE_URL}${item.poster_path}`;
   const genres: string = prettifyGenres(GENRES.tv, item.genre_ids);
-  const RTRatings = await getRTRating(item.name, true);
+  const [RTRatings, url] = await Promise.all([
+    getRTRating(item.name, true),
+    getIMDBURL(async () => tmdb.tvShows.details(item.id), "title"),
+  ]);
   const ratings = `${item.vote_average} / 10.0 (${item.vote_count} ratings)\n${RTRatings}`;
   const footer = `Released on ${item.first_air_date}`;
 
@@ -179,6 +190,7 @@ async function handleTVShowResult(
     .setTitle(item.name)
     .setDescription(item.overview)
     .setImage(imageUrl)
+    .setURL(url)
     .addFields(
       {
         name: "Genres",
@@ -243,8 +255,11 @@ async function handlePersonResult(
   replyMessage: Message,
   item: PersonItem
 ): Promise<void> {
-  console.log(item);
   const imageUrl = `${MOVIES_IMAGES_BASE_URL}${item.profile_path}`;
+  const url = await getIMDBURL(
+    async () => tmdb.people.details(item.id),
+    "name"
+  );
   const knownFor: string = (item.known_for as unknown as any[])
     .map((i) => (isMovieItem(i) ? i.title : i.name))
     .join(", ");
@@ -252,6 +267,7 @@ async function handlePersonResult(
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(item.name)
     .setImage(imageUrl)
+    .setURL(url)
     .addFields(
       {
         name: "Department",
@@ -267,4 +283,17 @@ async function handlePersonResult(
     content: null,
     embeds: [embed],
   });
+}
+
+async function getIMDBURL(
+  searchFunc: () => Promise<Movie | Person | TVShow>,
+  type: string
+): Promise<string> {
+  const item = await searchFunc();
+
+  if ("media_type" in item && item.media_type === "tv") {
+    return item.homepage ?? MOVIES_IMDB_BASE_URL;
+  }
+
+  return `${MOVIES_IMDB_BASE_URL}${type}/${item.imdb_id}`;
 }

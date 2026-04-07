@@ -30,12 +30,13 @@ export const DISCORD_ID_LENGTH = 18;
 export const DISCORD_VOICE_CHANNEL_TYPE = 2;
 
 export const MOVIES_IMAGES_BASE_URL = "https://image.tmdb.org/t/p/original/";
+export const MOVIES_IMDB_BASE_URL = "https://www.imdb.com/";
 export const MOVIES_RT_BASE_URL = "https://www.rottentomatoes.com/";
 
 export const MTG_PACK_SIZE = 12;
 
 export const REGEX_BOOKS_PATTERN =
-  /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
+  /\{\{\s*(?<name>[^|}]+?)\s*?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
 export const REGEX_GOODREADS_DATA_PATTERN =

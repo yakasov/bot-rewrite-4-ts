@@ -85,20 +85,27 @@ export async function scryfallGetCard(
 ): Promise<void> {
   let results: string[] = [""];
 
-  if (cardName && !modifiers.isSyntax) {
-    results = await Cards.autoCompleteName(cardName);
-  }
+  try {
+    if (cardName && !modifiers.isSyntax) {
+      results = await Cards.autoCompleteName(cardName);
+    }
 
-  if (modifiers.isSyntax || results.length === 0) {
-    const search: MagicPageResult<Card> = Cards.search(cardName);
-    const searchResults: Card[] = await search.get(25);
-    modifiers.syntaxInfo = {
-      totalCards: search.count,
-      searchURL: `https://scryfall.com/search?q=${encodeURIComponent(
-        cardName
-      )}`,
-    };
-    results = searchResults.map((card: Card) => card.flavor_name ?? card.name);
+    if (modifiers.isSyntax || results.length === 0) {
+      const search: MagicPageResult<Card> = Cards.search(cardName);
+      const searchResults: Card[] = await search.get(25);
+      modifiers.syntaxInfo = {
+        totalCards: search.count,
+        searchURL: `https://scryfall.com/search?q=${encodeURIComponent(
+          cardName
+        )}`,
+      };
+      results = searchResults.map(
+        (card: Card) => card.flavor_name ?? card.name
+      );
+    }
+  } catch (e) {
+    message.reply(`${e}`);
+    return;
   }
 
   /*

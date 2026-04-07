@@ -35,11 +35,10 @@ export async function goodreadsInvoke(message: Message): Promise<void> {
 
   while ((match = REGEX_BOOKS_PATTERN.exec(message.content)) !== null) {
     const bookName: string | undefined = match.groups?.name.trim();
-    const bookAuthor: string | undefined = match.groups?.author?.trim();
 
     if (!bookName) continue;
 
-    promises.push(goodreadsSearch(message, bookName, bookAuthor));
+    promises.push(goodreadsSearch(message, bookName));
   }
 
   await Promise.all(promises);
@@ -47,18 +46,13 @@ export async function goodreadsInvoke(message: Message): Promise<void> {
 
 export async function goodreadsSearch(
   message: Message,
-  input: string,
-  author: string | undefined
+  input: string
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  const replyMessage: Message = await message.reply(
-    `Fetching \`${input}, ${author ?? "any author"}\`...`
-  );
+  const replyMessage: Message = await message.reply(`Fetching \`${input}...`);
 
-  const url = `${BOOKS_GOODREADS_SEARCH_URL}${encodeURIToBasic(
-    input
-  )}${encodeURIToBasic(author ?? "")}`;
+  const url = `${BOOKS_GOODREADS_SEARCH_URL}${encodeURIToBasic(input)}`;
   const resultsText: string = await fetch(url).then((response: Response) =>
     response.text()
   );
@@ -82,9 +76,7 @@ export async function goodreadsSearch(
       );
     }) ?? bookItems[0];
   if (!bookElement || !bookElement.children) {
-    await replyMessage.edit(
-      `Could not find any results for ${input}, ${author ?? "any author"}`
-    );
+    await replyMessage.edit(`Could not find any results for ${input}`);
     return;
   }
   const bookInfo: HTMLElement = bookElement.children[1];
