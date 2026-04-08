@@ -49,9 +49,12 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   const setInfo: SetResponse = await fetch(cardDetails.set_uri).then(
     (response: Response) => response.json()
   );
-  const setSvgBuffer: ArrayBuffer | void = await fetch(setInfo.icon_svg_uri)
+  const setSvgBuffer: ArrayBuffer | null = await fetch(setInfo.icon_svg_uri)
     .then((response: Response) => response.arrayBuffer())
-    .catch((err: unknown) => console.error(err));
+    .catch((err: unknown) => {
+      console.error(err);
+      return Promise.resolve(null);
+    });
 
   if (!setSvgBuffer) return false;
 
@@ -159,7 +162,11 @@ export async function getTotalCommanderCards(): Promise<number> {
   if (commanderCards === 0) {
     commanderCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_QUERY)
       .then((response: Response) => response.json())
-      .then((response: OracleResponse) => response.total_cards);
+      .then((response: OracleResponse) => response.total_cards)
+      .catch((error) => {
+        console.error(error);
+        return Promise.resolve(0);
+      });
   }
 
   return commanderCards;
@@ -169,7 +176,11 @@ export async function getTotalLegalCards(): Promise<number> {
   if (totalLegalCards === 0) {
     totalLegalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
       .then((response: Response) => response.json())
-      .then((response: OracleResponse) => response.total_cards);
+      .then((response: OracleResponse) => response.total_cards)
+      .catch((error) => {
+        console.error(error);
+        return Promise.resolve(0);
+      });
   }
 
   return totalLegalCards;
@@ -179,7 +190,11 @@ export async function getTotalCards(): Promise<number> {
   if (totalCards === 0) {
     totalCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY)
       .then((response: Response) => response.json())
-      .then((response: OracleResponse) => response.total_cards);
+      .then((response: OracleResponse) => response.total_cards)
+      .catch((error) => {
+        console.error(error);
+        return Promise.resolve(0);
+      });
   }
 
   return totalCards;

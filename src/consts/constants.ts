@@ -29,16 +29,22 @@ export const BOOKS_SEARCH_OPENLIBRARY_URL =
 export const DISCORD_ID_LENGTH = 18;
 export const DISCORD_VOICE_CHANNEL_TYPE = 2;
 
+export const MOVIES_IMAGES_BASE_URL = "https://image.tmdb.org/t/p/original/";
+export const MOVIES_IMDB_BASE_URL = "https://www.imdb.com/";
+export const MOVIES_RT_BASE_URL = "https://www.rottentomatoes.com/";
+
 export const MTG_PACK_SIZE = 12;
 
 export const REGEX_BOOKS_PATTERN =
-  /\{\{\s*(?<name>[^|}]+?)\s*(?:\|\s*(?<author>[^}]+?)\s*)?\}\}/gu;
+  /\{\{\s*(?<name>[^|}]+?)\s*?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
 export const REGEX_GOODREADS_DATA_PATTERN =
   /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/gu;
 export const REGEX_GOODREADS_IMAGE_PATTERN =
   /(images\/S\/compressed\.photo\.goodreads\.com\/books\/\d+i\/\d+)/gu;
+export const REGEX_MOVIES_PATTERN =
+  /<<\s*(?<query>[^<>]+?)(?:\s+s(?<season>\d+))?(?:e(?<episode>\d+))?\s*>>/gu;
 export const REGEX_SANITIZE_STRING = /[^\x00-\x7F]/gu;
 export const REGEX_SCRYFALL_EDHREC_PATTERN = /[^ a-zA-Z0-9]/gu;
 export const REGEX_SCRYFALL_PATTERN =
