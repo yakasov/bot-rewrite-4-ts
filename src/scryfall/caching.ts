@@ -165,7 +165,7 @@ export async function getTotalCommanderCards(): Promise<number> {
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
         console.error(error);
-        return Promise.resolve(0);
+        return Promise.resolve(1);
       });
   }
 
@@ -179,7 +179,7 @@ export async function getTotalLegalCards(): Promise<number> {
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
         console.error(error);
-        return Promise.resolve(0);
+        return Promise.resolve(1);
       });
   }
 
@@ -193,7 +193,7 @@ export async function getTotalCards(): Promise<number> {
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
         console.error(error);
-        return Promise.resolve(0);
+        return Promise.resolve(1);
       });
   }
 
