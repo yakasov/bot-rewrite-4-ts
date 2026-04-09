@@ -260,18 +260,23 @@ async function handlePersonResult(
     async () => tmdb.people.details(item.id),
     "name"
   );
-  const knownFor: string = (item.known_for as unknown as any[])
-    .map((i) => (isMovieItem(i) ? i.title : i.name))
-    .join(", ");
+
+  let knownFor = "N/A";
+  if (item.known_for) {
+    knownFor = (item.known_for as unknown as (MovieItem | TVShowItem)[])
+      .map((i) => (isMovieItem(i) ? i.title : i.name))
+      .join(", ");
+  }
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(item.name)
     .setImage(imageUrl)
     .setURL(url)
     .addFields(
+      // Because PersonItem is Pick<Person, ...> it doesn't know known_for_department is actually on PersonItem
       {
         name: "Department",
-        value: (item as any).known_for_department,
+        value: (item as Person).known_for_department,
       },
       {
         name: "Known For",
