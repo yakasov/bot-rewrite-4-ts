@@ -10,10 +10,11 @@ async function getStuff() {
     const next100 = await fetch(`https://json.edhrec.com/pages/${url}`).then(
       (r) => r.json()
     );
+    const cards = next100.cardviews.filter((c) => c.salt !== 0);
 
-    first100 = [...first100, ...next100.cardviews];
+    first100 = [...first100, ...cards];
 
-    if (next100.more) {
+    if (next100.more && cards.length > 0) {
       await f(next100.more);
     }
   };
