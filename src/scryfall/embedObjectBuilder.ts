@@ -145,6 +145,9 @@ export async function getCardMessageObject(
 
   const collectorNumberString: string =
     cardDetails.scry.collector_number.toString();
+  const saltRank: string = cardDetails.edh?.saltRank
+    ? `(#${cardDetails.edh.saltRank})`
+    : "";
   embed.setFooter({
     text:
       `(${cardDetails.scry.set.toUpperCase()} | ${collectorNumberString.padStart(
@@ -155,7 +158,9 @@ export async function getCardMessageObject(
       (cardDetails.edh &&
       cardDetails.edh.container?.json_dict?.card.salt &&
       cardDetails.edh.container.json_dict.card.salt !== 0
-        ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(3)}`
+        ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(
+            3
+          )} ${saltRank}`
         : ""),
     ...(cardDetails.scry.game_changer
       ? { iconURL: "attachment://diamond.png" }

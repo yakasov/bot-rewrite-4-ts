@@ -15,6 +15,7 @@ import { DATABASE_KEYS_PRESENT } from "../keys";
 const printCache: Record<string, Card[]> = {};
 const setImageCache: string[] = [];
 const commanderRanks: Record<string, number> = {};
+let saltRanks: Record<string, number> | null = null;
 let commanderCards = 0;
 let totalLegalCards = 0;
 let totalCards = 0;
@@ -75,6 +76,19 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   setImageCache.push(cardDetails.id);
 
   return hasSaved;
+}
+
+export async function getSaltRanks(): Promise<Record<string, number>> {
+  if (!saltRanks) {
+    saltRanks = JSON.parse(
+      fs.readFileSync("./resources/scryfall/salt.json", {
+        encoding: "utf8",
+        flag: "r",
+      })
+    );
+  }
+
+  return saltRanks ?? {};
 }
 
 export async function getCommanderRanks(

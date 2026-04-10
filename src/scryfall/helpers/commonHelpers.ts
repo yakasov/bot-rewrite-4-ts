@@ -9,7 +9,7 @@ import {
 import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
 import { encodeURIToBasic } from "../cardFound";
 import { CardDetails } from "../../types/scryfall/Invoke";
-import { getCommanderRanks } from "../caching";
+import { getCommanderRanks, getSaltRanks } from "../caching";
 import { Message } from "discord.js";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
@@ -119,6 +119,11 @@ export async function getCardDetails(
     ? Promise.resolve(passthroughEDH)
     : getEDHRecDetails(cardName, isCommander);
   const edhRecDetails: EDHRecResponse | undefined = await edhRecPromise;
+  if (edhRecDetails) {
+    edhRecDetails.saltRank = (await getSaltRanks())[
+      cardDetails?.id ?? ""
+    ];
+  }
 
   return { scry: cardDetails, edh: edhRecDetails };
 }
