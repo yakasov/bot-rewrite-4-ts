@@ -121,7 +121,7 @@ export async function getCardDetails(
   const edhRecDetails: EDHRecResponse | undefined = await edhRecPromise;
   if (edhRecDetails) {
     edhRecDetails.saltRank = (await getSaltRanks())[
-      cardDetails?.id ?? ""
+      cardDetails?.id ?? cardDetails?.oracle_id ?? ""
     ];
   }
 

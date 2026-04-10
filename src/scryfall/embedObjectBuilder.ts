@@ -10,6 +10,7 @@ import {
 } from "../consts/constants.js";
 import {
   getCommanderRanks,
+  getSaltRanks,
   getSetImage,
   getTotalCards,
   getTotalLegalCards,
@@ -18,7 +19,7 @@ import { TagLink } from "../types/scryfall/EDHRecResponse";
 import { Card } from "scryfall-api";
 
 function getPercentileString(amount: number, total: number) {
-  return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;
+  return `top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%`;
 }
 
 function getTypeLine(scry: Card) {
@@ -59,10 +60,10 @@ export async function getCardMessageObject(
   const edhrecRank: string = cardDetails.scry.edhrec_rank
     ? `\n\nEDHREC Rank #${
         cardDetails.scry.edhrec_rank - cardDifference
-      } of ${await getTotalCards()} ${getPercentileString(
+      } of ${await getTotalCards()} (${getPercentileString(
         cardDetails.scry.edhrec_rank - cardDifference,
         await getTotalCards()
-      )}`
+      )})`
     : "";
   const commanderRanks: Record<string, number> = await getCommanderRanks(
     message
@@ -72,10 +73,10 @@ export async function getCardMessageObject(
   ]
     ? `\nCommander #${
         commanderRanks[cardDetails.scry.oracle_id ?? cardDetails.scry.id]
-      } of ${Object.keys(commanderRanks).length} ${getPercentileString(
+      } of ${Object.keys(commanderRanks).length} (${getPercentileString(
         commanderRanks[cardDetails.scry.oracle_id ?? cardDetails.scry.id],
         Object.keys(commanderRanks).length
-      )}`
+      )})`
     : "";
 
   const setImageAttachment: AttachmentBuilder | null = await getSetImage(
@@ -145,8 +146,12 @@ export async function getCardMessageObject(
 
   const collectorNumberString: string =
     cardDetails.scry.collector_number.toString();
+  const saltLength: number = Object.keys(await getSaltRanks()).length;
   const saltRank: string = cardDetails.edh?.saltRank
-    ? `(#${cardDetails.edh.saltRank})`
+    ? `(#${cardDetails.edh.saltRank} of ${saltLength}, ${getPercentileString(
+        cardDetails.edh.saltRank,
+        saltLength
+      )})`
     : "";
   embed.setFooter({
     text:
