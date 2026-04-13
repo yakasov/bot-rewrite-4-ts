@@ -48,8 +48,8 @@ async function deployCommands() {
         (data as any[]).length
       } application (/) commands.`
     );
-  } catch (err: unknown) {
-    console.error(err);
+  } catch (error) {
+    console.error("deployCommands Error", error);
   }
 }
 

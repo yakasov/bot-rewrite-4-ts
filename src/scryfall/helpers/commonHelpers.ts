@@ -49,14 +49,14 @@ export async function getLowestHighestData(
   )
     .then((response: Response) => response.json())
     .then((response: OracleResponse) => response.data)
-    .catch((err: Error) => {
+    .catch((error) => {
       console.warn(
         `Oracle fetch failed for ${URL_SCRYFALL_ORACLE.replace(
           "<<ORACLE_ID>>",
           oracleId
-        )}, error message: ${err.message}`
+        )}, error message: ${error}`
       );
-      return [];
+      return Promise.resolve([]);
     });
   if (!oracleCards.length) {
     return undefined;
@@ -145,11 +145,14 @@ export async function getEDHRecDetails(
     .then((response: string) =>
       response[0] !== "<" ? JSON.parse(response) : undefined
     )
-    .catch(() => undefined);
+    .catch((error) => {
+      console.error("EDHREC Error:", error);
+      return Promise.resolve(undefined);
+    });
 
   return EDHRecDetails;
 }
 
 export function getCardName(card: Card): string {
-  return card.printed_name ?? card.flavor_name ?? card.name
+  return card.printed_name ?? card.flavor_name ?? card.name;
 }

@@ -89,6 +89,6 @@ export async function handlePrintingChoice(
       .edit({
         components: [getPostActionButtonsRow(cardName).toJSON()],
       })
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }
 }

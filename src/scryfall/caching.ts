@@ -52,8 +52,8 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   );
   const setSvgBuffer: ArrayBuffer | null = await fetch(setInfo.icon_svg_uri)
     .then((response: Response) => response.arrayBuffer())
-    .catch((err: unknown) => {
-      console.error(err);
+    .catch((error) => {
+      console.error("getSetImage Error (setSvgBuffer)", error);
       return Promise.resolve(null);
     });
 
@@ -68,9 +68,9 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
       setImageCache.push(cardDetails.id);
       return true;
     })
-    .catch((err: unknown) => {
-      console.error(err);
-      return false;
+    .catch((error) => {
+      console.error("getSetImage Error (hasSaved)", error);
+      return Promise.resolve(false);
     });
 
   setImageCache.push(cardDetails.id);
