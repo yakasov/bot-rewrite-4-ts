@@ -99,17 +99,20 @@ export async function getLowestHighestData(
 }
 
 export async function getCardDetails(
-  cardName: string,
+  card: string | Card,
   set: string | undefined = undefined,
   number: number | undefined = undefined,
   passthroughEDH: EDHRecResponse | undefined = undefined,
   message: Message | undefined = undefined
 ): Promise<CardDetails> {
-  const cardDetailsPromise: Promise<Card | undefined> =
-    set && number
-      ? Cards.bySet(set, number)
-      : Cards.byName(cardName, set, true);
-  const cardDetails: Card | undefined = await cardDetailsPromise;
+  let cardDetails: Card | undefined = undefined;
+  if (typeof card === "string") {
+    const cardDetailsPromise: Promise<Card | undefined> =
+      set && number ? Cards.bySet(set, number) : Cards.byName(card, set, true);
+    cardDetails = await cardDetailsPromise;
+  } else {
+    cardDetails = card;
+  }
 
   const isCommander: boolean =
     (await getCommanderRanks(message))[
@@ -117,7 +120,7 @@ export async function getCardDetails(
     ] !== undefined;
   const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
     ? Promise.resolve(passthroughEDH)
-    : getEDHRecDetails(cardName, isCommander);
+    : getEDHRecDetails(cardDetails?.name ?? "", isCommander);
   const edhRecDetails: EDHRecResponse | undefined = await edhRecPromise;
   if (edhRecDetails) {
     edhRecDetails.saltRank = (await getSaltRanks())[
@@ -145,4 +148,8 @@ export async function getEDHRecDetails(
     .catch(() => undefined);
 
   return EDHRecDetails;
+}
+
+export function getCardName(card: Card): string {
+  return card.printed_name ?? card.flavor_name ?? card.name
 }

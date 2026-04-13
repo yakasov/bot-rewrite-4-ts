@@ -49,8 +49,8 @@ export async function getCardMessageObject(
     cardDetails.scry.legalities.commander === "legal"
       ? "Legal"
       : cardDetails.scry.legalities.commander === "banned"
-      ? "Banned"
-      : "Non-legal";
+        ? "Banned"
+        : "Non-legal";
   const rarity: string =
     cardDetails.scry.rarity.charAt(0).toUpperCase() +
     cardDetails.scry.rarity.slice(1);
@@ -65,9 +65,8 @@ export async function getCardMessageObject(
         await getTotalCards()
       )})`
     : "";
-  const commanderRanks: Record<string, number> = await getCommanderRanks(
-    message
-  );
+  const commanderRanks: Record<string, number> =
+    await getCommanderRanks(message);
   const commanderEdhrecRank: string = commanderRanks[
     cardDetails.scry.oracle_id ?? cardDetails.scry.id
   ]
@@ -89,9 +88,10 @@ export async function getCardMessageObject(
       : null
   );
 
-  const title: string = cardDetails.scry.flavor_name
-    ? `${cardDetails.scry.flavor_name} (${cardDetails.scry.name})`
-    : cardDetails.scry.name;
+  const title: string =
+    cardDetails.scry.printed_name || cardDetails.scry.flavor_name
+      ? `${cardDetails.scry.printed_name ?? cardDetails.scry.flavor_name} (${cardDetails.scry.name})`
+      : cardDetails.scry.name;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(title)

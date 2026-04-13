@@ -83,7 +83,7 @@ export async function scryfallGetCard(
   modifiers: Modifiers,
   fromSelectMenu = false
 ): Promise<void> {
-  let results: string[] = [""];
+  let results: string[] | Card[] = [""];
 
   try {
     if (cardName && !modifiers.isSyntax) {
@@ -91,7 +91,9 @@ export async function scryfallGetCard(
     }
 
     if (modifiers.isSyntax || results.length === 0) {
-      const search: MagicPageResult<Card> = Cards.search(cardName);
+      const search: MagicPageResult<Card> = Cards.search(cardName, {
+        include_multilingual: true,
+      });
       const searchResults: Card[] = await search.get(25);
       modifiers.syntaxInfo = {
         totalCards: search.count,
@@ -99,9 +101,7 @@ export async function scryfallGetCard(
           cardName
         )}`,
       };
-      results = searchResults.map(
-        (card: Card) => card.flavor_name ?? card.name
-      );
+      results = searchResults;
     }
   } catch (e) {
     message.reply(`${e}`);
@@ -124,8 +124,8 @@ export async function scryfallGetCard(
     await scryfallNoCardFound(message, cardName);
   } else if (
     results.length === 1 ||
-    (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
-      !modifiers.isFuzzy) ||
+    (typeof results[0] === "string" && (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
+      !modifiers.isFuzzy)) ||
     fromSelectMenu
   ) {
     await scryfallCardFound(message, results[0], modifiers);

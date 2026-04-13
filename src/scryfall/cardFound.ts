@@ -8,7 +8,7 @@ import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./embedObjectBuilder";
 import { handlePrintingChoice } from "./helpers/printHelpers";
 import { Card } from "scryfall-api";
-import { getCardDetails } from "./helpers/commonHelpers";
+import { getCardDetails, getCardName } from "./helpers/commonHelpers";
 import {
   REGEX_SCRYFALL_EDHREC_PATTERN,
   SCRYFALL_EDHREC_SEARCH,
@@ -20,13 +20,13 @@ import { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
 
 export async function scryfallCardFound(
   message: Message,
-  cardName: string,
+  card: string | Card,
   modifiers: Modifiers
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
   const cardDetails: CardDetails = await getCardDetails(
-    cardName,
+    card,
     modifiers.isSpecificSet,
     modifiers.isSpecificNumber,
     undefined,
@@ -35,7 +35,7 @@ export async function scryfallCardFound(
 
   if (!cardDetails.scry) {
     await message.channel.send(
-      `Ran into an error fetching ${cardName} for set ${modifiers.isSpecificSet} and number ${modifiers.isSpecificNumber}!`
+      `Ran into an error fetching ${card} for set ${modifiers.isSpecificSet} and number ${modifiers.isSpecificNumber}!`
     );
     return;
   }
@@ -63,12 +63,12 @@ export async function scryfallCardFound(
       printDetails.length > 1
         ? [
             getActionButtonsRow(
-              cardDetails.scry.flavor_name ?? cardDetails.scry.name
+              getCardName(cardDetails.scry)
             ).toJSON(),
           ]
         : [
             getPostActionButtonsRow(
-              cardDetails.scry.flavor_name ?? cardDetails.scry.name
+              getCardName(cardDetails.scry)
             ).toJSON(),
           ],
     ...cardObject,
