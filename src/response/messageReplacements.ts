@@ -3,6 +3,7 @@ import {
   REGEX_STEAM_LINK,
   STEAM_URL_LINK,
   TWITTER_LINKS,
+  TWITTER_REPLACEMENTS,
 } from "../consts/constants";
 import { getNicknameFromMessage } from "./responseHelpers";
 import { isSendableChannel } from "../util/typeGuards";
@@ -39,8 +40,12 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
   const replacedContentArray: string[] = [];
   for (const word of contentArray) {
     if (word.includes("status")) {
-      for (const [replacement, regex] of Object.entries(TWITTER_LINKS)) {
+      for (const [replacementKey, regex] of Object.entries(TWITTER_LINKS)) {
         if (regex.test(word)) {
+          let replacement = replacementKey;
+          if (replacement === "RANDOM") {
+            replacement = TWITTER_REPLACEMENTS[Math.floor(Math.random() * TWITTER_REPLACEMENTS.length)];
+          }
           replacedContentArray.push(word.replace(regex, replacement));
         }
       }

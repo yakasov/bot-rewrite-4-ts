@@ -108,9 +108,17 @@ export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF = "135410033524604928";
 export const THIS_ID_IS_A_PINGING_BOZO = "214404843442274304";
 
 export const TWITTER_LINKS: Record<string, RegExp> = {
-  "https://fixupx.com/": /https:\/\/x\.com\//u,
+  "RANDOM": /https:\/\/x\.com\//u,
   "https://fxtwitter.com/": /https:\/\/twitter\.com\//u,
 };
+export const TWITTER_REPLACEMENTS: string[] = [
+  "https://fixupx.com/",
+  "https://stupidpenisx.com/",
+  "https://peepeepoopoodumdumtwitterx.org/",
+  "https://autistic.kids/",
+  "https://dogsmilex.com/",
+  "https://skibidix.com/",
+]
 
 export const STATS_BACKUP_DIR = "./backups/";
 export const STATS_TOP_SCORES_N = 10;
