@@ -8,6 +8,7 @@ import { checkVoiceChannels } from "../stats/addStatEvent";
 import { checkAllUserStats } from "../stats/statsHelpers";
 import { saveStatsToDatabase } from "../database/saveToDatabase";
 import { backupStatsFromDatabaseToJSON } from "../database/backupDatabaseToJSON";
+import { checkDeadlockChangelog } from "../tasks/checkDeadlockForum.js";
 
 export async function handleClientReady(
   context: BotContext
@@ -19,8 +20,9 @@ export async function handleClientReady(
   );
 
   checkVoiceChannels(context);
+  checkMinecraftServer(context);
+  checkDeadlockChangelog(context);
   await checkBirthdays(context, true);
-  await checkMinecraftServer(context);
 
   context.splash = getRandomSplash();
   context.client.user?.setPresence({
@@ -32,6 +34,7 @@ export async function handleClientReady(
   }, getTime({ seconds: 10 }));
   setInterval(() => checkBirthdays(context), getTime({ minutes: 15 }));
   setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
+  setInterval(() => checkDeadlockChangelog(context), getTime({ minutes: 15 }));
   setInterval(() => checkMinecraftServer(context),
     getTime({ seconds: 5 }));
   setInterval(() => {

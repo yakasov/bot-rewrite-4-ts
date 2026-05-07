@@ -124,6 +124,7 @@ export const STATS_BACKUP_DIR = "./backups/";
 export const STATS_TOP_SCORES_N = 10;
 
 export const URL_API_RULES = "https://jmcd.uk/bot/getRules";
+export const URL_DEADLOCK_FORUM = "https://forums.playdeadlock.com/search/1762855/?t=post&c[users]=Yoshi&o=date";
 export const URL_FORTNITE_API = "https://fortnite-api.com/v2/shop";
 export const URL_FORTNITE_SONGS =
   "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/tracks.json";
