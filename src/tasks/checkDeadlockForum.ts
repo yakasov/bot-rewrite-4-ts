@@ -26,17 +26,18 @@ export async function checkDeadlockChangelog(
   }
 
   const aTag: ATag = (lastPost.querySelector("h3 > a") as ATag);
-  const postKey: string = aTag.href.split("#")[1];
+  const href: string = aTag.rawAttrs.replace("href=\"", "").replace("\"", "");
+  const postKey: string = href.split("/")[3];
 
   if (!aTag.innerText.includes("Update")) return;
 
-  if (lastUrl !== aTag.href) {
+  if (lastUrl !== href) {
     if (!lastUrl) {
-      lastUrl = aTag.href;
+      lastUrl = href;
       return;
     }
 
-    const postText: string = await fetch(aTag.href).then(
+    const postText: string = await fetch("https://forums.playdeadlock.com" + href).then(
       (response: Response) => response.text()
     );
     const parsedPostText: HTMLElement = HTMLParser(postText);
@@ -65,6 +66,6 @@ export async function checkDeadlockChangelog(
       return;
     }
 
-    await deadlockChannel.send(`# NEW POST\n${lastUpdateContent}`);
+    await deadlockChannel.send(`# NEW YOSHI POST\n${lastUpdateContent}`);
   }
 }
