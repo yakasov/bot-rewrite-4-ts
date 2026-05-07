@@ -35,8 +35,7 @@ export const MOVIES_RT_BASE_URL = "https://www.rottentomatoes.com/";
 
 export const MTG_PACK_SIZE = 12;
 
-export const REGEX_BOOKS_PATTERN =
-  /\{\{\s*(?<name>[^|}]+?)\s*?\}\}/gu;
+export const REGEX_BOOKS_PATTERN = /\{\{\s*(?<name>[^|}]+?)\s*?\}\}/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH = /[\s\S]{1,2000}(?!\S)/gu;
 export const REGEX_DISCORD_MESSAGE_LENGTH_SHORT = /[\s\S]{1,1980}(?!\S)/gu;
 export const REGEX_GOODREADS_DATA_PATTERN =
@@ -108,7 +107,7 @@ export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF = "135410033524604928";
 export const THIS_ID_IS_A_PINGING_BOZO = "214404843442274304";
 
 export const TWITTER_LINKS: Record<string, RegExp> = {
-  "RANDOM": /https:\/\/x\.com\//u,
+  RANDOM: /https:\/\/x\.com\//u,
   "https://fxtwitter.com/": /https:\/\/twitter\.com\//u,
 };
 export const TWITTER_REPLACEMENTS: string[] = [
@@ -118,13 +117,15 @@ export const TWITTER_REPLACEMENTS: string[] = [
   "https://autistic.kids/",
   "https://dogsmilex.com/",
   "https://skibidix.com/",
-]
+];
 
 export const STATS_BACKUP_DIR = "./backups/";
 export const STATS_TOP_SCORES_N = 10;
 
 export const URL_API_RULES = "https://jmcd.uk/bot/getRules";
-export const URL_DEADLOCK_FORUM = "https://forums.playdeadlock.com/search/1762855/?t=post&c[users]=Yoshi&o=date";
+export const URL_DEADLOCK_FORUM = "https://forums.playdeadlock.com";
+export const URL_DEADLOCK_YOSHI =
+  "https://forums.playdeadlock.com/search/1762855/?t=post&c[users]=Yoshi&o=date";
 export const URL_FORTNITE_API = "https://fortnite-api.com/v2/shop";
 export const URL_FORTNITE_SONGS =
   "https://raw.githubusercontent.com/FNFestival/fnfestival.github.io/refs/heads/main/data/tracks.json";
