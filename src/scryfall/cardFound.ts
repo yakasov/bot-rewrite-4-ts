@@ -8,7 +8,7 @@ import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./embedObjectBuilder";
 import { handlePrintingChoice } from "./helpers/printHelpers";
 import { Card } from "scryfall-api";
-import { getCardDetails, getCardName } from "./helpers/commonHelpers";
+import { getCardDetails, getCardName, to2DP } from "./helpers/commonHelpers";
 import {
   REGEX_SCRYFALL_EDHREC_PATTERN,
   SCRYFALL_EDHREC_SEARCH,
@@ -25,6 +25,7 @@ export async function scryfallCardFound(
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
+  const scryfallStartTime = performance.now();
   const cardDetails: CardDetails = await getCardDetails(
     card,
     modifiers.isSpecificSet,
@@ -32,6 +33,7 @@ export async function scryfallCardFound(
     undefined,
     message
   );
+  const scryfallCardDetailsTime = performance.now();
 
   if (!cardDetails.scry) {
     await message.channel.send(
@@ -58,19 +60,19 @@ export async function scryfallCardFound(
 
   if (!cardObject) return;
 
+  const scryfallEndTime = performance.now();
+  const scryfallTiming =
+    message.content[0] === "*"
+      ? `||Total time: ${to2DP(
+          scryfallEndTime - scryfallStartTime
+        )} (${to2DP(scryfallCardDetailsTime - scryfallStartTime)}) ms||`
+      : "";
   const cardFoundMessage: Message = await message.channel.send({
+    content: scryfallTiming,
     components:
       printDetails.length > 1
-        ? [
-            getActionButtonsRow(
-              getCardName(cardDetails.scry)
-            ).toJSON(),
-          ]
-        : [
-            getPostActionButtonsRow(
-              getCardName(cardDetails.scry)
-            ).toJSON(),
-          ],
+        ? [getActionButtonsRow(getCardName(cardDetails.scry)).toJSON()]
+        : [getPostActionButtonsRow(getCardName(cardDetails.scry)).toJSON()],
     ...cardObject,
   });
 

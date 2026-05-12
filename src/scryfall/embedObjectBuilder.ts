@@ -1,5 +1,5 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { getExactPrice } from "./helpers/commonHelpers";
+import { getExactPrice, to2DP } from "./helpers/commonHelpers";
 import { getImageUrl } from "./helpers/imageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
@@ -36,12 +36,15 @@ export async function getCardMessageObject(
 ): Promise<EmbedObject | undefined> {
   if (!isSendableChannel(message.channel) || !cardDetails.scry) return;
 
+  const scryfallImageStartTime = performance.now();
   const [isImageLocal, imageUrl]: [boolean, string] = await getImageUrl(
     cardDetails.scry
   );
   const cardImageAttachment: AttachmentBuilder | null = isImageLocal
     ? new AttachmentBuilder(`${imageUrl}.jpg`)
     : null;
+  const scryfallImageEndTime = performance.now();
+
   const releaseDate: moment.Moment = moment(cardDetails.scry.released_at);
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
@@ -55,8 +58,12 @@ export async function getCardMessageObject(
     cardDetails.scry.rarity.charAt(0).toUpperCase() +
     cardDetails.scry.rarity.slice(1);
 
+  const scryfallCardDifferenceStartTime = performance.now();
   const cardDifference: number =
     (await getTotalLegalCards()) - (await getTotalCards());
+  const scryfallCardDifferenceEndTime = performance.now();
+
+  const scryfallEdhrecStartTime = performance.now();
   const edhrecRank: string = cardDetails.scry.edhrec_rank
     ? `\n\nEDHREC Rank #${
         cardDetails.scry.edhrec_rank - cardDifference
@@ -77,6 +84,7 @@ export async function getCardMessageObject(
         Object.keys(commanderRanks).length
       )})`
     : "";
+  const scryfallEdhrecEndTime = performance.now();
 
   const setImageAttachment: AttachmentBuilder | null = await getSetImage(
     cardDetails.scry
@@ -142,6 +150,17 @@ export async function getCardMessageObject(
         .map((tag: TagLink) => tag.value)
         .join(", ")
     );
+  }
+
+  if (message.content[0] === "*") {
+    embed.addFields({
+      name: "Timings",
+      value: `Image: ${
+        to2DP(scryfallImageEndTime - scryfallImageStartTime)
+      } ms\nCard difference: ${
+        to2DP(scryfallCardDifferenceEndTime - scryfallCardDifferenceStartTime)
+      } ms\nEDHRec: ${to2DP(scryfallEdhrecEndTime - scryfallEdhrecStartTime)} ms`,
+    });
   }
 
   const collectorNumberString: string =
