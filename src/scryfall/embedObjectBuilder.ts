@@ -230,7 +230,10 @@ export function getQuickCardMessageObject(
     .setTitle(title)
     .setColor(SCRYFALL_HEX_COLOR_CODES[card.border_color])
     .setURL(card.scryfall_uri)
-    .setImage(card.image_uris?.large ?? "")
+    .setImage(
+      card.image_uris?.large ??
+        "https://static.wikia.nocookie.net/ultradragonball/images/b/b5/New_Goku.jpg/revision/latest?cb=20171106235356"
+    )
     .addFields(
       {
         name: "Type",
