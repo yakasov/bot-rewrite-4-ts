@@ -1,5 +1,6 @@
 import { Card } from "scryfall-api";
 import { EDHRecResponse } from "./EDHRecResponse";
+import { Message } from "discord.js";
 
 export interface Modifiers {
   isFuzzy: boolean;
@@ -23,4 +24,5 @@ export interface EmbedObject {
 export interface CardDetails {
   scry?: Card;
   edh?: EDHRecResponse;
+  quickMessage?: Message;
 }

@@ -67,14 +67,18 @@ export async function scryfallCardFound(
           scryfallEndTime - scryfallStartTime
         )} (${to2DP(scryfallCardDetailsTime - scryfallStartTime)}) ms||`
       : "";
-  const cardFoundMessage: Message = await message.channel.send({
+
+  const messageObject = {
     content: scryfallTiming,
     components:
       printDetails.length > 1
         ? [getActionButtonsRow(getCardName(cardDetails.scry)).toJSON()]
         : [getPostActionButtonsRow(getCardName(cardDetails.scry)).toJSON()],
     ...cardObject,
-  });
+  };
+  const cardFoundMessage: Message = cardDetails.quickMessage
+    ? await cardDetails.quickMessage.edit(messageObject)
+    : await message.channel.send(messageObject);
 
   if (printDetails.length <= 1) return;
 

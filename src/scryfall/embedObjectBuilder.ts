@@ -155,11 +155,11 @@ export async function getCardMessageObject(
   if (message.content[0] === "*") {
     embed.addFields({
       name: "Timings",
-      value: `Image: ${
-        to2DP(scryfallImageEndTime - scryfallImageStartTime)
-      } ms\nCard difference: ${
-        to2DP(scryfallCardDifferenceEndTime - scryfallCardDifferenceStartTime)
-      } ms\nEDHRec: ${to2DP(scryfallEdhrecEndTime - scryfallEdhrecStartTime)} ms`,
+      value: `Image: ${to2DP(
+        scryfallImageEndTime - scryfallImageStartTime
+      )} ms\nCard difference: ${to2DP(
+        scryfallCardDifferenceEndTime - scryfallCardDifferenceStartTime
+      )} ms\nEDHRec: ${to2DP(scryfallEdhrecEndTime - scryfallEdhrecStartTime)} ms`,
     });
   }
 
@@ -197,6 +197,70 @@ export async function getCardMessageObject(
       ...(cardImageAttachment ? [cardImageAttachment] : []),
       ...(setImageAttachment ? [setImageAttachment] : []),
       ...(cardDetails.scry.game_changer
+        ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
+        : []),
+    ],
+  };
+}
+
+export function getQuickCardMessageObject(
+  message: Message,
+  card: Card
+): EmbedObject | undefined {
+  if (!isSendableChannel(message.channel) || !card) return;
+
+  const releaseDate: moment.Moment = moment(card.released_at);
+  const unreleased: boolean = releaseDate.isAfter(moment.now());
+
+  const legality: string =
+    card.legalities.commander === "legal"
+      ? "Legal"
+      : card.legalities.commander === "banned"
+        ? "Banned"
+        : "Non-legal";
+  const rarity: string =
+    card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1);
+
+  const title: string =
+    card.printed_name || card.flavor_name
+      ? `${card.printed_name ?? card.flavor_name} (${card.name})`
+      : card.name;
+
+  const embed: EmbedBuilder = new EmbedBuilder()
+    .setTitle(title)
+    .setColor(SCRYFALL_HEX_COLOR_CODES[card.border_color])
+    .setURL(card.scryfall_uri)
+    .setImage(card.image_uris?.large ?? "")
+    .addFields(
+      {
+        name: "Type",
+        value: `${getTypeLine(card)}\n*${rarity}*`,
+        inline: true,
+      },
+      {
+        name: "Legality",
+        value: `${legality}${
+          unreleased
+            ? `\n*Releases on ${releaseDate.format("Do MMM YYYY")}*`
+            : ""
+        }`,
+        inline: true,
+      }
+    );
+
+  const collectorNumberString: string = card.collector_number.toString();
+  embed.setFooter({
+    text: `(${card.set.toUpperCase()} | ${collectorNumberString.padStart(
+      4 - collectorNumberString.length,
+      "0"
+    )}): £${getExactPrice(card.prices)}`,
+    ...(card.game_changer ? { iconURL: "attachment://diamond.png" } : {}),
+  });
+
+  return {
+    embeds: [embed],
+    files: [
+      ...(card.game_changer
         ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
         : []),
     ],

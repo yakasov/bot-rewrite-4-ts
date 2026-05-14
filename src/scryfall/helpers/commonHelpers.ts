@@ -11,6 +11,8 @@ import { encodeURIToBasic } from "../cardFound";
 import { CardDetails } from "../../types/scryfall/Invoke";
 import { getCommanderRanks, getSaltRanks } from "../caching";
 import { Message } from "discord.js";
+import { isSendableChannel } from "../../util/typeGuards";
+import { getQuickCardMessageObject } from "../embedObjectBuilder";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -114,6 +116,11 @@ export async function getCardDetails(
     cardDetails = card;
   }
 
+  let quickMessage: Message | undefined = undefined;
+  if (message && cardDetails && isSendableChannel(message.channel)) {
+    quickMessage = await message?.channel.send({ ...getQuickCardMessageObject(message, cardDetails)})
+  }
+  
   const isCommander: boolean =
     (await getCommanderRanks(message))[
       cardDetails?.oracle_id ?? cardDetails?.id ?? ""
@@ -128,7 +135,7 @@ export async function getCardDetails(
     ];
   }
 
-  return { scry: cardDetails, edh: edhRecDetails };
+  return { scry: cardDetails, edh: edhRecDetails, quickMessage };
 }
 
 export async function getEDHRecDetails(
