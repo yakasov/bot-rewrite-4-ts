@@ -44,7 +44,7 @@ export async function handleClientReady(context: BotContext): Promise<void> {
         activities: [{ name: context.splash, type: ActivityType.Watching }],
       });
     },
-    getTime({ minutes: 30 })
+    getTime({ minutes: 10 })
   );
   setInterval(() => checkVoiceChannels(context), getTime({ seconds: 15 }));
   setInterval(() => saveStatsToDatabase(context), getTime({ minutes: 3 }));
