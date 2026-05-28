@@ -27,11 +27,6 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
   if (!aTag.innerText.includes("Update")) return;
 
   if (lastUrl !== href) {
-    if (!lastUrl) {
-      lastUrl = href;
-      return;
-    }
-
     const postText: string = await fetch(URL_DEADLOCK_FORUM + href).then(
       (response: Response) => response.text()
     );
@@ -66,4 +61,6 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
 
     await deadlockChannel.send(`# NEW YOSHI POST\n${lastUpdateContent}`);
   }
+
+  lastUrl = href;
 }
