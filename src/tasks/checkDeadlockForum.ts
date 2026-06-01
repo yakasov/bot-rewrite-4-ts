@@ -67,7 +67,7 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
     }
 
     const deadlockChannel: TextChannel | null = (await guild.channels.fetch(
-      "271381095990296576"
+      "1507294074158190692"
     )) as TextChannel | null;
 
     if (!deadlockChannel || !deadlockChannel.isTextBased()) {
