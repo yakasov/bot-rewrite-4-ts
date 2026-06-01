@@ -29,6 +29,12 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
   if (!aTag.innerText.includes("Update")) return;
 
   if (lastUrl !== href) {
+    // Don't post on reboot
+    if (!lastUrl) {
+      lastUrl = href;
+      return;
+    }
+
     const postText: string = await fetch(URL_DEADLOCK_FORUM + href).then(
       (response: Response) => response.text()
     );
@@ -44,12 +50,7 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
     const codeBlock: nHTMLElement =
       lastUpdateWrapper?.querySelector(".bbCodeBlock");
     if (codeBlock) {
-      const url: string = codeBlock.attributes["data-url"];
-      const contentSnippet: string | undefined = codeBlock
-        ?.querySelector("contentRow-snippet")
-        ?.innerText?.split(" - ")
-        .join("\n- ");
-      lastUpdateContent = `${contentSnippet}\n\n${url}`;
+      lastUpdateContent = codeBlock.attributes["data-url"];
     } else {
       lastUpdateContent = lastUpdateWrapper?.innerText;
     }
