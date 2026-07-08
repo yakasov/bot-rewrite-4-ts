@@ -16,7 +16,8 @@ export async function handleMessageCreate(
     if (message.embeds && message.embeds.length > 0 && message.embeds[0].data && message.embeds[0].data.description) {
       const detection = await cld.detect(message.embeds[0].data.description);
 
-      if (detection.languages[0].code != "en") {
+      console.log(detection.languages);
+      if (detection.languages.some(lang => lang.code != "en" && lang.percent > 33)) {
         const translation = await tr(message.embeds[0].data.description);
 
         await message.reply(translation.text.split("**[💬]")[0]);
