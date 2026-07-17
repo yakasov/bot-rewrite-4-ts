@@ -26,12 +26,12 @@ export default {
     .setDescription("Link your Steam account for Deadlock commands")
     .addStringOption((opt: SlashCommandStringOption) =>
       opt
-        .setName("ID")
+        .setName("id")
         .setDescription("Your Steam ID (in any format)")
         .setRequired(true)
     ),
   async execute(interaction: ChatInputCommandInteraction) {
-    const idString: string = interaction.options.getString("ID") ?? "";
+    const idString: string = interaction.options.getString("id") ?? "";
     const deadlockLinks: GenericNumberObject = deadlockJson;
 
     if (idString.length === 17) {
@@ -52,7 +52,7 @@ export default {
     }
 
     fs.writeFileSync(
-      "../../../resources/deadlock.json",
+      "./resources/deadlock.json",
       JSON.stringify(deadlockLinks)
     );
 
