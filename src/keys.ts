@@ -12,6 +12,7 @@ const {
   DISCORD_CLIENT_ID,
   OPENAI_TOKEN,
   GOOGLE_BOOKS_TOKEN,
+  STEAM_API_KEY,
   TMDB_TOKEN,
 } = process.env;
 
@@ -37,6 +38,7 @@ export const KEYS = {
   DISCORD_CLIENT_ID,
   OPENAI_TOKEN,
   GOOGLE_BOOKS_TOKEN,
+  STEAM_API_KEY,
   TMDB_TOKEN,
 };
 
