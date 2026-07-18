@@ -24,13 +24,8 @@ export async function scryfallShowCardList(
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
-  // TODO: This sucks
   const displaySet: Set<string> = new Set<string>(
-    typeof results[0] === "object"
-      ? (results as unknown as Card[]).map(
-          getCardName
-        )
-      : (results as unknown as string[])
+    results.map(q => typeof q === "string" ? q : getCardName(q))
   );
 
   const selectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()

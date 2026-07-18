@@ -1,0 +1,3 @@
+[submodule "deadlock-ts"]
+	path = deadlock-ts
+	url = ./deadlock-ts

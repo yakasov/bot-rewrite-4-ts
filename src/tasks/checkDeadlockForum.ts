@@ -3,6 +3,8 @@ import { URL_DEADLOCK_FORUM, URL_DEADLOCK_YOSHI } from "../consts/constants";
 import { BotContext } from "../types/BotContext";
 import { Guild, TextChannel } from "discord.js";
 
+type nHTMLElement = HTMLElement | null | undefined;
+
 let lastUrl: string | null = null;
 
 export async function checkDeadlockForum(context: BotContext): Promise<void> {
@@ -10,14 +12,14 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
     (response: Response) => response.text()
   );
   const parsedHTML: HTMLElement = HTMLParser(profileText);
-  const lastPost: HTMLElement | null = parsedHTML.querySelector(".contentRow");
+  const lastPost: nHTMLElement = parsedHTML.querySelector(".contentRow");
 
   if (!lastPost) {
     console.warn("Last Deadlock fetch was seemingly unsuccessful!");
     return;
   }
 
-  const aTag: HTMLElement | null = lastPost.querySelector("h3 > a");
+  const aTag: nHTMLElement = lastPost.querySelector("h3 > a");
 
   if (!aTag) return;
 
@@ -27,15 +29,31 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
   if (!aTag.innerText.includes("Update")) return;
 
   if (lastUrl !== href) {
+    // Don't post on reboot
+    if (!lastUrl) {
+      lastUrl = href;
+      return;
+    }
+
     const postText: string = await fetch(URL_DEADLOCK_FORUM + href).then(
       (response: Response) => response.text()
     );
     const parsedPostText: HTMLElement = HTMLParser(postText);
-    const lastUpdate: HTMLElement | null = parsedPostText.querySelector(
+    const lastUpdate: nHTMLElement = parsedPostText.querySelector(
       `article[data-content=${postKey}]`
     );
-    const lastUpdateContent: string | undefined =
-      lastUpdate?.querySelector(".bbWrapper")?.innerText;
+
+    const lastUpdateWrapper: nHTMLElement =
+      lastUpdate?.querySelector(".bbWrapper");
+
+    let lastUpdateContent;
+    const codeBlock: nHTMLElement =
+      lastUpdateWrapper?.querySelector(".bbCodeBlock");
+    if (codeBlock) {
+      lastUpdateContent = codeBlock.attributes["data-url"];
+    } else {
+      lastUpdateContent = lastUpdateWrapper?.innerText;
+    }
 
     if (!lastUpdateContent) return;
 
@@ -49,7 +67,7 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
     }
 
     const deadlockChannel: TextChannel | null = (await guild.channels.fetch(
-      "271381095990296576"
+      "1507294074158190692"
     )) as TextChannel | null;
 
     if (!deadlockChannel || !deadlockChannel.isTextBased()) {
