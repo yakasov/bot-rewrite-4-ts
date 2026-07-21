@@ -67,8 +67,7 @@ function prettifyGenres(
 }
 
 export async function movieInvoke(message: Message): Promise<void> {
-  if (!isSendableChannel(message.channel)) return;
-
+  if (!isSendableChannel(message.channel) ||!KEYS.TMDB_TOKEN) return;
   initialiseGenres();
 
   const promises: Promise<void>[] = [];
