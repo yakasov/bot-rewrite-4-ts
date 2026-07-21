@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 
 export function isSendableChannel(
-  channel: Channel
+  channel: Channel | null
 ): channel is Extract<
   typeof channel,
   {
@@ -16,6 +16,7 @@ export function isSendableChannel(
   }
 > {
   return (
+    channel != null && 
     channel.isTextBased() &&
     !channel.isDMBased() &&
     typeof (channel).send === "function"

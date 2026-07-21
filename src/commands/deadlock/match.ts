@@ -2,11 +2,19 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import {
   DAPIMatches,
   DAPISteam,
+  getAccoladeNameFromId,
   getHeroNameFromId,
 } from "../../steam/deadlockApis";
-import { BulkMetadata, Player } from "../../types/steam/Deadlock";
+import deadlockJson from "../../../resources/deadlock.json";
+import {
+  BulkMetadata,
+  Player,
+  PlayerAccolade,
+} from "../../types/steam/Deadlock";
 import { MatchSaltsResponse } from "../../../deadlock-ts";
 import { AxiosError } from "axios";
+import { GenericNumberObject } from "../../types/Generic";
+import { isSendableChannel } from "../../util/typeGuards";
 
 export default {
   data: new SlashCommandBuilder()
@@ -26,7 +34,7 @@ export default {
       // I run this first just to check the salt exists, and it's ready to be fetched
       const saltData: MatchSaltsResponse | null = await DAPIMatches()
         .salts({ matchId })
-        .then((a) => a.status <= 200 ? a.data : null)
+        .then((a) => (a.status <= 200 ? a.data : null))
         .catch();
 
       if (!saltData?.metadata_salt) {
@@ -65,9 +73,24 @@ Match ID: ${metadata.match_id}
 \`\`\`
 ${playersTable}
 \`\`\`
-    `;
+`;
 
     await interaction.reply(message);
+
+    const deadlockLinks: GenericNumberObject = deadlockJson;
+    const accountId = deadlockLinks[interaction.user.id];
+
+    if (accountId) {
+      const linkedPlayer: Player | undefined = metadata.players.find(
+        (p) => p.account_id === accountId
+      );
+
+      if (linkedPlayer && isSendableChannel(interaction.channel)) {
+        await interaction.channel.send(
+          `## Accolades\nAvailable if you have linked your account!\n${getPlayerAccolades(linkedPlayer.accolades)}`
+        );
+      }
+    }
   },
 };
 
@@ -139,4 +162,19 @@ ${tableA}\
 ${tableB}`;
 
   return table;
+}
+
+function getPlayerAccolades(accolades: PlayerAccolade[]) {
+  const lineBreakers: number[] = [6, 11, 15, 26];
+  return `\`\`\`
+${accolades
+  .sort((a, b) => a.accolade_id - b.accolade_id)
+  .map(
+    (a) =>
+      `${lineBreakers.includes(a.accolade_id) ? "\n" : ""}${getAccoladeNameFromId(
+        a.accolade_id
+      ).padEnd(24)}: ${a.accolade_stat_value.toString().padStart(6)}`
+  )
+  .join("\n")}
+\`\`\``;
 }
