@@ -12,6 +12,7 @@ export interface Config {
   }
 
   ids: {
+    deadlockChannel: string;
     mainGuild: string;
     birthdayChannel: string;
     birthdayRole: string;

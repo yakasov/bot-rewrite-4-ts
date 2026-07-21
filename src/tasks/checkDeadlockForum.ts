@@ -8,6 +8,8 @@ type nHTMLElement = HTMLElement | null | undefined;
 let lastUrl: string | null = null;
 
 export async function checkDeadlockForum(context: BotContext): Promise<void> {
+  if (!context.config.ids.mainGuild || !context.config.ids.deadlockChannel) return;
+  
   const profileText: string = await fetch(URL_DEADLOCK_YOSHI).then(
     (response: Response) => response.text()
   );
@@ -67,7 +69,7 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
     }
 
     const deadlockChannel: TextChannel | null = (await guild.channels.fetch(
-      "1507294074158190692"
+      context.config.ids.deadlockChannel
     )) as TextChannel | null;
 
     if (!deadlockChannel || !deadlockChannel.isTextBased()) {

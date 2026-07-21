@@ -8,7 +8,9 @@ export default defineConfig(
   {
     ignores: [
       "dist/**",
-      "test/**"
+      "test/**",
+      "deadlock-ts/**",
+      "**/*.js"
     ]
   },
   eslint.configs.recommended,
