@@ -8,7 +8,7 @@ import { isSendableChannel } from "../util/typeGuards";
 import { getCardMessageObject } from "./embedObjectBuilder";
 import { handlePrintingChoice } from "./helpers/printHelpers";
 import { Card } from "scryfall-api";
-import { getCardDetails } from "./helpers/commonHelpers";
+import { getCardDetails, getCardName, to2DP } from "./helpers/commonHelpers";
 import {
   REGEX_SCRYFALL_EDHREC_PATTERN,
   SCRYFALL_EDHREC_SEARCH,
@@ -20,22 +20,24 @@ import { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
 
 export async function scryfallCardFound(
   message: Message,
-  cardName: string,
+  card: string | Card,
   modifiers: Modifiers
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
+  const scryfallStartTime = performance.now();
   const cardDetails: CardDetails = await getCardDetails(
-    cardName,
+    card,
     modifiers.isSpecificSet,
     modifiers.isSpecificNumber,
     undefined,
     message
   );
+  const scryfallCardDetailsTime = performance.now();
 
   if (!cardDetails.scry) {
     await message.channel.send(
-      `Ran into an error fetching ${cardName} for set ${modifiers.isSpecificSet} and number ${modifiers.isSpecificNumber}!`
+      `Ran into an error fetching ${card} for set ${modifiers.isSpecificSet} and number ${modifiers.isSpecificNumber}!`
     );
     return;
   }
@@ -58,21 +60,25 @@ export async function scryfallCardFound(
 
   if (!cardObject) return;
 
-  const cardFoundMessage: Message = await message.channel.send({
+  const scryfallEndTime = performance.now();
+  const scryfallTiming =
+    message.content[0] === "*"
+      ? `||Total time: ${to2DP(
+          scryfallEndTime - scryfallStartTime
+        )} (${to2DP(scryfallCardDetailsTime - scryfallStartTime)}) ms||`
+      : "";
+
+  const messageObject = {
+    content: scryfallTiming,
     components:
       printDetails.length > 1
-        ? [
-            getActionButtonsRow(
-              cardDetails.scry.flavor_name ?? cardDetails.scry.name
-            ).toJSON(),
-          ]
-        : [
-            getPostActionButtonsRow(
-              cardDetails.scry.flavor_name ?? cardDetails.scry.name
-            ).toJSON(),
-          ],
+        ? [getActionButtonsRow(getCardName(cardDetails.scry)).toJSON()]
+        : [getPostActionButtonsRow(getCardName(cardDetails.scry)).toJSON()],
     ...cardObject,
-  });
+  };
+  const cardFoundMessage: Message = cardDetails.quickMessage
+    ? await cardDetails.quickMessage.edit(messageObject)
+    : await message.channel.send(messageObject);
 
   if (printDetails.length <= 1) return;
 

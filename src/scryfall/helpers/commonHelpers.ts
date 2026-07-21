@@ -9,8 +9,10 @@ import {
 import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
 import { encodeURIToBasic } from "../cardFound";
 import { CardDetails } from "../../types/scryfall/Invoke";
-import { getCommanderRanks } from "../caching";
+import { getCommanderRanks, getSaltRanks } from "../caching";
 import { Message } from "discord.js";
+import { isSendableChannel } from "../../util/typeGuards";
+import { getQuickCardMessageObject } from "../embedObjectBuilder";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
@@ -49,14 +51,14 @@ export async function getLowestHighestData(
   )
     .then((response: Response) => response.json())
     .then((response: OracleResponse) => response.data)
-    .catch((err: Error) => {
+    .catch((error) => {
       console.warn(
         `Oracle fetch failed for ${URL_SCRYFALL_ORACLE.replace(
           "<<ORACLE_ID>>",
           oracleId
-        )}, error message: ${err.message}`
+        )}, error message: ${error}`
       );
-      return [];
+      return Promise.resolve([]);
     });
   if (!oracleCards.length) {
     return undefined;
@@ -99,28 +101,41 @@ export async function getLowestHighestData(
 }
 
 export async function getCardDetails(
-  cardName: string,
+  card: string | Card,
   set: string | undefined = undefined,
   number: number | undefined = undefined,
   passthroughEDH: EDHRecResponse | undefined = undefined,
   message: Message | undefined = undefined
 ): Promise<CardDetails> {
-  const cardDetailsPromise: Promise<Card | undefined> =
-    set && number
-      ? Cards.bySet(set, number)
-      : Cards.byName(cardName, set, true);
-  const cardDetails: Card | undefined = await cardDetailsPromise;
+  let cardDetails: Card | undefined = undefined;
+  if (typeof card === "string") {
+    const cardDetailsPromise: Promise<Card | undefined> =
+      set && number ? Cards.bySet(set, number) : Cards.byName(card, set, true);
+    cardDetails = await cardDetailsPromise;
+  } else {
+    cardDetails = card;
+  }
 
+  let quickMessage: Message | undefined = undefined;
+  if (message && cardDetails && isSendableChannel(message.channel)) {
+    quickMessage = await message?.channel.send({ ...getQuickCardMessageObject(message, cardDetails)})
+  }
+  
   const isCommander: boolean =
     (await getCommanderRanks(message))[
       cardDetails?.oracle_id ?? cardDetails?.id ?? ""
     ] !== undefined;
   const edhRecPromise: Promise<EDHRecResponse | undefined> = passthroughEDH
     ? Promise.resolve(passthroughEDH)
-    : getEDHRecDetails(cardName, isCommander);
+    : getEDHRecDetails(cardDetails?.name ?? "", isCommander);
   const edhRecDetails: EDHRecResponse | undefined = await edhRecPromise;
+  if (edhRecDetails) {
+    edhRecDetails.saltRank = (await getSaltRanks())[
+      cardDetails?.id ?? cardDetails?.oracle_id ?? ""
+    ];
+  }
 
-  return { scry: cardDetails, edh: edhRecDetails };
+  return { scry: cardDetails, edh: edhRecDetails, quickMessage };
 }
 
 export async function getEDHRecDetails(
@@ -137,7 +152,14 @@ export async function getEDHRecDetails(
     .then((response: string) =>
       response[0] !== "<" ? JSON.parse(response) : undefined
     )
-    .catch(() => undefined);
+    .catch((error) => {
+      console.error("EDHREC Error:", error);
+      return Promise.resolve(undefined);
+    });
 
   return EDHRecDetails;
+}
+
+export function getCardName(card: Card): string {
+  return card.printed_name ?? card.flavor_name ?? card.name;
 }

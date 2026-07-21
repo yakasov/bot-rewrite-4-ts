@@ -8,22 +8,31 @@ import {
 } from "discord.js";
 import { scryfallGetCard } from "./invoke";
 import { isSendableChannel } from "../util/typeGuards";
-import type { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
+import type {
+  CardDetails,
+  EmbedObject,
+  Modifiers,
+} from "../types/scryfall/Invoke";
 import { getCardMessageObject } from "./embedObjectBuilder";
-import { getCardDetails } from "./helpers/commonHelpers";
+import { getCardDetails, getCardName } from "./helpers/commonHelpers";
+import { Card } from "scryfall-api";
 
 export async function scryfallShowCardList(
   message: Message,
-  results: string[],
+  results: string[] | Card[],
   modifiers: Modifiers
 ): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
+
+  const displaySet: Set<string> = new Set<string>(
+    results.map(q => typeof q === "string" ? q : getCardName(q))
+  );
 
   const selectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
     .setCustomId("scryfall_list_select")
     .setPlaceholder("Select other cards...")
     .addOptions(
-      [... new Set(results)]
+      [...displaySet]
         .slice(1)
         .map((card: string, i: number) =>
           new StringSelectMenuOptionBuilder()
@@ -36,7 +45,7 @@ export async function scryfallShowCardList(
     selectMenu
   );
 
-  const cardDetails: CardDetails = (await getCardDetails(results[0]));
+  const cardDetails: CardDetails = await getCardDetails(results[0]);
   const cardMessageObject: EmbedObject = (await getCardMessageObject(
     message,
     cardDetails

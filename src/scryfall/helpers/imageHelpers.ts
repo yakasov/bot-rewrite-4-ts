@@ -27,7 +27,10 @@ export async function combineImages(card: Card): Promise<string> {
   ]);
   const image: Sharp | undefined = await joinImages(filePaths, {
     direction: "horizontal",
-  }).catch(() => undefined);
+  }).catch((error) => {
+    console.error("combineImages Error:", error);
+    return undefined;
+  });
   if (!image) return "";
   await image.toFile(`${baseFilePath}.jpg`);
 

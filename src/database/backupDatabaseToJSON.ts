@@ -3,8 +3,11 @@ import moment from "moment-timezone";
 import type { Stats } from "../types/Stats.d.ts";
 import { loadStatsFromDatabase } from "./loadFromDatabase";
 import { STATS_BACKUP_DIR } from "../consts/constants";
+import { DATABASE_KEYS_PRESENT } from "../keys.js";
 
 export async function backupStatsFromDatabaseToJSON(): Promise<void> {
+  if (!DATABASE_KEYS_PRESENT) return;
+
   try {
     const stats: Stats | undefined = await loadStatsFromDatabase();
     if (!stats) {

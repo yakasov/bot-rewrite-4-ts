@@ -14,6 +14,7 @@ export interface EDHRecResponse {
   panels?: Panels;
   description: string;
   container?: Container;
+  saltRank?: number;
 }
 
 export interface Panels {

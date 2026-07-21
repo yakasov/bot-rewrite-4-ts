@@ -16,8 +16,8 @@ export async function getMCStatus(
   return fetch(`${URL_MINECRAFT_STATUS}/${context.config.minecraft.serverIp}`)
     .then((response: Response) => response.json())
     .then((response: MinecraftResponse | null) => response)
-    .catch((err) => {
-      console.error(`\n${err}`);
+    .catch((error) => {
+      console.error("getMCStatus Error:", error);
 
       if (context.runState.minecraft === MinecraftQueryStates.FIRST_RUN) {
         context.runState.minecraft = MinecraftQueryStates.ERROR_STOP;

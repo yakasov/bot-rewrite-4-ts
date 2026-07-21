@@ -1,5 +1,5 @@
 import { Message, AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { getExactPrice } from "./helpers/commonHelpers";
+import { getExactPrice, to2DP } from "./helpers/commonHelpers";
 import { getImageUrl } from "./helpers/imageHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 import moment from "moment-timezone";
@@ -10,6 +10,7 @@ import {
 } from "../consts/constants.js";
 import {
   getCommanderRanks,
+  getSaltRanks,
   getSetImage,
   getTotalCards,
   getTotalLegalCards,
@@ -18,7 +19,7 @@ import { TagLink } from "../types/scryfall/EDHRecResponse";
 import { Card } from "scryfall-api";
 
 function getPercentileString(amount: number, total: number) {
-  return `(top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%)`;
+  return `top ${Math.min(100, (amount / total) * 100).toPrecision(3)}%`;
 }
 
 function getTypeLine(scry: Card) {
@@ -35,12 +36,15 @@ export async function getCardMessageObject(
 ): Promise<EmbedObject | undefined> {
   if (!isSendableChannel(message.channel) || !cardDetails.scry) return;
 
+  const scryfallImageStartTime = performance.now();
   const [isImageLocal, imageUrl]: [boolean, string] = await getImageUrl(
     cardDetails.scry
   );
   const cardImageAttachment: AttachmentBuilder | null = isImageLocal
     ? new AttachmentBuilder(`${imageUrl}.jpg`)
     : null;
+  const scryfallImageEndTime = performance.now();
+
   const releaseDate: moment.Moment = moment(cardDetails.scry.released_at);
   const unreleased: boolean = releaseDate.isAfter(moment.now());
 
@@ -48,35 +52,39 @@ export async function getCardMessageObject(
     cardDetails.scry.legalities.commander === "legal"
       ? "Legal"
       : cardDetails.scry.legalities.commander === "banned"
-      ? "Banned"
-      : "Non-legal";
+        ? "Banned"
+        : "Non-legal";
   const rarity: string =
     cardDetails.scry.rarity.charAt(0).toUpperCase() +
     cardDetails.scry.rarity.slice(1);
 
+  const scryfallCardDifferenceStartTime = performance.now();
   const cardDifference: number =
     (await getTotalLegalCards()) - (await getTotalCards());
+  const scryfallCardDifferenceEndTime = performance.now();
+
+  const scryfallEdhrecStartTime = performance.now();
   const edhrecRank: string = cardDetails.scry.edhrec_rank
     ? `\n\nEDHREC Rank #${
         cardDetails.scry.edhrec_rank - cardDifference
-      } of ${await getTotalCards()} ${getPercentileString(
+      } of ${await getTotalCards()} (${getPercentileString(
         cardDetails.scry.edhrec_rank - cardDifference,
         await getTotalCards()
-      )}`
+      )})`
     : "";
-  const commanderRanks: Record<string, number> = await getCommanderRanks(
-    message
-  );
+  const commanderRanks: Record<string, number> =
+    await getCommanderRanks(message);
   const commanderEdhrecRank: string = commanderRanks[
     cardDetails.scry.oracle_id ?? cardDetails.scry.id
   ]
     ? `\nCommander #${
         commanderRanks[cardDetails.scry.oracle_id ?? cardDetails.scry.id]
-      } of ${Object.keys(commanderRanks).length} ${getPercentileString(
+      } of ${Object.keys(commanderRanks).length} (${getPercentileString(
         commanderRanks[cardDetails.scry.oracle_id ?? cardDetails.scry.id],
         Object.keys(commanderRanks).length
-      )}`
+      )})`
     : "";
+  const scryfallEdhrecEndTime = performance.now();
 
   const setImageAttachment: AttachmentBuilder | null = await getSetImage(
     cardDetails.scry
@@ -88,9 +96,10 @@ export async function getCardMessageObject(
       : null
   );
 
-  const title: string = cardDetails.scry.flavor_name
-    ? `${cardDetails.scry.flavor_name} (${cardDetails.scry.name})`
-    : cardDetails.scry.name;
+  const title: string =
+    cardDetails.scry.printed_name || cardDetails.scry.flavor_name
+      ? `${cardDetails.scry.printed_name ?? cardDetails.scry.flavor_name} (${cardDetails.scry.name})`
+      : cardDetails.scry.name;
 
   const embed: EmbedBuilder = new EmbedBuilder()
     .setTitle(title)
@@ -143,8 +152,26 @@ export async function getCardMessageObject(
     );
   }
 
+  if (message.content[0] === "*") {
+    embed.addFields({
+      name: "Timings",
+      value: `Image: ${to2DP(
+        scryfallImageEndTime - scryfallImageStartTime
+      )} ms\nCard difference: ${to2DP(
+        scryfallCardDifferenceEndTime - scryfallCardDifferenceStartTime
+      )} ms\nEDHRec: ${to2DP(scryfallEdhrecEndTime - scryfallEdhrecStartTime)} ms`,
+    });
+  }
+
   const collectorNumberString: string =
     cardDetails.scry.collector_number.toString();
+  const saltLength: number = Object.keys(await getSaltRanks()).length;
+  const saltRank: string = cardDetails.edh?.saltRank
+    ? `(#${cardDetails.edh.saltRank} of ${saltLength}, ${getPercentileString(
+        cardDetails.edh.saltRank,
+        saltLength
+      )})`
+    : "";
   embed.setFooter({
     text:
       `(${cardDetails.scry.set.toUpperCase()} | ${collectorNumberString.padStart(
@@ -155,7 +182,9 @@ export async function getCardMessageObject(
       (cardDetails.edh &&
       cardDetails.edh.container?.json_dict?.card.salt &&
       cardDetails.edh.container.json_dict.card.salt !== 0
-        ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(3)}`
+        ? `\nSalt ${cardDetails.edh.container.json_dict.card.salt.toFixed(
+            3
+          )} ${saltRank}`
         : ""),
     ...(cardDetails.scry.game_changer
       ? { iconURL: "attachment://diamond.png" }
@@ -168,6 +197,73 @@ export async function getCardMessageObject(
       ...(cardImageAttachment ? [cardImageAttachment] : []),
       ...(setImageAttachment ? [setImageAttachment] : []),
       ...(cardDetails.scry.game_changer
+        ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
+        : []),
+    ],
+  };
+}
+
+export function getQuickCardMessageObject(
+  message: Message,
+  card: Card
+): EmbedObject | undefined {
+  if (!isSendableChannel(message.channel) || !card) return;
+
+  const releaseDate: moment.Moment = moment(card.released_at);
+  const unreleased: boolean = releaseDate.isAfter(moment.now());
+
+  const legality: string =
+    card.legalities.commander === "legal"
+      ? "Legal"
+      : card.legalities.commander === "banned"
+        ? "Banned"
+        : "Non-legal";
+  const rarity: string =
+    card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1);
+
+  const title: string =
+    card.printed_name || card.flavor_name
+      ? `${card.printed_name ?? card.flavor_name} (${card.name})`
+      : card.name;
+
+  const embed: EmbedBuilder = new EmbedBuilder()
+    .setTitle(title)
+    .setColor(SCRYFALL_HEX_COLOR_CODES[card.border_color])
+    .setURL(card.scryfall_uri)
+    .setImage(
+      card.image_uris?.large ??
+        "https://static.wikia.nocookie.net/ultradragonball/images/b/b5/New_Goku.jpg/revision/latest?cb=20171106235356"
+    )
+    .addFields(
+      {
+        name: "Type",
+        value: `${getTypeLine(card)}\n*${rarity}*`,
+        inline: true,
+      },
+      {
+        name: "Legality",
+        value: `${legality}${
+          unreleased
+            ? `\n*Releases on ${releaseDate.format("Do MMM YYYY")}*`
+            : ""
+        }`,
+        inline: true,
+      }
+    );
+
+  const collectorNumberString: string = card.collector_number.toString();
+  embed.setFooter({
+    text: `(${card.set.toUpperCase()} | ${collectorNumberString.padStart(
+      4 - collectorNumberString.length,
+      "0"
+    )}): £${getExactPrice(card.prices)}`,
+    ...(card.game_changer ? { iconURL: "attachment://diamond.png" } : {}),
+  });
+
+  return {
+    embeds: [embed],
+    files: [
+      ...(card.game_changer
         ? [new AttachmentBuilder("./resources/scryfall/diamond.png")]
         : []),
     ],

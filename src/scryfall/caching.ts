@@ -15,6 +15,7 @@ import { DATABASE_KEYS_PRESENT } from "../keys";
 const printCache: Record<string, Card[]> = {};
 const setImageCache: string[] = [];
 const commanderRanks: Record<string, number> = {};
+let saltRanks: Record<string, number> | null = null;
 let commanderCards = 0;
 let totalLegalCards = 0;
 let totalCards = 0;
@@ -51,8 +52,8 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
   );
   const setSvgBuffer: ArrayBuffer | null = await fetch(setInfo.icon_svg_uri)
     .then((response: Response) => response.arrayBuffer())
-    .catch((err: unknown) => {
-      console.error(err);
+    .catch((error) => {
+      console.error("getSetImage Error (setSvgBuffer)", error);
       return Promise.resolve(null);
     });
 
@@ -67,14 +68,27 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
       setImageCache.push(cardDetails.id);
       return true;
     })
-    .catch((err: unknown) => {
-      console.error(err);
-      return false;
+    .catch((error) => {
+      console.error("getSetImage Error (hasSaved)", error);
+      return Promise.resolve(false);
     });
 
   setImageCache.push(cardDetails.id);
 
   return hasSaved;
+}
+
+export async function getSaltRanks(): Promise<Record<string, number>> {
+  if (!saltRanks) {
+    saltRanks = JSON.parse(
+      fs.readFileSync("./resources/scryfall/salt.json", {
+        encoding: "utf8",
+        flag: "r",
+      })
+    );
+  }
+
+  return saltRanks ?? {};
 }
 
 export async function getCommanderRanks(
@@ -165,7 +179,7 @@ export async function getTotalCommanderCards(): Promise<number> {
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
         console.error(error);
-        return Promise.resolve(0);
+        return Promise.resolve(1);
       });
   }
 
@@ -179,7 +193,7 @@ export async function getTotalLegalCards(): Promise<number> {
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
         console.error(error);
-        return Promise.resolve(0);
+        return Promise.resolve(1);
       });
   }
 
@@ -193,7 +207,7 @@ export async function getTotalCards(): Promise<number> {
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
         console.error(error);
-        return Promise.resolve(0);
+        return Promise.resolve(1);
       });
   }
 

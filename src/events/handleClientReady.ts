@@ -8,10 +8,9 @@ import { checkVoiceChannels } from "../stats/addStatEvent";
 import { checkAllUserStats } from "../stats/statsHelpers";
 import { saveStatsToDatabase } from "../database/saveToDatabase";
 import { backupStatsFromDatabaseToJSON } from "../database/backupDatabaseToJSON";
+import { checkDeadlockForum } from "../tasks/checkDeadlockForum";
 
-export async function handleClientReady(
-  context: BotContext
-): Promise<void> {
+export async function handleClientReady(context: BotContext): Promise<void> {
   console.log(
     `\nCurrent date and time is ${context.currentDate}, ` +
       `logged in as ${context.client.user?.tag}\n` +
@@ -19,27 +18,34 @@ export async function handleClientReady(
   );
 
   checkVoiceChannels(context);
+  checkMinecraftServer(context);
+  checkDeadlockForum(context);
   await checkBirthdays(context, true);
-  await checkMinecraftServer(context);
 
   context.splash = getRandomSplash();
   context.client.user?.setPresence({
-    activities: [{ name: context.splash , type: ActivityType.Watching }]
+    activities: [{ name: context.splash, type: ActivityType.Watching }],
   });
 
-  setInterval(() => {
-    context.uptime = context.uptime + 10;
-  }, getTime({ seconds: 10 }));
+  setInterval(
+    () => {
+      context.uptime = context.uptime + 10;
+    },
+    getTime({ seconds: 10 })
+  );
   setInterval(() => checkBirthdays(context), getTime({ minutes: 15 }));
   setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
-  setInterval(() => checkMinecraftServer(context),
-    getTime({ seconds: 5 }));
-  setInterval(() => {
-    context.splash = getRandomSplash();
-    context.client.user?.setPresence({
-      activities: [{ name: context.splash , type: ActivityType.Watching }]
-    });
-  }, getTime({ minutes: 30 }));
+  setInterval(() => checkDeadlockForum(context), getTime({ minutes: 15 }));
+  setInterval(() => checkMinecraftServer(context), getTime({ seconds: 5 }));
+  setInterval(
+    () => {
+      context.splash = getRandomSplash();
+      context.client.user?.setPresence({
+        activities: [{ name: context.splash, type: ActivityType.Watching }],
+      });
+    },
+    getTime({ minutes: 10 })
+  );
   setInterval(() => checkVoiceChannels(context), getTime({ seconds: 15 }));
   setInterval(() => saveStatsToDatabase(context), getTime({ minutes: 3 }));
   setInterval(backupStatsFromDatabaseToJSON, getTime({ minutes: 15 }));
