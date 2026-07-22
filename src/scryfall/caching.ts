@@ -21,11 +21,20 @@ let totalLegalCards = 0;
 let totalCards = 0;
 let rebuildingCache = false;
 
+// Scryfall requires a User-Agent, and on Windows this isn't auto-added in
+export const fetchWithHeader = (url: string): Promise<Response> =>
+  fetch(url, {
+    headers: {
+      Accept: "*/*",
+      "User-Agent": "Scryfall-TS",
+    },
+  });
+
 export async function getPrintList(card: Card): Promise<Card[]> {
   if (!card.oracle_id) return [];
 
   if (!printCache[card.oracle_id]) {
-    printCache[card.oracle_id] = await fetch(card.prints_search_uri)
+    printCache[card.oracle_id] = await fetchWithHeader(card.prints_search_uri)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.data);
   }
@@ -47,10 +56,12 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
 
   if (setImageCache.includes(cardDetails.id)) return true;
 
-  const setInfo: SetResponse = await fetch(cardDetails.set_uri).then(
-    (response: Response) => response.json()
-  );
-  const setSvgBuffer: ArrayBuffer | null = await fetch(setInfo.icon_svg_uri)
+  const setInfo: SetResponse = await fetchWithHeader(
+    cardDetails.set_uri
+  ).then((response: Response) => response.json());
+  const setSvgBuffer: ArrayBuffer | null = await fetchWithHeader(
+    setInfo.icon_svg_uri
+  )
     .then((response: Response) => response.arrayBuffer())
     .catch((error) => {
       console.error("getSetImage Error (setSvgBuffer)", error);
@@ -174,7 +185,7 @@ export async function readWriteCommanderCache(): Promise<number> {
 
 export async function getTotalCommanderCards(): Promise<number> {
   if (commanderCards === 0) {
-    commanderCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_QUERY)
+    commanderCards = await fetchWithHeader(SCRYFALL_DEFAULT_COMMANDER_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
@@ -188,7 +199,7 @@ export async function getTotalCommanderCards(): Promise<number> {
 
 export async function getTotalLegalCards(): Promise<number> {
   if (totalLegalCards === 0) {
-    totalLegalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
+    totalLegalCards = await fetchWithHeader(SCRYFALL_DEFAULT_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
@@ -202,7 +213,7 @@ export async function getTotalLegalCards(): Promise<number> {
 
 export async function getTotalCards(): Promise<number> {
   if (totalCards === 0) {
-    totalCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY)
+    totalCards = await fetchWithHeader(SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {

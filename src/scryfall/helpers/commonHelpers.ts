@@ -9,7 +9,7 @@ import {
 import { EDHRecResponse } from "../../types/scryfall/EDHRecResponse";
 import { encodeURIToBasic } from "../cardFound";
 import { CardDetails } from "../../types/scryfall/Invoke";
-import { getCommanderRanks, getSaltRanks } from "../caching";
+import { fetchWithHeader, getCommanderRanks, getSaltRanks } from "../caching";
 import { Message } from "discord.js";
 import { isSendableChannel } from "../../util/typeGuards";
 import { getQuickCardMessageObject } from "../embedObjectBuilder";
@@ -46,7 +46,7 @@ export function getExactPrice(prices: Prices): string {
 export async function getLowestHighestData(
   oracleId: string
 ): Promise<PricingData | undefined> {
-  const oracleCards: Card[] = await fetch(
+  const oracleCards: Card[] = await fetchWithHeader(
     URL_SCRYFALL_ORACLE.replace("<<ORACLE_ID>>", oracleId)
   )
     .then((response: Response) => response.json())
@@ -142,6 +142,7 @@ export async function getEDHRecDetails(
   cardName: string,
   isCommander = false
 ): Promise<EDHRecResponse | undefined> {
+  // EDHRec doesn't need the header
   const EDHRecDetails: EDHRecResponse | undefined = await fetch(
     (isCommander
       ? SCRYFALL_EDHREC_API_COMMANDER_SEARCH
