@@ -16,10 +16,20 @@ import { getQuickCardMessageObject } from "../embedObjectBuilder";
 
 const acceptedPrices: string[] = ["usd", "usd_foil", "eur", "eur_foil"];
 
+/**
+ * @param number
+ * @returns a rounded number (to 2 decimal places).
+ */
 export function to2DP(number: number): string {
   return (Math.round(number * 100) / 100).toFixed(2);
 }
 
+/**
+ * Translates a Prices object to an array of GBP prices.
+ *
+ * @param prices - a Scryfall API Prices object
+ * @returns an array of GBP prices
+ */
 export function pricesToGBPArray(prices: Prices): number[] {
   return Object.entries(prices)
     .filter(([key, value]) => acceptedPrices.includes(key) && value !== null)
@@ -28,6 +38,12 @@ export function pricesToGBPArray(prices: Prices): number[] {
     );
 }
 
+/**
+ * Gets a best estimation price for a given card.
+ *
+ * @param prices - a Scryfall API Prices object
+ * @returns the cheapest price of USD and EUR
+ */
 export function getExactPrice(prices: Prices): string {
   const USDPriceString: string =
     prices.usd ?? prices.usd_foil ?? prices.usd_etched ?? "Infinity";
@@ -43,6 +59,12 @@ export function getExactPrice(prices: Prices): string {
   return Math.min(USDPrice, EURPrice).toFixed(2);
 }
 
+/**
+ * Gets the lowest and highest priced prints for a given card.
+ *
+ * @param oracleId - the card Oracle ID
+ * @returns a Pricing Data object
+ */
 export async function getLowestHighestData(
   oracleId: string
 ): Promise<PricingData | undefined> {
@@ -100,6 +122,18 @@ export async function getLowestHighestData(
   return lowestHighestData;
 }
 
+/**
+ * Fetches and collates information about a given Scryfall card.
+ * Different combinations of parameters are accepted, and the function will
+ * attempt to get a single card for the parameters provided.
+ *
+ * @param card - a string or Card object. If this is a string, the function will attempt to fetch a Card. Otherwise, it will use the Card provided.
+ * @param set - a set tag. Defaults to undefined (and will then be ignored)
+ * @param number - a card number (within a set). Defaults to undefined (and will then be ignored)
+ * @param passthroughEDH - a prefetched EDHRec response. Used for fetching new Scryfall details without refetching EDHRec.
+ * @param message - a Discord message. Used for sending a quick message. Defaults to undefined (and then no quick message will be sent).
+ * @returns a CardDetails object
+ */
 export async function getCardDetails(
   card: string | Card,
   set: string | undefined = undefined,
@@ -118,9 +152,11 @@ export async function getCardDetails(
 
   let quickMessage: Message | undefined = undefined;
   if (message && cardDetails && isSendableChannel(message.channel)) {
-    quickMessage = await message?.channel.send({ ...getQuickCardMessageObject(message, cardDetails)})
+    quickMessage = await message?.channel.send({
+      ...getQuickCardMessageObject(message, cardDetails),
+    });
   }
-  
+
   const isCommander: boolean =
     (await getCommanderRanks(message))[
       cardDetails?.oracle_id ?? cardDetails?.id ?? ""
@@ -138,6 +174,13 @@ export async function getCardDetails(
   return { scry: cardDetails, edh: edhRecDetails, quickMessage };
 }
 
+/**
+ * Gets EDHRec details about a given card.
+ * 
+ * @param cardName - the card name as a string
+ * @param isCommander - whether to use the EDHREC Commander API. Only used for valid commanders, not for any card in the Commander format.
+ * @returns an EDHRec object
+ */
 export async function getEDHRecDetails(
   cardName: string,
   isCommander = false
@@ -161,6 +204,12 @@ export async function getEDHRecDetails(
   return EDHRecDetails;
 }
 
+/**
+ * Get the best guess of what the listed card name is.
+ * 
+ * @param card - a Card object
+ * @returns the card name
+ */
 export function getCardName(card: Card): string {
   return card.printed_name ?? card.flavor_name ?? card.name;
 }

@@ -15,6 +15,7 @@ import {
   NextData,
   WorkHeader,
 } from "../../types/books/GoodreadsNextData";
+import { wrapCodeBlockString } from "../../util/commonFunctions";
 
 interface GoodreadsAttributes {
   url: string;
@@ -123,7 +124,7 @@ export async function goodreadsSearch(
         workHeader = jsonData.props.pageProps.apolloState[workKey];
       } catch (error) {
         await replyMessage.edit(
-          `Failed to parse JSON for ${bookURL}: \`\`\`\n${error}\`\`\``
+          `Failed to parse JSON for ${bookURL}: ${wrapCodeBlockString(error)}`
         );
         return;
       }

@@ -46,9 +46,9 @@ export default {
     }
 
     interaction.followUp({
-      content: `Valid keys:\n\`\`\`\n${Object.keys(chanceResponses).join(
-        ", "
-      )}\n\`\`\``,
+      content: `Valid keys:\n${wrapCodeBlockString(
+        Object.keys(chanceResponses).join(", ")
+      )}`,
       flags: MessageFlags.Ephemeral,
     });
   },

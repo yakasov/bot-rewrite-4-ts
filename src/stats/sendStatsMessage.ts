@@ -2,6 +2,7 @@ import { Guild, GuildBasedChannel, User } from "discord.js";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { GuildStats, StatsMessage } from "../types/Stats.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
+import { wrapCodeBlockString } from "../util/commonFunctions.js";
 
 export async function sendMessage(
   messageEvent: StatsMessage,
@@ -27,8 +28,10 @@ export async function sendMessage(
   if (channel) {
     if (!isSendableChannel(channel)) return;
 
+    const message = `${user.displayName} has reached ${messageEvent.accolade} (${messageEvent.title})!`;
+
     await channel.send(
-      `## ${messageEvent.subject}!\n\`\`\`ansi\n${user.displayName} has reached ${messageEvent.accolade} (${messageEvent.title})!\`\`\``
+      `## ${messageEvent.subject}!\n${wrapCodeBlockString(message, "ansi")}`
     );
   }
 }
