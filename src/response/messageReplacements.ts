@@ -8,6 +8,11 @@ import {
 import { getNicknameFromMessage } from "./responseHelpers";
 import { isSendableChannel } from "../util/typeGuards";
 
+/**
+ * Utilises a website URL to allow for opening Steam links from Discord 'directly'.
+ * 
+ * @param message 
+ */
 export async function sendSteamDirectLink(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -19,6 +24,11 @@ export async function sendSteamDirectLink(message: Message): Promise<void> {
   );
 }
 
+/**
+ * Swaps Twitter/X links for their 'fixup'/better embedded versions.
+ * 
+ * @param message 
+ */
 export async function swapTwitterLinks(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -63,7 +73,6 @@ export async function swapTwitterLinks(message: Message): Promise<void> {
     message.reference.messageId &&
     message.reference.channelId === message.channel.id
   ) {
-    // messageId is a snowflake? so hopefully enforcing it as not-null works
     const replyMessage: Message = await message.channel.messages.fetch(
       message.reference.messageId
     );

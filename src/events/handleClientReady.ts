@@ -34,7 +34,7 @@ export async function handleClientReady(context: BotContext): Promise<void> {
     getTime({ seconds: 10 })
   );
   setInterval(() => checkBirthdays(context), getTime({ minutes: 15 }));
-  setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
+  // setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
   setInterval(() => checkDeadlockForum(context), getTime({ minutes: 15 }));
   setInterval(() => checkMinecraftServer(context), getTime({ seconds: 5 }));
   setInterval(

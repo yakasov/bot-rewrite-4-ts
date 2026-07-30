@@ -4,6 +4,14 @@ import { ChanceResponse } from "../types/JSON";
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJSON as Record<string, ChanceResponse>;
 
+  /**
+   * Creates a normalised 'table' (flat array) of responses based on their chance to be activated.
+   * Each element of the array has a cumulative chance.
+   * The choice function will generate a number, and find the first match above that number.
+   * 
+   * @param newResponses - whether this function is being invoked as a result of /editresponses
+   * @returns the normalised flat array of ChanceResponses
+   */
 export function generateRollTable(newResponses?: Record<string, ChanceResponse>): ChanceResponse[] {
   const responses: Record<string, ChanceResponse> = newResponses ?? chanceResponses;
 

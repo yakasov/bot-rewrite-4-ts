@@ -17,6 +17,13 @@ import { getCardMessageObject } from "./embedObjectBuilder";
 import { getCardDetails, getCardName } from "./helpers/commonHelpers";
 import { Card } from "scryfall-api";
 
+/**
+ * Builds an embed with a select menu of the top 20 closest match cards.
+ * 
+ * @param message 
+ * @param results - the top 20 results for cards. Must be 20 or less, or this function will throw an error.
+ * @param modifiers - provides information about the total cards fetched, and the search URL.
+ */
 export async function scryfallShowCardList(
   message: Message,
   results: string[] | Card[],

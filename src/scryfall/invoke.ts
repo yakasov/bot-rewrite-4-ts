@@ -12,6 +12,11 @@ import { scryfallShowCardList } from "./showCardList";
 import { isSendableChannel } from "../util/typeGuards";
 import type { Modifiers } from "../types/scryfall/Invoke.d.ts";
 
+/**
+ * Handles Scryfall invocation and subsequent functions.
+ * 
+ * @param message 
+ */
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
    * The reality of this check is that it'll never really be relevant;

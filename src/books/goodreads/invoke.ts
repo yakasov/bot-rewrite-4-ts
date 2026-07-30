@@ -28,6 +28,11 @@ interface GoodreadsAttributes {
   footer: string;
 }
 
+/**
+ * Handles Goodreads invocation and subsequent functions.
+ * 
+ * @param message 
+ */
 export async function goodreadsInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
