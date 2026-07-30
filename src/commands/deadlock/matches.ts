@@ -18,38 +18,33 @@ export default {
       return;
     }
 
-    if (accountId) {
-      const matchData: PlayerMatchHistoryEntry[] = await DAPIPlayers()
-        .matchHistory({ accountId })
-        .then((a) => a.data);
-      const tenRecentMatches: PlayerMatchHistoryEntry[] = matchData.slice(
-        0,
-        10
-      );
+    const matchData: PlayerMatchHistoryEntry[] = await DAPIPlayers()
+      .matchHistory({ accountId })
+      .then((a) => a.data);
+    const tenRecentMatches: PlayerMatchHistoryEntry[] = matchData.slice(0, 10);
 
-      const header = `${"Match ID".padEnd(10)} ${"Hero".padEnd(12)}  ${"Start Time".padEnd(20)}  Kills  Deaths  Assists  Won`;
-      const headerBar: string = "-".padEnd(header.length, "-");
-      const rows = await Promise.all(
-        tenRecentMatches.map(async (m) => {
-          const heroName = await getHeroNameFromId(m.hero_id);
+    const header = `${"Match ID".padEnd(10)} ${"Hero".padEnd(12)}  ${"Start Time".padEnd(20)}  Kills  Deaths  Assists  Won`;
+    const headerBar: string = "-".padEnd(header.length, "-");
+    const rows = await Promise.all(
+      tenRecentMatches.map(async (m) => {
+        const heroName = await getHeroNameFromId(m.hero_id);
 
-          return `${m.match_id.toString().padEnd(10)} ${heroName.padEnd(
-            12
-          )}  ${new Date(m.start_time * 1000).toLocaleString()}  ${m.player_kills
-            .toString()
-            .padStart(5)}  ${m.player_deaths
-            .toString()
-            .padStart(6)}  ${m.player_assists.toString().padStart(7)}  ${
-            m.match_result === 1 ? "Yes" : "No "
-          }`;
-        })
-      );
+        return `${m.match_id.toString().padEnd(10)} ${heroName.padEnd(
+          12
+        )}  ${new Date(m.start_time * 1000).toLocaleString()}  ${m.player_kills
+          .toString()
+          .padStart(5)}  ${m.player_deaths
+          .toString()
+          .padStart(6)}  ${m.player_assists.toString().padStart(7)}  ${
+          m.match_result === 1 ? "Yes" : "No "
+        }`;
+      })
+    );
 
-      const tableString = `${header}
+    const tableString = `${header}
 ${headerBar}
 ${rows.join("\n")}`;
 
-      await interaction.reply(wrapCodeBlockString(tableString));
-    }
+    await interaction.reply(wrapCodeBlockString(tableString));
   },
 };
