@@ -3,10 +3,21 @@ import { URL_DEADLOCK_FORUM, URL_DEADLOCK_YOSHI } from "../consts/constants";
 import { BotContext } from "../types/BotContext";
 import { Guild, TextChannel } from "discord.js";
 
+/** Nullable HTMLElement */
 type nHTMLElement = HTMLElement | null | undefined;
 
 let lastUrl: string | null = null;
 
+/**
+ * Task for checking the Deadlock forum for a new forum post. 
+ * This loads the page for Yoshi and checks the most recent post URL,
+ * then compares it with the cached URL.
+ * 
+ * On first run, this will only get the URL, and stop processing.
+ * Otherwise, it will send the URL as a message.
+ * 
+ * @param context 
+ */
 export async function checkDeadlockForum(context: BotContext): Promise<void> {
   if (!context.config.ids.mainGuild || !context.config.ids.deadlockChannel) return;
   

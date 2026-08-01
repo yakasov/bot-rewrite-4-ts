@@ -4,6 +4,12 @@ import type { GuildStats, StatsMessage } from "../types/Stats.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
 import { wrapCodeBlockString } from "../util/commonFunctions.js";
 
+/**
+ * Sends a level up message in the configured level up channel.
+ * 
+ * @param messageEvent - properties required to build the level up message
+ * @param context 
+ */
 export async function sendMessage(
   messageEvent: StatsMessage,
   context: BotContext

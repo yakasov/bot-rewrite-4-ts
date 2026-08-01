@@ -50,6 +50,12 @@ export async function goodreadsInvoke(message: Message): Promise<void> {
   await Promise.all(promises);
 }
 
+/**
+ * Performs a web search on Goodreads (via their web search page) and parses the page for the result.
+ * 
+ * @param message 
+ * @param input - the search query
+ */
 export async function goodreadsSearch(
   message: Message,
   input: string
@@ -177,6 +183,12 @@ export async function goodreadsSearch(
   }
 }
 
+/**
+ * Gets and joins author names into a single string.
+ * 
+ * @param elements - HTMLElement list
+ * @returns 
+ */
 function concatAuthorNames(elements: HTMLElement[]) {
   const endElement = elements.find((e, i) => i !== 0 && e.hasAttribute("role"));
   const endIndex = endElement ? elements.indexOf(endElement) : elements.length;
@@ -187,6 +199,12 @@ function concatAuthorNames(elements: HTMLElement[]) {
     .join(", ");
 }
 
+/**
+ * Builds the Goodreads reply embed.
+ * 
+ * @param replyMessage 
+ * @param param1 - deconstructor for GoodreadsAttributes object
+ */
 export async function goodreadsBookFound(
   replyMessage: Message,
   {

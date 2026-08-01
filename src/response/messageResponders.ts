@@ -9,6 +9,13 @@ import moment from "moment-timezone";
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJson as Record<string, ChanceResponse>;
 
+  
+/**
+ * Fetches a random response from the chanceResponses.json
+ * 
+ * @param filter - string used to filter the responses by key
+ * @returns a random response string
+ */
 export function getRandomResponse(filter = "hype"): string {
   const responses: [string, ChanceResponse][] = Object.entries(
     chanceResponses
@@ -19,6 +26,13 @@ export function getRandomResponse(filter = "hype"): string {
   return randomEntry;
 }
 
+/**
+ * Sends a custom bot response based on responses.json
+ *  
+ * @param message 
+ * @param key - key/value pair from Object.entries(responses)
+ * @param value - as above
+ */
 export async function sendCustomResponse(
   message: Message,
   key: string,
@@ -73,6 +87,12 @@ export async function sendCustomResponse(
   await message.channel.send(response);
 }
 
+/**
+ * Decides whether the bot should respond to a given message.
+ * 
+ * @param message 
+ * @param context 
+ */
 export async function checkMessageReactions(
   message: Message,
   context: BotContext

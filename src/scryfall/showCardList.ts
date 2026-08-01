@@ -90,7 +90,7 @@ export async function scryfallShowCardList(
     }
 
     await Promise.all([
-      scryfallGetCard(message, selectedValue, modifiers, true),
+      scryfallGetCard(message, selectedValue, modifiers, false),
       multipleCardsMessage.delete().catch(console.error),
     ]);
   } catch {

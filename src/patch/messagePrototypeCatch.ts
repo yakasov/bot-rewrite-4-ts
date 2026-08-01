@@ -5,7 +5,12 @@ import {
   OmitPartialGroupDMChannel,
 } from "discord.js";
 
-export function messagePrototypeCatch() {
+/**
+ * Adds try/catch to Message.reply and Message.delete.
+ * Without this, the bot will fully crash if these fail.
+ * In this instance, an error will be spit out and the bot will continue.
+ */
+export function messagePrototypeCatch(): void {
   const superReply = Message.prototype.reply;
   const superDelete = Message.prototype.delete;
 

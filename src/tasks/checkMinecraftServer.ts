@@ -2,14 +2,16 @@ import { ActivityType } from "discord.js";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { MinecraftResponse, User } from "../types/responses/MinecraftResponse.d.ts";
 import { URL_MINECRAFT_STATUS } from "../consts/constants";
+import { MinecraftQueryStates } from "../types/RunState.js";
 
-enum MinecraftQueryStates {
-  NORMAL = 0,
-  FIRST_RUN = 1,
-  ERROR_STOP = 2,
-  ERROR_RETRY = 3,
-}
-
+/**
+ * Calls the MCStatus API to check on the configured server IP.
+ * This function will also automatically update the Minecraft Query State
+ * to an appropriate value.
+ * 
+ * @param context 
+ * @returns a {@link MinecraftResponse} object (or null if an error occurred)
+ */
 export async function getMCStatus(
   context: BotContext
 ): Promise<MinecraftResponse | null> {
@@ -32,6 +34,12 @@ export async function getMCStatus(
     });
 }
 
+/**
+ * Task for checking on a Minecraft server.
+ * This will update the bot presence if applicable.
+ * 
+ * @param context 
+ */
 export async function checkMinecraftServer(
   context: BotContext
 ): Promise<void> {
