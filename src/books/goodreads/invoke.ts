@@ -12,21 +12,11 @@ import moment from "moment-timezone";
 import {
   ApolloState,
   BookHeader,
+  GoodreadsAttributes,
   NextData,
   WorkHeader,
-} from "../../types/books/GoodreadsNextData";
+} from "../../types/books/Goodreads";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
-
-interface GoodreadsAttributes {
-  url: string;
-  name: string;
-  author: string;
-  imageURL: string;
-  description: string;
-  genres: string;
-  ratings: string;
-  footer: string;
-}
 
 /**
  * Handles Goodreads invocation and subsequent functions.

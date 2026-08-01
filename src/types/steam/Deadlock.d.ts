@@ -103,3 +103,8 @@ interface FinalStats {
   time_stamp_s: number;
   weapon_power: number;
 }
+
+export interface NeatBanData {
+  heroName: string;
+  bans: number;
+}

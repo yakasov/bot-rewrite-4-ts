@@ -2,11 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { DAPIAnalytics, getHeroNameFromId } from "../../steam/deadlockApis";
 import { HeroBanStats } from "../../../deadlock-ts";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
-
-interface NeatBanData {
-  heroName: string;
-  bans: number;
-}
+import { NeatBanData } from "../../types/steam/Deadlock";
 
 export default {
   data: new SlashCommandBuilder()

@@ -21,11 +21,7 @@ import {
 } from "@leandrowkz/tmdb";
 import { KEYS } from "../keys";
 import { getRTRating } from "./rottenTomatoesScores";
-
-interface Genres {
-  movie: GenresResponse | undefined;
-  tv: GenresResponse | undefined;
-}
+import { Genres } from "../types/movies/RottenTomatoes";
 
 const tmdb = new TMDB({ apiKey: KEYS.TMDB_TOKEN ?? "" });
 const GENRES: Genres = {
@@ -51,6 +47,9 @@ function isPersonItem(
   return "known_for_department" in item;
 }
 
+/**
+ * Genre lists need fetching before they can be used, but we can cache the result
+ */
 async function initialiseGenres(): Promise<void> {
   if (!GENRES.movie) {
     GENRES.movie = await tmdb.genres.movie();
@@ -58,6 +57,13 @@ async function initialiseGenres(): Promise<void> {
   }
 }
 
+/**
+ * Converts a list of genre codes (as IDs) to genre names
+ * 
+ * @param genres - see {@link @leandrowkz/tmdb#Genre}
+ * @param ids - see {@link GenreCode}
+ * @returns the joined list as a string
+ */
 function prettifyGenres(
   genres: GenresResponse | undefined,
   ids: GenreCode[] | undefined
