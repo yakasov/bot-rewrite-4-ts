@@ -15,7 +15,7 @@ import {
   getRandomResponse,
   sendCustomResponse,
 } from "./messageResponders";
-import { GenericStringObject } from "../types/ChanceResponse.js";
+import { GenericStringObject } from "../types/Generic.js";
 
 const responses: GenericStringObject = responsesJson as GenericStringObject;
 
