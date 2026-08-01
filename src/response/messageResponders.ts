@@ -1,6 +1,6 @@
 import { Message, StickerResolvable } from "discord.js";
 import chanceResponsesJson from "../../resources/chanceResponses.json";
-import type { ChanceResponse } from "../types/JSON.d.ts";
+import type { ChanceResponse } from "../types/ChanceResponse";
 import { getNicknameFromMessage } from "./responseHelpers";
 import type { BotContext } from "../types/BotContext.d.ts";
 import { isSendableChannel } from "../util/typeGuards";

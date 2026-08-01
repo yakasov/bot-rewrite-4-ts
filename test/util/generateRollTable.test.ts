@@ -1,6 +1,6 @@
 import * as TestModule from "../../src/util/generateRollTable";
 import chanceResponsesJSON from "../../resources/chanceResponses.json";
-import { ChanceResponse } from "../../src/types/JSON";
+import { ChanceResponse } from "../../src/types/ChanceResponse";
 
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJSON as Record<string, ChanceResponse>;

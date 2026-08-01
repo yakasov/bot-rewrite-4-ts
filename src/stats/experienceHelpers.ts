@@ -2,7 +2,7 @@ import type { BotContext } from "../types/BotContext.ts";
 import type { UserStats } from "../types/Stats.ts";
 import { sendMessage } from "./sendStatsMessage";
 import ranksJSON from "../../resources/ranks.json";
-import { GenericStringObject } from "../types/Generic.js";
+import { GenericStringObject } from "../types/ChanceResponse.js";
 
 /**
  * Recalculates and sets user level XP and total XP.

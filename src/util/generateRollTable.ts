@@ -1,5 +1,5 @@
 import chanceResponsesJSON from "../../resources/chanceResponses.json";
-import { ChanceResponse } from "../types/JSON";
+import { ChanceResponse } from "../types/ChanceResponse";
 
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJSON as Record<string, ChanceResponse>;

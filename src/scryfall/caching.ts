@@ -1,7 +1,6 @@
 import fs from "fs";
-import { Cards, type Card } from "scryfall-api";
+import { Cards, Set, type Card } from "scryfall-api";
 import type { OracleResponse } from "../types/scryfall/OracleResponse";
-import type { SetResponse } from "../types/scryfall/SetResponse";
 import sharp, { Sharp } from "sharp";
 import {
   SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY,
@@ -74,7 +73,7 @@ export async function getSetImage(card: Card): Promise<boolean> {
 
   if (setImageCache.includes(card.id)) return true;
 
-  const setInfo: SetResponse = await fetchWithHeader(
+  const setInfo: Set = await fetchWithHeader(
     card.set_uri
   ).then((response: Response) => response.json());
   const setSvgBuffer: ArrayBuffer | null = await fetchWithHeader(

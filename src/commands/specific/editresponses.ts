@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { generateRollTable } from "../../util/generateRollTable";
 import chanceResponsesJSON from "../../../resources/chanceResponses.json";
-import type { ChanceResponse } from "../../types/JSON.d.ts";
+import type { ChanceResponse } from "../../types/ChanceResponse";
 import type { BotContext } from "../../types/BotContext.d.ts";
 
 const chanceResponses: Record<string, ChanceResponse> =

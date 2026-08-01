@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 import { Config } from "./Config";
 import { RunState as RunState } from "./RunState";
-import { ChanceResponse } from "./JSON";
+import { ChanceResponse } from "./ChanceResponse";
 import { Stats } from "./Stats";
 
 export interface BotContext {
