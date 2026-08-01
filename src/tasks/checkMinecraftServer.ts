@@ -2,7 +2,7 @@ import { ActivityType } from "discord.js";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { MinecraftResponse, User } from "../types/responses/MinecraftResponse.d.ts";
 import { URL_MINECRAFT_STATUS } from "../consts/constants";
-import { MinecraftQueryStates } from "../types/RunState.js";
+import { MinecraftQueryStates } from "../types/RunStateEnums";
 
 /**
  * Calls the MCStatus API to check on the configured server IP.

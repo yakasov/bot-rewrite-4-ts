@@ -14,7 +14,7 @@ export function messagePrototypeCatch(): void {
   const superReply = Message.prototype.reply;
   const superDelete = Message.prototype.delete;
 
-  Message.prototype.reply = function (
+  Message.prototype.reply = async function (
     this: Message,
     options: string | MessagePayload | MessageReplyOptions
   ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
@@ -30,7 +30,7 @@ export function messagePrototypeCatch(): void {
         return superReply.call(this, options);
       }
 
-      return superReply.call(this, {
+      return await superReply.call(this, {
         ...options,
         failIfNotExists: false,
       });
@@ -40,11 +40,11 @@ export function messagePrototypeCatch(): void {
     }
   };
 
-  Message.prototype.delete = function (
+  Message.prototype.delete = async function (
     this: Message
   ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
     try {
-      return superDelete.call(this);
+      return await superDelete.call(this);
     } catch (err: unknown) {
       console.error(err);
       return Promise.reject(err);

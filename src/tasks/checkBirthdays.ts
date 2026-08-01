@@ -10,7 +10,7 @@ import birthdaysJSON from "../../resources/birthdays.json";
 import moment from "moment-timezone";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { Birthdays } from "../types/Birthdays.d.ts";
-import { BirthdayStates } from "../types/RunState";
+import { BirthdayStates } from "../types/RunStateEnums";
 
 const birthdays: Birthdays = birthdaysJSON;
 

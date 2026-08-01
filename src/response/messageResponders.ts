@@ -20,6 +20,8 @@ export function getRandomResponse(filter = "hype"): string {
   const responses: [string, ChanceResponse][] = Object.entries(
     chanceResponses
   ).filter(([key]) => (filter.length !== 0 ? key.startsWith(filter) : true));
+  if (responses.length === 0) return "No response found!"
+
   const randomEntry: string =
     responses[Math.floor(Math.random() * responses.length)][1].string;
 
@@ -104,9 +106,11 @@ export async function checkMessageReactions(
     return;
   }
 
+  // Both are calculated percentages out of 100
   const roll: number = Math.random() * 100;
   const initialRoll: number = Math.random() * 100;
 
+  // So response chance should be a percentage of 100 too
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
     for (const response of context.rollTable) {
       if (roll < response.chance) {
@@ -165,7 +169,7 @@ export async function checkMoMessage(message: Message): Promise<boolean> {
 
     if (isPing(replyMessage)) {
       const replyMessageMoment: moment.Moment = moment(
-        replyMessage.createdTimestamp * 1000
+        replyMessage.createdTimestamp
       );
 
       const replyMessageParts: string[] = replyMessage.content.split(" ");

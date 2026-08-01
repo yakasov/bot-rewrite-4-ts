@@ -27,18 +27,24 @@ export default {
         .setName("id")
         .setDescription("The match ID to query")
         .setRequired(true)
+)
+    .addNumberOption((opt) =>
+      opt
+        .setName("user_id")
+        .setDescription("Filter to a given user ID")
     ),
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
 
-    const matchId = interaction.options.getNumber("id") ?? 0;
+    const matchId: number = interaction.options.getNumber("id") ?? 0;
+    const userId: number | null = interaction.options.getNumber("user_id");
     let fetchAttempts = 0;
 
     while (fetchAttempts < 3) {
       fetchAttempts++;
 
       try {
-        await tryGetMatchData(interaction, matchId);
+        await tryGetMatchData(interaction, matchId, userId);
         break;
       } catch {
         if (fetchAttempts === 1 && isSendableChannel(interaction.channel)) {
@@ -55,7 +61,8 @@ export default {
 
 async function tryGetMatchData(
   interaction: ChatInputCommandInteraction,
-  matchId: number
+  matchId: number,
+  userId: number | null
 ) {
   // This catch fails to catch the 404 AxiosError!!!
   try {
@@ -101,9 +108,9 @@ ${wrapCodeBlockString(playersTable)}
   await interaction.followUp(message);
 
   const deadlockLinks: GenericNumberObject = deadlockJson;
-  const accountId: number = deadlockLinks[interaction.user.id];
+  const accountId: number = userId ?? deadlockLinks[interaction.user.id];
 
-  if (accountId) {
+  if (accountId ) {
     const linkedPlayer: Player | undefined = metadata.players.find(
       (p) => p.account_id === accountId
     );
