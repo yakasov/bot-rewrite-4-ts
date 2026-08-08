@@ -31,7 +31,7 @@ export default {
 
         return `${m.match_id.toString().padEnd(10)} ${heroName.padEnd(
           12
-        )}  ${new Date(m.start_time * 1000).toLocaleString()}  ${m.player_kills
+        )}  ${new Date(m.start_time * 1000).toLocaleString("en-GB")}  ${m.player_kills
           .toString()
           .padStart(5)}  ${m.player_deaths
           .toString()

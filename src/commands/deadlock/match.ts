@@ -64,21 +64,16 @@ async function tryGetMatchData(
   matchId: number,
   userId: number | null
 ) {
-  // This catch fails to catch the 404 AxiosError!!!
-  try {
-    // I run this first just to check the salt exists, and it's ready to be fetched
-    const saltData: MatchSaltsResponse | null = await DAPIMatches()
-      .salts({ matchId })
-      .then((a) => (a.status <= 200 ? a.data : null))
-      .catch();
+  // I run this first just to check the salt exists, and it's ready to be fetched
+  const saltData: MatchSaltsResponse | null = await DAPIMatches()
+    .salts({ matchId })
+    .then((a) => (a.status <= 200 ? a.data : null))
+    .catch();
 
-    if (!saltData?.metadata_salt) {
-      throw new AxiosError();
-    }
-  } catch {
-    return;
+  if (!saltData?.metadata_salt) {
+    throw new AxiosError();
   }
-
+  
   // For some reason the bulkMetadata signature returns number[]?
   const bulkMetadata: BulkMetadata[] = (await DAPIMatches()
     .bulkMetadata({
