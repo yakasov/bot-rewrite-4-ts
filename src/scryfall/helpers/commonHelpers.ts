@@ -157,7 +157,6 @@ export async function getCardDetails(
             }
             return undefined;
           });
-    console.log(cardDetailsPromise)
     cardDetails = await cardDetailsPromise;
   } else {
     cardDetails = card;
