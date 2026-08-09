@@ -143,8 +143,21 @@ export async function getCardDetails(
 ): Promise<CardDetails> {
   let cardDetails: Card | undefined = undefined;
   if (typeof card === "string") {
+    /*
+     * retryFetcher in scryfall-api doesn't seem to have its own error handling
+     * and so if bySet or byName throw an error, it'll pass all the way back to here
+     * and crash the bot, so this is a potential workaround
+     */
     const cardDetailsPromise: Promise<Card | undefined> =
-      set && number ? Cards.bySet(set, number) : Cards.byName(card, set, true);
+      (set && number
+        ? Cards.bySet(set, number)
+        : Cards.byName(card, set, true)).catch(async (error) => {
+            if (message?.channel && isSendableChannel(message.channel)) {
+              await message.channel.send(error);
+            }
+            return undefined;
+          });
+    console.log(cardDetailsPromise)
     cardDetails = await cardDetailsPromise;
   } else {
     cardDetails = card;
@@ -176,7 +189,7 @@ export async function getCardDetails(
 
 /**
  * Gets EDHRec details about a given card.
- * 
+ *
  * @param cardName - the card name as a string
  * @param isCommander - whether to use the EDHREC Commander API. Only used for valid commanders, not for any card in the Commander format.
  * @returns an EDHRec object
@@ -206,7 +219,7 @@ export async function getEDHRecDetails(
 
 /**
  * Get the best guess of what the listed card name is.
- * 
+ *
  * @param card - a Card object
  * @returns the card name
  */
