@@ -20,3 +20,9 @@ export enum MinecraftQueryStates {
   /** Error query state - will skip the next query, and then attempt normal behaviour again. */
   ERROR_RETRY = 3,
 }
+
+export enum PresenceStates {
+  SPLASH = 0,
+  WEATHER_A = 1,
+  WEATHER_B = 2
+}

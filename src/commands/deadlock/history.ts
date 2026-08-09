@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { GenericNumberObject } from "../../types/Generic";
 import deadlockJson from "../../../resources/deadlock.json";
 import { DAPIPlayers, getHeroNameFromId } from "../../steam/deadlockApis";
-import { PlayerMatchHistoryEntry } from "../../../deadlock-ts";
+import { PlayerMatchHistoryEntry } from "../../../deadlock-ts/dist";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
 
 export default {
