@@ -28,7 +28,6 @@ export async function checkDeadlockForum(context: BotContext): Promise<void> {
   const lastPost: nHTMLElement = parsedHTML.querySelector(".contentRow");
 
   if (!lastPost) {
-    console.warn("Last Deadlock fetch was seemingly unsuccessful!");
     return;
   }
 
