@@ -21,7 +21,7 @@ export async function rollingPresence(context: BotContext): Promise<void> {
   } else if (context.runState.presence === PresenceStates.WEATHER_B) {
     setPresence(
       context,
-      `Humidity ${context.weather.weather.humidity}%, overall ${context.weather.weather.description}`
+      `Humidity ${context.weather.weather.humidity}%, ${context.weather.weather.description}`
     );
     context.runState.presence = PresenceStates.SPLASH;
   }
