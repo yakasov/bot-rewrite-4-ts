@@ -36,7 +36,8 @@ export async function handleMessageCreate(
             refetchedMessage.embeds[0].data.description
           );
 
-          await refetchedMessage.reply(translation.text.split("**[💬]")[0]);
+          const repliedMessage: Message = await refetchedMessage.reply(translation.text.split("**[💬]")[0]);
+          await repliedMessage.suppressEmbeds();
         }
       } catch (error: unknown) {
         console.error(error);
