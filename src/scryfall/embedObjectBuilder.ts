@@ -29,6 +29,14 @@ function getTypeLine(scry: Card) {
   );
 }
 
+/**
+ * Builds a Scryfall embed object based on provided card details.
+ * 
+ * @param message 
+ * @param cardDetails - the combined Scryfall + EDHRec object that has already been fetched
+ * @param indexString - used when paging through cards (eg in printing mode)
+ * @returns a Discord EmbedObject
+ */
 export async function getCardMessageObject(
   message: Message,
   cardDetails: CardDetails,

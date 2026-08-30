@@ -2,11 +2,21 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import {
   DAPIMatches,
   DAPISteam,
+  getAccoladeNameFromId,
   getHeroNameFromId,
 } from "../../steam/deadlockApis";
-import { BulkMetadata, Player } from "../../types/steam/Deadlock";
+import deadlockJson from "../../../resources/deadlock.json";
+import {
+  BulkMetadata,
+  Player,
+  PlayerAccolade,
+} from "../../types/steam/Deadlock";
 import { MatchSaltsResponse } from "../../../deadlock-ts";
 import { AxiosError } from "axios";
+import { GenericNumberObject } from "../../types/Generic";
+import { isSendableChannel } from "../../util/typeGuards";
+import { getTime } from "../../tasks/taskHelpers";
+import { wrapCodeBlockString } from "../../util/commonFunctions";
 
 export default {
   data: new SlashCommandBuilder()
@@ -17,42 +27,67 @@ export default {
         .setName("id")
         .setDescription("The match ID to query")
         .setRequired(true)
+)
+    .addNumberOption((opt) =>
+      opt
+        .setName("user_id")
+        .setDescription("Filter to a given user ID")
     ),
   async execute(interaction: ChatInputCommandInteraction) {
-    const matchId = interaction.options.getNumber("id") ?? 0;
+    await interaction.deferReply();
 
-    // This catch fails to catch the 404 AxiosError!!!
-    try {
-      // I run this first just to check the salt exists, and it's ready to be fetched
-      const saltData: MatchSaltsResponse | null = await DAPIMatches()
-        .salts({ matchId })
-        .then((a) => a.status <= 200 ? a.data : null)
-        .catch();
+    const matchId: number = interaction.options.getNumber("id") ?? 0;
+    const userId: number | null = interaction.options.getNumber("user_id");
+    let fetchAttempts = 0;
 
-      if (!saltData?.metadata_salt) {
-        throw new AxiosError();
+    while (fetchAttempts < 3) {
+      fetchAttempts++;
+
+      try {
+        await tryGetMatchData(interaction, matchId, userId);
+        break;
+      } catch {
+        if (fetchAttempts === 1 && isSendableChannel(interaction.channel)) {
+          interaction.channel.send(
+            `Failed to get match ${matchId}, will retry in 30 minutes (silently)`
+          );
+        }
+
+        setTimeout(() => {}, getTime({ minutes: 30 }));
       }
-    } catch {
-      await interaction.reply(
-        `Could not get metadata salt for match ID ${matchId}!`
-      );
-      return;
     }
+  },
+};
 
-    // For some reason the bulkMetadata signature returns number[]?
-    const bulkMetadata: BulkMetadata[] = (await DAPIMatches()
-      .bulkMetadata({
-        includeInfo: true,
-        includeMoreInfo: true,
-        includePlayerInfo: true,
-        includePlayerFinalStats: true,
-        matchIds: [matchId],
-      })
-      .then((a) => a.data)) as BulkMetadata[];
-    const metadata: BulkMetadata = bulkMetadata[0];
+async function tryGetMatchData(
+  interaction: ChatInputCommandInteraction,
+  matchId: number,
+  userId: number | null
+) {
+  // I run this first just to check the salt exists, and it's ready to be fetched
+  const saltData: MatchSaltsResponse | null = await DAPIMatches()
+    .salts({ matchId })
+    .then((a) => (a.status <= 200 ? a.data : null))
+    .catch();
 
-    const playersTable: string = await getPlayersTable(metadata.players);
-    const message = `
+  if (!saltData?.metadata_salt) {
+    throw new AxiosError();
+  }
+  
+  // For some reason the bulkMetadata signature returns number[]?
+  const bulkMetadata: BulkMetadata[] = (await DAPIMatches()
+    .bulkMetadata({
+      includeInfo: true,
+      includeMoreInfo: true,
+      includePlayerInfo: true,
+      includePlayerFinalStats: true,
+      matchIds: [matchId],
+    })
+    .then((a) => a.data)) as BulkMetadata[];
+  const metadata: BulkMetadata = bulkMetadata[0];
+
+  const playersTable: string = await getPlayersTable(metadata.players);
+  const message = `
 Match ID: ${metadata.match_id}
 
 **Start Time:** ${metadata.start_time}
@@ -62,14 +97,26 @@ Match ID: ${metadata.match_id}
 **Low Priority Pool?:** ${f(metadata.low_pri_pool)}
 **New Player Pool?:** ${f(metadata.new_player_pool)}
 
-\`\`\`
-${playersTable}
-\`\`\`
-    `;
+${wrapCodeBlockString(playersTable)}
+`;
 
-    await interaction.reply(message);
-  },
-};
+  await interaction.followUp(message);
+
+  const deadlockLinks: GenericNumberObject = deadlockJson;
+  const accountId: number = userId ?? deadlockLinks[interaction.user.id];
+
+  if (accountId ) {
+    const linkedPlayer: Player | undefined = metadata.players.find(
+      (p) => p.account_id === accountId
+    );
+
+    if (linkedPlayer && isSendableChannel(interaction.channel)) {
+      await interaction.channel.send(
+        `## Accolades\nAvailable if you have linked your account!\n${getPlayerAccolades(linkedPlayer.accolades)}`
+      );
+    }
+  }
+}
 
 function sToMS(s: number): string {
   const minutes: number = Math.round(s / 60);
@@ -139,4 +186,18 @@ ${tableA}\
 ${tableB}`;
 
   return table;
+}
+
+function getPlayerAccolades(accolades: PlayerAccolade[]) {
+  const lineBreakers: number[] = [6, 11, 15, 26];
+  const formattedAccolades: string = accolades
+    .sort((a, b) => a.accolade_id - b.accolade_id)
+    .map(
+      (a) =>
+        `${lineBreakers.includes(a.accolade_id) ? "\n" : ""}${getAccoladeNameFromId(
+          a.accolade_id
+        ).padEnd(24)}: ${a.accolade_stat_value.toString().padStart(6)}`
+    )
+    .join("\n");
+  return wrapCodeBlockString(formattedAccolades);
 }

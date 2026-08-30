@@ -8,6 +8,14 @@ import {
 } from "./experienceHelpers";
 import { REGEX_SANITIZE_STRING } from "../consts/constants";
 
+/**
+ * Adds to the stats of a given guild and user based on the event type.
+ * See {@link StatsEvent.type} for accepted events.
+ * 
+ * @param event - the StatsEvent raised, including Guild ID, User ID and event type
+ * @param context 
+ * @param forceReset - used for resetting all stats to 0
+ */
 export function addToStats(event: StatsEvent, context: BotContext, forceReset = false): void {
   if (!context.isStatsEnabled || !context.stats) return;
 
@@ -86,6 +94,11 @@ export function addToStats(event: StatsEvent, context: BotContext, forceReset = 
   checkAllUserStats(context);
 }
 
+/**
+ * Used for performing regular stat checks, recalculating experience and levels if needed.
+ * 
+ * @param context 
+ */
 export function checkAllUserStats(context: BotContext): void {
   const stats: Stats | undefined = context.stats;
   if (!stats) return;
@@ -106,6 +119,12 @@ export function checkAllUserStats(context: BotContext): void {
   }
 }
 
+/**
+ * Orders all stats in a given guild and returns them.
+ * 
+ * @param guildStats 
+ * @returns an array with entries [user name, user stats, user ranking]
+ */
 export function orderStatsByRank(
   guildStats: GuildStats
 ): [string, UserStats, number][] {
@@ -118,12 +137,21 @@ export function getDateNowInSeconds(): number {
   return Math.floor(Date.now() / 1000);
 }
 
+/**
+ * Used for getting the nickname of a member from an interaction.
+ * If `id` is omitted, then it will use the interaction author -
+ * otherwise, it will use the provided ID.
+ * 
+ * @param interaction 
+ * @param id - used for specific interaction fetching
+ * @param sanitize - sanitizes a string to A-Z0-9
+ * @returns 
+ */
 export function getNicknameFromInteraction(
   interaction: Interaction,
   id = "",
   sanitize = false
 ): string | undefined {
-  // Used for fetching nickname from interaction
   const member: GuildMember | undefined = interaction.guild?.members.cache
     .filter((m) => m.id === (id !== "" ? id : interaction.user.id))
     .first();
@@ -136,6 +164,11 @@ export function getNicknameFromInteraction(
   return name;
 }
 
+/**
+ * Returns a second count in [months, days, hours, minutes, seconds]
+ * 
+ * @param seconds 
+ */
 export function formatTime(seconds: number): string {
   const f = (n: number) => `${n < 10 ? "0" : ""}${n}`;
   const totalSeconds = seconds;

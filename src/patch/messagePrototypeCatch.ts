@@ -5,11 +5,16 @@ import {
   OmitPartialGroupDMChannel,
 } from "discord.js";
 
-export function messagePrototypeCatch() {
+/**
+ * Adds try/catch to Message.reply and Message.delete.
+ * Without this, the bot will fully crash if these fail.
+ * In this instance, an error will be spit out and the bot will continue.
+ */
+export function messagePrototypeCatch(): void {
   const superReply = Message.prototype.reply;
   const superDelete = Message.prototype.delete;
 
-  Message.prototype.reply = function (
+  Message.prototype.reply = async function (
     this: Message,
     options: string | MessagePayload | MessageReplyOptions
   ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
@@ -25,7 +30,7 @@ export function messagePrototypeCatch() {
         return superReply.call(this, options);
       }
 
-      return superReply.call(this, {
+      return await superReply.call(this, {
         ...options,
         failIfNotExists: false,
       });
@@ -35,11 +40,11 @@ export function messagePrototypeCatch() {
     }
   };
 
-  Message.prototype.delete = function (
+  Message.prototype.delete = async function (
     this: Message
   ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
     try {
-      return superDelete.call(this);
+      return await superDelete.call(this);
     } catch (err: unknown) {
       console.error(err);
       return Promise.reject(err);

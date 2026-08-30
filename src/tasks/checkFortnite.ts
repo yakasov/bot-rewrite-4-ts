@@ -17,6 +17,11 @@ export const emoteMessages: GenericStringObject = {
   "Get Griddy": "**Get Griddy is now in the Fortnite shop!**",
 };
 
+/**
+ * Fetches Fortnite shop data.
+ * 
+ * @returns data as {@link ResponseData}
+ */
 export async function getFortniteShop(): Promise<
   ResponseData | undefined
 > {
@@ -35,6 +40,11 @@ export async function getFortniteShop(): Promise<
   }
 }
 
+/**
+ * Fetches Fortnite Festival data and formats into an array of {@link FestivalItem} 
+ * 
+ * @returns a {@link FestivalItem} arra
+ */
 export async function getFestivalData(): Promise<
   FestivalItem[] | undefined
 > {
@@ -53,6 +63,14 @@ export async function getFestivalData(): Promise<
   }
 }
 
+/**
+ * Sorts songs first by artist, and then by song title.
+ * compareFn that can be used in `.sort(sortSongArray)`.
+ * 
+ * @param songA 
+ * @param songB 
+ * @returns the sort position
+ */
 export function sortSongArray(songA: string, songB: string): number {
   const [titleA, artistA] = songA.split(" - ");
   const [titleB, artistB] = songB.split(" - ");
@@ -61,6 +79,13 @@ export function sortSongArray(songA: string, songB: string): number {
   return titleA.localeCompare(titleB);
 }
 
+/**
+ * Task for checking both Fortnite Festival and the Fortnite shop.
+ * This will send send relevant messages showing if certain items are in the shop,
+ * and if Jam Tracks have been added or removed.
+ * 
+ * @param context 
+ */
 export async function checkFortnite(context: BotContext): Promise<void> {
   const guild: Guild = await context.client.guilds.fetch(
     context.config.ids.mainGuild

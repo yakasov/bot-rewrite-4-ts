@@ -2,6 +2,12 @@ import { Collection, Guild, GuildBasedChannel } from "discord.js";
 import { BotContext } from "../types/BotContext";
 import { addToStats } from "./statsHelpers";
 
+/**
+ * Task for checking voice channels - if anybod is in a voice channel,
+ * raise addToStats with inVoiceChannel
+ * 
+ * @param context 
+ */
 export function checkVoiceChannels(context: BotContext): void {
   const guilds: Collection<string, Guild> = context.client.guilds.cache;
 

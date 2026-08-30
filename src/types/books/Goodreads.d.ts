@@ -350,3 +350,14 @@ export interface Shelf {
   sortOrder: unknown;
   webUrl: string;
 }
+
+export interface GoodreadsAttributes {
+  url: string;
+  name: string;
+  author: string;
+  imageURL: string;
+  description: string;
+  genres: string;
+  ratings: string;
+  footer: string;
+}

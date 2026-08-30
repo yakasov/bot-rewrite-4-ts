@@ -13,13 +13,34 @@ export async function handleMessageCreate(
   context: BotContext
 ): Promise<void> {
   if (message.author.bot) {
-    if (message.embeds && message.embeds.length > 0 && message.embeds[0].data && message.embeds[0].data.description) {
-      const detection = await cld.detect(message.embeds[0].data.description);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (detection.languages.some(lang => lang.code != "en" && lang.percent > 33)) {
-        const translation = await tr(message.embeds[0].data.description);
+    const refetchedMessage = await message.channel.messages.fetch(message.id);
+    if (
+      refetchedMessage.embeds &&
+      refetchedMessage.embeds.length > 0 &&
+      refetchedMessage.embeds[0].data &&
+      refetchedMessage.embeds[0].data.description
+    ) {
+      try {
+        const detection = await cld.detect(
+          refetchedMessage.embeds[0].data.description
+        );
 
-        await message.reply(translation.text.split("**[💬]")[0]);
+        if (
+          detection.languages.some(
+            (lang) => lang.code != "en" && lang.percent > 33
+          )
+        ) {
+          const translation = await tr(
+            refetchedMessage.embeds[0].data.description
+          );
+
+          const repliedMessage: Message = await refetchedMessage.reply(translation.text.split("**[💬]")[0]);
+          await repliedMessage.suppressEmbeds();
+        }
+      } catch (error: unknown) {
+        console.error(error);
       }
     }
 

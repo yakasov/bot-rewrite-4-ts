@@ -5,8 +5,15 @@ import {
   MessagePayload,
 } from "discord.js";
 
+/**
+ * Checks whether a Discord channel is 'sendable', ie whether the bot can actually use the channel.
+ * Without this, .send() and .reply() functions will not be available.
+ * 
+ * @param channel 
+ * @returns whether the channel supports the aforementioned functions
+ */
 export function isSendableChannel(
-  channel: Channel
+  channel: Channel | null
 ): channel is Extract<
   typeof channel,
   {
@@ -16,6 +23,7 @@ export function isSendableChannel(
   }
 > {
   return (
+    channel != null && 
     channel.isTextBased() &&
     !channel.isDMBased() &&
     typeof (channel).send === "function"

@@ -10,14 +10,9 @@ import birthdaysJSON from "../../resources/birthdays.json";
 import moment from "moment-timezone";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { Birthdays } from "../types/Birthdays.d.ts";
+import { BirthdayStates } from "../types/RunStateEnums";
 
 const birthdays: Birthdays = birthdaysJSON;
-
-enum BirthdayStates {
-  NORMAL = 0,
-  FIRST_RUN = 1,
-  ERROR_STOP = 2,
-}
 
 export async function checkBirthdays(
   context: BotContext,

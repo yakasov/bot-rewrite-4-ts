@@ -29,7 +29,7 @@ export interface BulkMetadata {
 export interface Player {
   abandon_match_time_s: number;
   ability_points: number;
-  accolades: Accolade[];
+  accolades: PlayerAccolade[];
   account_id: number;
   assigned_lane: number;
   assists: number;
@@ -46,7 +46,7 @@ export interface Player {
   team: string;
 }
 
-interface Accolade {
+export interface PlayerAccolade {
   accolade_id: number;
   accolade_stat_value: number;
   accolade_threshold_achieved: number;
@@ -102,4 +102,9 @@ interface FinalStats {
   tech_power: number;
   time_stamp_s: number;
   weapon_power: number;
+}
+
+export interface NeatBanData {
+  heroName: string;
+  bans: number;
 }

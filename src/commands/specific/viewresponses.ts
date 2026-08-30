@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import { wrapCodeBlockString } from "../../util/commonFunctions";
 import chanceResponsesJSON from "../../../resources/chanceResponses.json";
-import type { ChanceResponse } from "../../types/JSON.d.ts";
+import type { ChanceResponse } from "../../types/ChanceResponse";
 
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJSON as Record<string, ChanceResponse>;
@@ -46,9 +46,9 @@ export default {
     }
 
     interaction.followUp({
-      content: `Valid keys:\n\`\`\`\n${Object.keys(chanceResponses).join(
-        ", "
-      )}\n\`\`\``,
+      content: `Valid keys:\n${wrapCodeBlockString(
+        Object.keys(chanceResponses).join(", ")
+      )}`,
       flags: MessageFlags.Ephemeral,
     });
   },

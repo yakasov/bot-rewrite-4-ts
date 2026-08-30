@@ -1,5 +1,10 @@
 import { Message } from "discord.js";
 
+/**
+ * Returns the user nickname where available.
+ * 
+ * @param message 
+ */
 export function getNicknameFromMessage(message: Message): string {
   const member =
     message.guild?.members.cache

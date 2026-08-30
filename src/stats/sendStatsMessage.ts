@@ -2,7 +2,14 @@ import { Guild, GuildBasedChannel, User } from "discord.js";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { GuildStats, StatsMessage } from "../types/Stats.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
+import { wrapCodeBlockString } from "../util/commonFunctions.js";
 
+/**
+ * Sends a level up message in the configured level up channel.
+ * 
+ * @param messageEvent - properties required to build the level up message
+ * @param context 
+ */
 export async function sendMessage(
   messageEvent: StatsMessage,
   context: BotContext
@@ -27,8 +34,10 @@ export async function sendMessage(
   if (channel) {
     if (!isSendableChannel(channel)) return;
 
+    const message = `${user.displayName} has reached ${messageEvent.accolade} (${messageEvent.title})!`;
+
     await channel.send(
-      `## ${messageEvent.subject}!\n\`\`\`ansi\n${user.displayName} has reached ${messageEvent.accolade} (${messageEvent.title})!\`\`\``
+      `## ${messageEvent.subject}!\n${wrapCodeBlockString(message, "ansi")}`
     );
   }
 }

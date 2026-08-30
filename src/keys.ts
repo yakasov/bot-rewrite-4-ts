@@ -14,6 +14,7 @@ const {
   GOOGLE_BOOKS_TOKEN,
   STEAM_API_KEY,
   TMDB_TOKEN,
+  OPEN_WEATHER_API_KEY
 } = process.env;
 
 if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
@@ -40,6 +41,7 @@ export const KEYS = {
   GOOGLE_BOOKS_TOKEN,
   STEAM_API_KEY,
   TMDB_TOKEN,
+  OPEN_WEATHER_API_KEY
 };
 
 export const DATABASE = {

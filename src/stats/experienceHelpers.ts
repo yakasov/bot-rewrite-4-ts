@@ -4,6 +4,12 @@ import { sendMessage } from "./sendStatsMessage";
 import ranksJSON from "../../resources/ranks.json";
 import { GenericStringObject } from "../types/Generic.js";
 
+/**
+ * Recalculates and sets user level XP and total XP.
+ * 
+ * @param userStats 
+ * @param context 
+ */
 export function calculateExperience(
   userStats: UserStats,
   context: BotContext
@@ -20,6 +26,13 @@ export function calculateExperience(
   userStats.totalXP = Math.max(experience, userStats.totalXP);
 }
 
+/**
+ * Calls the update stats function and broadcasts level ups.
+ * 
+ * @param guildId 
+ * @param userId 
+ * @param context 
+ */
 export function levelUp(
   guildId: string,
   userId: string,
@@ -45,6 +58,12 @@ export function levelUp(
   }
 }
 
+/**
+ * Uses ranks.json for level names
+ * 
+ * @param level 
+ * @returns the level name as a string
+ */
 export function getLevelName(level: number): string {
   const ranks = ranksJSON as GenericStringObject;
   let nameLevel: number = Math.floor(level / 10) + 1;
@@ -57,6 +76,13 @@ export function getLevelName(level: number): string {
   return `${ranks[`${nameLevel}` as string]}\u001b[0m`;
 }
 
+/**
+ * Returns the XP required for any one given level.
+ * 
+ * @param level 
+ * @param config - as part of BotContext
+ * @returns XP as number
+ */
 export function getRequiredExperience(
   level: number,
   config: BotContext["config"]
@@ -64,6 +90,13 @@ export function getRequiredExperience(
   return level * config.stats.XPPerLevel;
 }
 
+/**
+ * Returns the total XP required to reach any one given level.
+ * 
+ * @param level 
+ * @param config - as part of BotContext
+ * @returns XP as number
+ */
 export function getRequiredExperienceCumulative(
   level: number,
   config: BotContext["config"]
@@ -71,6 +104,12 @@ export function getRequiredExperienceCumulative(
   return (level * ((level + 1) * config.stats.XPPerLevel)) / 2;
 }
 
+/**
+ * Adjusts user level and level XP on level up
+ * 
+ * @param userStats 
+ * @param config 
+ */
 export function updateStatsOnLevelUp(
   userStats: UserStats,
   config: BotContext["config"]
