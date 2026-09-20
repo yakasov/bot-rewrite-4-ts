@@ -11,6 +11,8 @@ import { handleMessageCreate } from "./events/handleMessageCreate";
 import { handleVoiceStateUpdate } from "./events/handleVoiceStateUpdate";
 import { loadStatsFromDatabase } from "./database/loadFromDatabase";
 import { DATABASE_KEYS_PRESENT } from "./keys";
+import * as DiscordSpeechRecognition from "@midspike/discord-speech-recognition";
+import { handleVoiceRecognitionVoiceMessage } from "./events/handleVoiceRecognitionVoiceMessage";
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled error:", error);
@@ -40,6 +42,16 @@ botContext.client.on(
   (oldState: VoiceState, newState: VoiceState) =>
     handleVoiceStateUpdate(oldState, newState, botContext)
 );
+botContext.client.on(
+  DiscordSpeechRecognition.Events.VoiceMessage,
+  handleVoiceRecognitionVoiceMessage
+);
+botContext.client.on(DiscordSpeechRecognition.Events.Error, (speechError: DiscordSpeechRecognition.SpeechError) => {
+  // It is highly recommended to filter out errors that you don't care about.
+  // Use `speechError.code` and the enum `SpeechErrorCode` to filter.
+
+  console.trace(speechError);
+});
 
 messagePrototypeCatch();
 botContext.client.login();

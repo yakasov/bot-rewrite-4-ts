@@ -15,13 +15,13 @@ export async function rollingPresence(context: BotContext): Promise<void> {
   } else if (context.runState.presence === PresenceStates.WEATHER_A) {
     setPresence(
       context,
-      `Currently ${context.weather.weather.temp.cur.toFixed(1)}℃, feels like ${context.weather.weather.feelsLike.cur.toFixed(1)}℃`
+      `Currently ${context.weather?.weather.temp.cur.toFixed(1)}℃, feels like ${context.weather?.weather.feelsLike.cur.toFixed(1)}℃`
     );
     context.runState.presence = PresenceStates.WEATHER_B;
   } else if (context.runState.presence === PresenceStates.WEATHER_B) {
     setPresence(
       context,
-      `Humidity ${context.weather.weather.humidity}%, ${context.weather.weather.description}`
+      `Humidity ${context.weather?.weather.humidity}%, ${context.weather?.weather.description}`
     );
     context.runState.presence = PresenceStates.SPLASH;
   }
