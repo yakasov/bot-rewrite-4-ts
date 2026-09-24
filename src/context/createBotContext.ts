@@ -3,8 +3,6 @@ import moment from "moment-timezone";
 import type { Config } from "../types/Config.d.ts";
 import type { BotContext } from "../types/BotContext.d.ts";
 import { generateRollTable } from "../util/generateRollTable";
-import * as DiscordSpeechRecognition from "@midspike/discord-speech-recognition";
-import { THIS_ID_SHOULD_BE_VOICE_PROCESSED } from "../consts/constants.js";
 
 export function createBotContext(config: Config): BotContext {
   const client = new Client({
@@ -21,12 +19,6 @@ export function createBotContext(config: Config): BotContext {
       GatewayIntentBits.GuildVoiceStates,
       GatewayIntentBits.MessageContent,
     ],
-  });
-
-  DiscordSpeechRecognition.attachSpeechEvent({
-    client: client as any,
-    shouldProcessUserId: async (userId) =>
-      userId === THIS_ID_SHOULD_BE_VOICE_PROCESSED,
   });
 
   return {

@@ -9,10 +9,11 @@ import { handleClientReady } from "./events/handleClientReady";
 import { handleInteractionCreate } from "./events/handleInteractionCreate";
 import { handleMessageCreate } from "./events/handleMessageCreate";
 import { handleVoiceStateUpdate } from "./events/handleVoiceStateUpdate";
+import { handleVoiceTranscript } from "./events/handleVoiceTranscript";
 import { loadStatsFromDatabase } from "./database/loadFromDatabase";
-import { DATABASE_KEYS_PRESENT } from "./keys";
-import * as DiscordSpeechRecognition from "@midspike/discord-speech-recognition";
-import { handleVoiceRecognitionVoiceMessage } from "./events/handleVoiceRecognitionVoiceMessage";
+import { DATABASE_KEYS_PRESENT, KEYS } from "./keys";
+import { VoiceRecognitionManager } from "./voice/voiceRecognitionManager";
+import { THIS_ID_SHOULD_BE_VOICE_PROCESSED } from "./consts/constants";
 
 process.on("unhandledRejection", (error) => {
   console.error("Unhandled error:", error);
@@ -20,6 +21,17 @@ process.on("unhandledRejection", (error) => {
 
 const config: Config = configJson;
 const botContext: BotContext = createBotContext(config);
+const voiceRecognitionManager = new VoiceRecognitionManager(
+  THIS_ID_SHOULD_BE_VOICE_PROCESSED,
+  KEYS.AZURE_SPEECH_KEY ?? "",
+  KEYS.AZURE_SPEECH_REGION ?? "",
+  (transcript) => handleVoiceTranscript(
+    transcript.guildId,
+    transcript.userId,
+    transcript.text,
+    botContext
+  )
+);
 
 botContext.client.once(Events.ClientReady, async () => {
   await loadCommands(botContext.client);
@@ -40,18 +52,21 @@ botContext.client.on(Events.MessageCreate, (message: Message) =>
 botContext.client.on(
   Events.VoiceStateUpdate,
   (oldState: VoiceState, newState: VoiceState) =>
-    handleVoiceStateUpdate(oldState, newState, botContext)
+    handleVoiceStateUpdate(
+      oldState,
+      newState,
+      botContext,
+      voiceRecognitionManager
+    )
 );
-botContext.client.on(
-  DiscordSpeechRecognition.Events.VoiceMessage,
-  handleVoiceRecognitionVoiceMessage
-);
-botContext.client.on(DiscordSpeechRecognition.Events.Error, (speechError: DiscordSpeechRecognition.SpeechError) => {
-  // It is highly recommended to filter out errors that you don't care about.
-  // Use `speechError.code` and the enum `SpeechErrorCode` to filter.
-
-  console.trace(speechError);
-});
 
 messagePrototypeCatch();
 botContext.client.login();
+
+process.once("SIGINT", () => {
+  voiceRecognitionManager.stopAll();
+});
+
+process.once("SIGTERM", () => {
+  voiceRecognitionManager.stopAll();
+});
