@@ -7,6 +7,7 @@ import { Guild } from "discord.js";
 import type { VoiceTranscript } from "../types/voice/VoiceRecognition.d.ts";
 import { AzureSpeechRecognizer } from "./AzureSpeechRecognizer";
 import { DiscordUserVoiceSession } from "./DiscordUserVoiceSession";
+import { handleVoiceTranscript } from "../events/handleVoiceTranscript.js";
 
 export class VoiceRecognitionManager {
   private readonly sessions = new Map<
@@ -46,7 +47,7 @@ export class VoiceRecognitionManager {
       this.azureSpeechRegion,
       {
         onPartial: (text) => {
-          console.debug(`Partial transcript from ${this.targetUserId}: ${text}`);
+          handleVoiceTranscript(guild.id, this.targetUserId, text);
         },
         onFinal: (text) => {
           void this.onTranscript({

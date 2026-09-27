@@ -4,7 +4,7 @@ export async function handleVoiceTranscript(
   guildId: string,
   userId: string,
   text: string,
-  context: BotContext
+  context?: BotContext
 ): Promise<void> {
   console.log(`Transcript from ${userId}: ${text}`);
 }

@@ -25,6 +25,7 @@ export class AzureSpeechRecognizer {
 
     const speechConfig = sdk.SpeechConfig.fromSubscription(key, region);
     speechConfig.speechRecognitionLanguage = "en-GB";
+    speechConfig.setProfanity(sdk.ProfanityOption.Raw);
 
     const audioFormat = sdk.AudioStreamFormat.getWaveFormatPCM(
       16_000,
