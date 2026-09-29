@@ -8,6 +8,7 @@ import type { VoiceTranscript } from "../types/voice/VoiceRecognition.d.ts";
 import { AzureSpeechRecognizer } from "./AzureSpeechRecognizer";
 import { DiscordUserVoiceSession } from "./DiscordUserVoiceSession";
 import { handleVoiceTranscript } from "../events/handleVoiceTranscript.js";
+import { BotContext } from "../types/BotContext.js";
 
 export class VoiceRecognitionManager {
   private readonly sessions = new Map<
@@ -16,6 +17,7 @@ export class VoiceRecognitionManager {
   >();
 
   public constructor(
+    private readonly context: BotContext,
     private readonly targetUserId: string,
     private readonly azureSpeechKey: string,
     private readonly azureSpeechRegion: string,
@@ -47,13 +49,13 @@ export class VoiceRecognitionManager {
       this.azureSpeechRegion,
       {
         onPartial: (text) => {
-          handleVoiceTranscript(guild.id, this.targetUserId, text);
+          handleVoiceTranscript(guild.id, this.targetUserId, "[PARTIAL] " + text, this.context, true);
         },
         onFinal: (text) => {
           void this.onTranscript({
             guildId: guild.id,
             userId: this.targetUserId,
-            text,
+            text
           }).catch((error) => {
             console.error("Failed to handle voice transcript:", error);
           });

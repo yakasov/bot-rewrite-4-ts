@@ -22,6 +22,7 @@ process.on("unhandledRejection", (error) => {
 const config: Config = configJson;
 const botContext: BotContext = createBotContext(config);
 const voiceRecognitionManager = new VoiceRecognitionManager(
+  botContext,
   THIS_ID_SHOULD_BE_VOICE_PROCESSED,
   KEYS.AZURE_SPEECH_KEY ?? "",
   KEYS.AZURE_SPEECH_REGION ?? "",

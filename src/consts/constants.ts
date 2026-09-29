@@ -49,6 +49,7 @@ export const REGEX_SCRYFALL_EDHREC_PATTERN = /[^ a-zA-Z0-9]/gu;
 export const REGEX_SCRYFALL_PATTERN =
   /\[\[\s*(?<card>[^|\]]*?)\s*(?:\|\s*(?<set>[^|\]]*?))?(?:\|\s*(?<number>[^|\]]+?))?\s*\]\]/gu;
 export const REGEX_STEAM_LINK = /https:\/\/steamcommunity\.com\S*/gu;
+export const REGEX_SWEAR_JAR = /^(?:\[(\d+)\]\s*)?(.*)$/u;
 export const REGEX_TIME_MATCH = /\b\d+\s*:\s*\d+\b/gu;
 export const REGEX_YOUTUBE_URL_FULL =
   /^https?:\/\/(?<subdomain>www\.)?youtube\.com\/watch\?v=*/gu;
@@ -105,8 +106,7 @@ export const STEAM_URL_LINK =
 
 export const THIS_ID_IS_ALWAYS_LATE_TELL_HIM_OFF = "135410033524604928";
 export const THIS_ID_IS_A_PINGING_BOZO = "214404843442274304";
-//export const THIS_ID_SHOULD_BE_VOICE_PROCESSED = "235474598542442497";
-export const THIS_ID_SHOULD_BE_VOICE_PROCESSED = "135410033524604928";
+export const THIS_ID_SHOULD_BE_VOICE_PROCESSED = "235474598542442497";
 
 export const TWITTER_LINKS: Record<string, RegExp> = {
   RANDOM: /https:\/\/x\.com\//u,
