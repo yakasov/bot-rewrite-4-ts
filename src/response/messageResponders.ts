@@ -1,6 +1,6 @@
 import { Message, StickerResolvable } from "discord.js";
 import chanceResponsesJson from "../../resources/chanceResponses.json";
-import type { ChanceResponse } from "../types/JSON.d.ts";
+import type { ChanceResponse } from "../types/ChanceResponse";
 import { getNicknameFromMessage } from "./responseHelpers";
 import type { BotContext } from "../types/BotContext.d.ts";
 import { isSendableChannel } from "../util/typeGuards";
@@ -9,16 +9,32 @@ import moment from "moment-timezone";
 const chanceResponses: Record<string, ChanceResponse> =
   chanceResponsesJson as Record<string, ChanceResponse>;
 
+  
+/**
+ * Fetches a random response from the chanceResponses.json
+ * 
+ * @param filter - string used to filter the responses by key
+ * @returns a random response string
+ */
 export function getRandomResponse(filter = "hype"): string {
   const responses: [string, ChanceResponse][] = Object.entries(
     chanceResponses
   ).filter(([key]) => (filter.length !== 0 ? key.startsWith(filter) : true));
+  if (responses.length === 0) return "No response found!"
+
   const randomEntry: string =
     responses[Math.floor(Math.random() * responses.length)][1].string;
 
   return randomEntry;
 }
 
+/**
+ * Sends a custom bot response based on responses.json
+ *  
+ * @param message 
+ * @param key - key/value pair from Object.entries(responses)
+ * @param value - as above
+ */
 export async function sendCustomResponse(
   message: Message,
   key: string,
@@ -73,6 +89,12 @@ export async function sendCustomResponse(
   await message.channel.send(response);
 }
 
+/**
+ * Decides whether the bot should respond to a given message.
+ * 
+ * @param message 
+ * @param context 
+ */
 export async function checkMessageReactions(
   message: Message,
   context: BotContext
@@ -84,9 +106,11 @@ export async function checkMessageReactions(
     return;
   }
 
+  // Both are calculated percentages out of 100
   const roll: number = Math.random() * 100;
   const initialRoll: number = Math.random() * 100;
 
+  // So response chance should be a percentage of 100 too
   if (initialRoll < (context.config.bot.responseChance ?? 0)) {
     for (const response of context.rollTable) {
       if (roll < response.chance) {
@@ -145,7 +169,7 @@ export async function checkMoMessage(message: Message): Promise<boolean> {
 
     if (isPing(replyMessage)) {
       const replyMessageMoment: moment.Moment = moment(
-        replyMessage.createdTimestamp * 1000
+        replyMessage.createdTimestamp
       );
 
       const replyMessageParts: string[] = replyMessage.content.split(" ");

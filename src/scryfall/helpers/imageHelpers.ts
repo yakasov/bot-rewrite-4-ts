@@ -5,6 +5,12 @@ import joinImages from "join-images";
 import { Card } from "scryfall-api";
 import { Sharp } from "sharp";
 
+/**
+ * Gets an image URL for a card, building one if a card is double sided and otherwise using the provided one.
+ * 
+ * @param cardDetails - a Card object
+ * @returns an array of [0] whether the URL is local (for attachment use), [1] the image URL
+ */
 export async function getImageUrl(
   cardDetails: Card
 ): Promise<[boolean, string]> {
@@ -18,6 +24,12 @@ export async function getImageUrl(
   return [false, cardDetails.image_uris?.large ?? ""];
 }
 
+/**
+ * Combines two images into one, placing them side by side.
+ * 
+ * @param card - a Card object
+ * @returns the URL of the saved, combined images
+ */
 export async function combineImages(card: Card): Promise<string> {
   const baseFilePath = `./resources/scryfall/images/${card.id}`;
 
@@ -38,6 +50,14 @@ export async function combineImages(card: Card): Promise<string> {
   return baseFilePath;
 }
 
+/**
+ * Downloads an image for combining with another, or for caching.
+ * 
+ * @param card - a Card object
+ * @param i - which side of the card to download
+ * @param baseFilePath - the directory to save images to
+ * @returns the local file paths of the downloaded images
+ */
 export function downloadImage(
   card: Card,
   i: number,
@@ -70,6 +90,11 @@ export function downloadImage(
   });
 }
 
+/**
+ * Deletes files for download cleanup.
+ * 
+ * @param filePaths - an array of file paths
+ */
 export async function deleteFiles(filePaths: string[]): Promise<void> {
   await Promise.all(
     filePaths.map(

@@ -1,15 +1,18 @@
 import { VoiceState } from "discord.js";
 import { addToStats } from "../stats/statsHelpers";
 import type { BotContext } from "../types/BotContext.d.ts";
+import { THIS_ID_SHOULD_BE_VOICE_PROCESSED } from "../consts/constants";
+import type { VoiceRecognitionManager } from "../voice/voiceRecognitionManager";
 
 export async function handleVoiceStateUpdate(
   oldState: VoiceState,
   newState: VoiceState,
-  context: BotContext
+  context: BotContext,
+  voiceRecognitionManager: VoiceRecognitionManager
 ): Promise<void> {
   if (newState.member?.user.bot || !newState.member) return;
 
-  if (oldState.channel && !newState.channel) {
+  if (oldState.channelId && !newState.channelId) {
     addToStats(
       {
         guildId: newState.guild.id,
@@ -18,7 +21,11 @@ export async function handleVoiceStateUpdate(
       },
       context
     );
-  } else if (!oldState.channel && newState.channel) {
+
+    if (newState.member.id === THIS_ID_SHOULD_BE_VOICE_PROCESSED) {
+      voiceRecognitionManager.stop(newState.guild.id);
+    }
+  } else if (!oldState.channelId && newState.channelId) {
     addToStats(
       {
         guildId: newState.guild.id,
@@ -27,5 +34,16 @@ export async function handleVoiceStateUpdate(
       },
       context
     );
+
+    if (newState.member.id === THIS_ID_SHOULD_BE_VOICE_PROCESSED) {
+      voiceRecognitionManager.start(newState.guild, newState.channelId);
+    }
+  } else if (
+    oldState.channelId &&
+    newState.channelId &&
+    oldState.channelId !== newState.channelId &&
+    newState.member.id === THIS_ID_SHOULD_BE_VOICE_PROCESSED
+  ) {
+    voiceRecognitionManager.start(newState.guild, newState.channelId);
   }
 }

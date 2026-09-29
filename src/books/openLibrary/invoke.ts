@@ -6,6 +6,7 @@ import {
 } from "../../consts/constants";
 import { openLibraryShowBookList } from "./showBookList";
 import { openBooksFound } from "./bookFound";
+import { wrapCodeBlockString } from "../../util/commonFunctions";
 
 export async function openLibraryInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
@@ -53,7 +54,7 @@ export async function openLibrarySearch(
 
   if (resultsText[0] !== "{") {
     await replyMessage.edit(
-      `Error fetching book :')\n\`\`\`${resultsText}\n\`\`\``
+      `Error fetching book :')\n${wrapCodeBlockString(resultsText)}`
     );
     return;
   }

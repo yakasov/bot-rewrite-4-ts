@@ -9,6 +9,9 @@ import { checkAllUserStats } from "../stats/statsHelpers";
 import { saveStatsToDatabase } from "../database/saveToDatabase";
 import { backupStatsFromDatabaseToJSON } from "../database/backupDatabaseToJSON";
 import { checkDeadlockForum } from "../tasks/checkDeadlockForum";
+import { rollingPresence } from "../tasks/rollingPresence.js";
+import { checkWeather } from "../tasks/checkWeather.js";
+import { PresenceStates } from "../types/RunStateEnums.js";
 
 export async function handleClientReady(context: BotContext): Promise<void> {
   console.log(
@@ -21,7 +24,9 @@ export async function handleClientReady(context: BotContext): Promise<void> {
   checkMinecraftServer(context);
   checkDeadlockForum(context);
   await checkBirthdays(context, true);
+  await checkWeather(context);
 
+  context.runState.presence = PresenceStates.SPLASH;
   context.splash = getRandomSplash();
   context.client.user?.setPresence({
     activities: [{ name: context.splash, type: ActivityType.Watching }],
@@ -34,18 +39,17 @@ export async function handleClientReady(context: BotContext): Promise<void> {
     getTime({ seconds: 10 })
   );
   setInterval(() => checkBirthdays(context), getTime({ minutes: 15 }));
-  setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
+  // setInterval(() => checkFortnite(context), getTime({ minutes: 15 }));
   setInterval(() => checkDeadlockForum(context), getTime({ minutes: 15 }));
   setInterval(() => checkMinecraftServer(context), getTime({ seconds: 5 }));
   setInterval(
     () => {
       context.splash = getRandomSplash();
-      context.client.user?.setPresence({
-        activities: [{ name: context.splash, type: ActivityType.Watching }],
-      });
     },
     getTime({ minutes: 10 })
   );
+  setInterval(() => rollingPresence(context), getTime({ seconds: 10 }));
+  setInterval(() => checkWeather(context), getTime({ minutes: 10 }))
   setInterval(() => checkVoiceChannels(context), getTime({ seconds: 15 }));
   setInterval(() => saveStatsToDatabase(context), getTime({ minutes: 3 }));
   setInterval(backupStatsFromDatabaseToJSON, getTime({ minutes: 15 }));

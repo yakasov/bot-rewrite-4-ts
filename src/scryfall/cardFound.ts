@@ -18,6 +18,13 @@ import {
 import { getPrintList } from "./caching";
 import { CardDetails, EmbedObject, Modifiers } from "../types/scryfall/Invoke";
 
+/**
+ * Handles message sending and any follow up interactions for a given Scryfall card.
+ * 
+ * @param message - the original message that invoked Scryfall
+ * @param card - a string or Card object. If this is a string, the function will attempt to fetch a Card. Otherwise, it will use the Card provided.
+ * @param modifiers - a Scryfall Modifiers object
+ */
 export async function scryfallCardFound(
   message: Message,
   card: string | Card,
@@ -84,12 +91,18 @@ export async function scryfallCardFound(
 
   await handlePrintingChoice(
     cardFoundMessage,
-    message,
+    message.author.id,
     printDetails,
     cardDetails
   );
 }
 
+/**
+ * Builds an 'action row' for a Scryfall embed. This one specifically is for printings.
+ * 
+ * @param cardName 
+ * @returns an ActionRowBuilder consisting of interactable buttons
+ */
 export function getActionButtonsRow(cardName: string): ActionRowBuilder {
   const previousButton = new ButtonBuilder()
     .setCustomId("previous")
@@ -124,6 +137,12 @@ export function getActionButtonsRow(cardName: string): ActionRowBuilder {
   );
 }
 
+/**
+ * Builds an 'action row' for a Scryfall embed.
+ * 
+ * @param cardName 
+ * @returns an ActionRowBuilder consisting of interactable buttons
+ */
 export function getPostActionButtonsRow(cardName: string): ActionRowBuilder {
   const printButton = new ButtonBuilder()
     .setLabel("Prints")
@@ -152,6 +171,11 @@ export function getPostActionButtonsRow(cardName: string): ActionRowBuilder {
   );
 }
 
+/**
+ * Formats a string for use with EDHRec queries.
+ * 
+ * @param string - the card name to be formatted
+ */
 export function encodeURIToBasic(string: string) {
   return string
     .replace(REGEX_SCRYFALL_EDHREC_PATTERN, "")

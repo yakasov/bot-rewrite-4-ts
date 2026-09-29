@@ -19,6 +19,12 @@ import { GenericStringObject } from "../types/Generic.js";
 
 const responses: GenericStringObject = responsesJson as GenericStringObject;
 
+/**
+ * Handles miscellaneous invocations and subsequent functions.
+ * 
+ * @param message 
+ * @param context 
+ */
 export async function checkMessageInvoke(
   message: Message,
   context: BotContext

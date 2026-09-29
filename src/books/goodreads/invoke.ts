@@ -12,21 +12,17 @@ import moment from "moment-timezone";
 import {
   ApolloState,
   BookHeader,
+  GoodreadsAttributes,
   NextData,
   WorkHeader,
-} from "../../types/books/GoodreadsNextData";
+} from "../../types/books/Goodreads";
+import { wrapCodeBlockString } from "../../util/commonFunctions";
 
-interface GoodreadsAttributes {
-  url: string;
-  name: string;
-  author: string;
-  imageURL: string;
-  description: string;
-  genres: string;
-  ratings: string;
-  footer: string;
-}
-
+/**
+ * Handles Goodreads invocation and subsequent functions.
+ * 
+ * @param message 
+ */
 export async function goodreadsInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel)) return;
 
@@ -44,6 +40,12 @@ export async function goodreadsInvoke(message: Message): Promise<void> {
   await Promise.all(promises);
 }
 
+/**
+ * Performs a web search on Goodreads (via their web search page) and parses the page for the result.
+ * 
+ * @param message 
+ * @param input - the search query
+ */
 export async function goodreadsSearch(
   message: Message,
   input: string
@@ -123,7 +125,7 @@ export async function goodreadsSearch(
         workHeader = jsonData.props.pageProps.apolloState[workKey];
       } catch (error) {
         await replyMessage.edit(
-          `Failed to parse JSON for ${bookURL}: \`\`\`\n${error}\`\`\``
+          `Failed to parse JSON for ${bookURL}: ${wrapCodeBlockString(error)}`
         );
         return;
       }
@@ -171,6 +173,12 @@ export async function goodreadsSearch(
   }
 }
 
+/**
+ * Gets and joins author names into a single string.
+ * 
+ * @param elements - HTMLElement list
+ * @returns 
+ */
 function concatAuthorNames(elements: HTMLElement[]) {
   const endElement = elements.find((e, i) => i !== 0 && e.hasAttribute("role"));
   const endIndex = endElement ? elements.indexOf(endElement) : elements.length;
@@ -181,6 +189,12 @@ function concatAuthorNames(elements: HTMLElement[]) {
     .join(", ");
 }
 
+/**
+ * Builds the Goodreads reply embed.
+ * 
+ * @param replyMessage 
+ * @param param1 - deconstructor for GoodreadsAttributes object
+ */
 export async function goodreadsBookFound(
   replyMessage: Message,
   {

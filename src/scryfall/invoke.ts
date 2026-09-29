@@ -12,6 +12,11 @@ import { scryfallShowCardList } from "./showCardList";
 import { isSendableChannel } from "../util/typeGuards";
 import type { Modifiers } from "../types/scryfall/Invoke.d.ts";
 
+/**
+ * Handles Scryfall invocation and subsequent functions.
+ * 
+ * @param message 
+ */
 export async function scryfallInvoke(message: Message): Promise<void> {
   /*
    * The reality of this check is that it'll never really be relevant;
@@ -77,11 +82,23 @@ export async function scryfallInvoke(message: Message): Promise<void> {
   }
 }
 
+/**
+ * Attempts to get a card from Scryfall givn a set of criteria.
+ * This can be a card name with or without modifiers,
+ * or a syntax search (see {@link Modifiers.isSyntax})
+ * 
+ * Once a card has been found, it will delegate to different functions to handle the response.
+ * 
+ * @param message 
+ * @param cardName - the card name to search. Can be blank
+ * @param modifiers - see {@link Modifiers}
+ * @param showCardList - whether to show the card list or not. We don't want to if it's already been shown
+ */
 export async function scryfallGetCard(
   message: Message,
   cardName = "",
   modifiers: Modifiers,
-  fromSelectMenu = false
+  showCardList = true
 ): Promise<void> {
   let results: string[] | Card[] = [""];
 
@@ -109,7 +126,7 @@ export async function scryfallGetCard(
   }
 
   /*
-   * An explanation for 'fromSelectMenu':
+   * An explanation for 'showCardList':
    * basically, if we get multiple cards from Scryfall (eg when searching 'pan')
    * then the user is given a choice of the 20 best matching cards (Scryfall limit).
    *
@@ -126,7 +143,7 @@ export async function scryfallGetCard(
     results.length === 1 ||
     (typeof results[0] === "string" && (results[0].toLocaleLowerCase() === cardName.toLocaleLowerCase() &&
       !modifiers.isFuzzy)) ||
-    fromSelectMenu
+    !showCardList
   ) {
     await scryfallCardFound(message, results[0], modifiers);
   } else {
@@ -134,7 +151,12 @@ export async function scryfallGetCard(
   }
 }
 
-export async function sendMinorSpellingMistakeGif(channel: Channel) {
+/**
+ * Called by sending exactly [[msm]]. Overrides Scryfall invocation.
+ * 
+ * @param channel - message channel
+ */
+export async function sendMinorSpellingMistakeGif(channel: Channel): Promise<void> {
   // Obviously this will never, ever fail but TS will get upset without it
   if (!isSendableChannel(channel)) return;
 

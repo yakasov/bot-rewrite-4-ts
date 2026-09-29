@@ -8,6 +8,13 @@ import {
 import { getCardDetails } from "./commonHelpers";
 import { CardDetails, EmbedObject } from "../../types/scryfall/Invoke";
 
+/**
+ * Used for determining the index of a wrap-around embed.
+ * 
+ * @param newIndex 
+ * @param max - the max amount of pages the embed has
+ * @returns the new index position, wrapping around to 0 if greater than max
+ */
 function getNextIndex(newIndex: number, max: number): number {
   if (newIndex === max) {
     return 0;
@@ -18,9 +25,17 @@ function getNextIndex(newIndex: number, max: number): number {
   return newIndex;
 }
 
+/**
+ * Updates the card embed based on the interaction when choosing a printing.
+ * 
+ * @param message - the card embed message
+ * @param authorId - the ID of the user who originally invoked Scryfall
+ * @param printDetails - an array of Card objects, one for each printing
+ * @param cardDetails - the card details to display on the embed, to avoid refetching
+ */
 export async function handlePrintingChoice(
   message: Message,
-  originalMessage: Message,
+  authorId: string,
   printDetails: Card[],
   cardDetails: CardDetails
 ): Promise<void> {
@@ -29,7 +44,7 @@ export async function handlePrintingChoice(
   const filter: (interaction: Interaction) => boolean = (
     interaction: Interaction
   ) =>
-    interaction.isButton() && interaction.user.id === originalMessage.author.id;
+    interaction.isButton() && interaction.user.id === authorId;
   const cardName = cardDetails.scry.name;
 
   try {
@@ -50,7 +65,6 @@ export async function handlePrintingChoice(
     } else {
       await Promise.all([
         message.delete().catch(console.error),
-        originalMessage.delete().catch(console.error),
       ]);
       return;
     }
@@ -79,7 +93,7 @@ export async function handlePrintingChoice(
       }),
       handlePrintingChoice(
         message,
-        originalMessage,
+        authorId,
         printDetails,
         newCardDetails
       ),

@@ -21,16 +21,12 @@ import {
 } from "@leandrowkz/tmdb";
 import { KEYS } from "../keys";
 import { getRTRating } from "./rottenTomatoesScores";
-
-interface Genres {
-  movie: GenresResponse | undefined;
-  tv: GenresResponse | undefined;
-}
+import { Genres } from "../types/movies/RottenTomatoes";
 
 const tmdb = new TMDB({ apiKey: KEYS.TMDB_TOKEN ?? "" });
 const GENRES: Genres = {
   movie: undefined,
-  tv: undefined,
+  tv: undefined,  
 };
 
 function isMovieItem(
@@ -51,6 +47,9 @@ function isPersonItem(
   return "known_for_department" in item;
 }
 
+/**
+ * Genre lists need fetching before they can be used, but we can cache the result
+ */
 async function initialiseGenres(): Promise<void> {
   if (!GENRES.movie) {
     GENRES.movie = await tmdb.genres.movie();
@@ -58,6 +57,13 @@ async function initialiseGenres(): Promise<void> {
   }
 }
 
+/**
+ * Converts a list of genre codes (as IDs) to genre names
+ * 
+ * @param genres - see {@link @leandrowkz/tmdb#Genre}
+ * @param ids - see {@link GenreCode}
+ * @returns the joined list as a string
+ */
 function prettifyGenres(
   genres: GenresResponse | undefined,
   ids: GenreCode[] | undefined
@@ -66,6 +72,11 @@ function prettifyGenres(
   return ids.map((i) => genres.genres.find((g) => g.id === i)?.name).join(", ");
 }
 
+/**
+ * Handles TMDB invocation and subsequent functions.
+ * 
+ * @param message 
+ */
 export async function movieInvoke(message: Message): Promise<void> {
   if (!isSendableChannel(message.channel) ||!KEYS.TMDB_TOKEN) return;
   initialiseGenres();
@@ -86,6 +97,14 @@ export async function movieInvoke(message: Message): Promise<void> {
   await Promise.all(promises);
 }
 
+/**
+ * Performs a general TMDB search for a piece of media, where we don't know the result type yet. Delegates to different functions for different replies.
+ * 
+ * @param message 
+ * @param query - the input string
+ * @param season - if a season has been specified and the result is a TV Show, it will research using this season
+ * @param episode - if an episode has been specified and the result is a TV Show, it will research using this episode
+ */
 async function querySearch(
   message: Message,
   query: string,
@@ -117,6 +136,12 @@ async function querySearch(
   await replyMessage.edit("No results, wha");
 }
 
+/**
+ * Creates an embed for movie results from TMDB.
+ * 
+ * @param replyMessage - the fetching message the bot sent before querying
+ * @param item - the movie item from TMDB
+ */
 async function handleMovieResult(
   replyMessage: Message,
   item: MovieItem
@@ -151,6 +176,12 @@ async function handleMovieResult(
   });
 }
 
+/**
+ * Creates an embed for TV Show results from TMDB.
+ * 
+ * @param replyMessage - the fetching message the bot sent before querying
+ * @param item - the TV Show item from TMDB
+ */
 async function handleTVShowResult(
   replyMessage: Message,
   item: TVShowItem,
@@ -208,6 +239,12 @@ async function handleTVShowResult(
   });
 }
 
+/**
+ * Creates an embed for TV Season results from TMDB.
+ * 
+ * @param replyMessage - the fetching message the bot sent before querying
+ * @param item - the TV Season item from TMDB
+ */
 async function handleTVSeasonResult(
   replyMessage: Message,
   item: TVSeason
@@ -227,6 +264,12 @@ async function handleTVSeasonResult(
   });
 }
 
+/**
+ * Creates an embed for TV Episode results from TMDB.
+ * 
+ * @param replyMessage - the fetching message the bot sent before querying
+ * @param item - the TV Episode item from TMDB
+ */
 async function handleTVEpisodeResult(
   replyMessage: Message,
   item: TVEpisode
@@ -250,6 +293,12 @@ async function handleTVEpisodeResult(
   });
 }
 
+/**
+ * Creates an embed for people results from TMDB.
+ * 
+ * @param replyMessage - the fetching message the bot sent before querying
+ * @param item - the Person item from TMDB
+ */
 async function handlePersonResult(
   replyMessage: Message,
   item: PersonItem
@@ -289,6 +338,13 @@ async function handlePersonResult(
   });
 }
 
+/**
+ * Get an IMDB URL based on the type of object provided.
+ * 
+ * @param searchFunc - the logic to use when finding the URL on an object
+ * @param type - the key of the URL
+ * @returns 
+ */
 async function getIMDBURL(
   searchFunc: () => Promise<Movie | Person | TVShow>,
   type: string

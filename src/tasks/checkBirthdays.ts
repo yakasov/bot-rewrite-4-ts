@@ -10,14 +10,9 @@ import birthdaysJSON from "../../resources/birthdays.json";
 import moment from "moment-timezone";
 import type { BotContext } from "../types/BotContext.d.ts";
 import type { Birthdays } from "../types/Birthdays.d.ts";
+import { BirthdayStates } from "../types/RunStateEnums";
 
 const birthdays: Birthdays = birthdaysJSON;
-
-enum BirthdayStates {
-  NORMAL = 0,
-  FIRST_RUN = 1,
-  ERROR_STOP = 2,
-}
 
 export async function checkBirthdays(
   context: BotContext,
@@ -44,7 +39,7 @@ export async function checkBirthdays(
 
     if (!birthdayChannel || !birthdayChannel.isTextBased()) {
       console.error(
-        `Birthday channel not found or not text-based in guild ${guild.id} (${guild.name})`
+        `Birthday channel not found or not text-based in guild ${guild.name} (${guild.id})`
       );
       context.runState.birthdays = BirthdayStates.ERROR_STOP;
       return;
@@ -63,7 +58,7 @@ export async function checkBirthdays(
         if (!guildMembers.some((member: GuildMember) => member.id === id)) {
           promises.push(
             context.client.users.fetch(id).then((user: User) => {
-              console.warn(`${id} (${user?.tag || "unknown user"})`);
+              console.warn(`${user?.tag || "unknown user"} (${id})`);
               return undefined;
             })
           );
@@ -72,7 +67,7 @@ export async function checkBirthdays(
 
       if (promises.length) {
         console.log(
-          `The following birthday IDs are not present in guild ${guild.id} (${guild.name}):`
+          `The following birthday IDs are not present in guild ${guild.name} (${guild.id}):`
         );
         await Promise.all(promises);
       }

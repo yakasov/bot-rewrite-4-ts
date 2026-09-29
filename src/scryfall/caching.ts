@@ -1,7 +1,6 @@
 import fs from "fs";
-import { Cards, type Card } from "scryfall-api";
+import { Cards, Set, type Card } from "scryfall-api";
 import type { OracleResponse } from "../types/scryfall/OracleResponse";
-import type { SetResponse } from "../types/scryfall/SetResponse";
 import sharp, { Sharp } from "sharp";
 import {
   SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY,
@@ -21,11 +20,31 @@ let totalLegalCards = 0;
 let totalCards = 0;
 let rebuildingCache = false;
 
+/**
+ * Adds Accept and User-Agent headers for use with the Scryfall API
+ * 
+ * @param url 
+ * @returns a fetch with the correct headers
+ */
+export const fetchWithHeader = (url: string): Promise<Response> =>
+  fetch(url, {
+    headers: {
+      Accept: "*/*",
+      "User-Agent": "Scryfall-TS",
+    },
+  });
+
+  /**
+   * Fetches the full print list of a given card. If this card has already been fetched, it will use a local cache instead.
+   * 
+   * @param card 
+   * @returns an array of printings represented by Card
+   */
 export async function getPrintList(card: Card): Promise<Card[]> {
   if (!card.oracle_id) return [];
 
   if (!printCache[card.oracle_id]) {
-    printCache[card.oracle_id] = await fetch(card.prints_search_uri)
+    printCache[card.oracle_id] = await fetchWithHeader(card.prints_search_uri)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.data);
   }
@@ -33,7 +52,14 @@ export async function getPrintList(card: Card): Promise<Card[]> {
   return printCache[card.oracle_id];
 }
 
-export async function getSetImage(cardDetails: Card): Promise<boolean> {
+/**
+ * Fetches the set icon of a given card. If this icon has already been fetched, it will use a local cache instead.
+ * The set icon is given in SVG, so it is converted to a PNG for caching.
+ * 
+ * @param card 
+ * @returns whether the SVG was converted and cached successfully (or, whether it exists in the cache)
+ */
+export async function getSetImage(card: Card): Promise<boolean> {
   if (setImageCache.length === 0) {
     fs.readdir(
       SCRYFALL_SET_IMAGES_PATH,
@@ -45,12 +71,14 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
     );
   }
 
-  if (setImageCache.includes(cardDetails.id)) return true;
+  if (setImageCache.includes(card.id)) return true;
 
-  const setInfo: SetResponse = await fetch(cardDetails.set_uri).then(
-    (response: Response) => response.json()
-  );
-  const setSvgBuffer: ArrayBuffer | null = await fetch(setInfo.icon_svg_uri)
+  const setInfo: Set = await fetchWithHeader(
+    card.set_uri
+  ).then((response: Response) => response.json());
+  const setSvgBuffer: ArrayBuffer | null = await fetchWithHeader(
+    setInfo.icon_svg_uri
+  )
     .then((response: Response) => response.arrayBuffer())
     .catch((error) => {
       console.error("getSetImage Error (setSvgBuffer)", error);
@@ -63,9 +91,9 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
     alpha: false,
   });
   const hasSaved: boolean = await setIconPng
-    .toFile(`${SCRYFALL_SET_IMAGES_PATH}/${cardDetails.id}.png`)
+    .toFile(`${SCRYFALL_SET_IMAGES_PATH}/${card.id}.png`)
     .then(() => {
-      setImageCache.push(cardDetails.id);
+      setImageCache.push(card.id);
       return true;
     })
     .catch((error) => {
@@ -73,11 +101,16 @@ export async function getSetImage(cardDetails: Card): Promise<boolean> {
       return Promise.resolve(false);
     });
 
-  setImageCache.push(cardDetails.id);
+  setImageCache.push(card.id);
 
   return hasSaved;
 }
 
+/**
+ * Gets the pre-saved salt listings for each card. This is computed once a year manually.
+ * 
+ * @returns a record of Oracle ID: salt value
+ */
 export async function getSaltRanks(): Promise<Record<string, number>> {
   if (!saltRanks) {
     saltRanks = JSON.parse(
@@ -91,6 +124,12 @@ export async function getSaltRanks(): Promise<Record<string, number>> {
   return saltRanks ?? {};
 }
 
+/**
+ * Fetches the relative rankings of each commander card. If the rankings have already been fetched, it will use a local cache instead.
+ * 
+ * @param message 
+ * @returns a record of Oracle ID: commander rank
+ */
 export async function getCommanderRanks(
   message?: Message
 ): Promise<Record<string, number>> {
@@ -106,7 +145,13 @@ export async function getCommanderRanks(
   return commanderRanks;
 }
 
-async function rebuildCommanderCache(message?: Message) {
+/**
+ * Rebuilds the commander cache via Scryfall commander syntax if the previous one is outdated.
+ * This occurs if the amount of commanders has changed.
+ * 
+ * @param message 
+ */
+async function rebuildCommanderCache(message?: Message): Promise<void> {
   rebuildingCache = true;
 
   message?.reply("No / expired commander cache found! Generating one now...");
@@ -146,6 +191,11 @@ async function rebuildCommanderCache(message?: Message) {
   rebuildingCache = false;
 }
 
+/**
+ * Handles read/write operations to the commander JSON cache.
+ * 
+ * @returns the amount of commanders in the cache.
+ */
 export async function readWriteCommanderCache(): Promise<number> {
   if (Object.keys(commanderRanks).length === 0) {
     let cachedCommanderData: {
@@ -172,9 +222,14 @@ export async function readWriteCommanderCache(): Promise<number> {
   }
 }
 
+/**
+ * Fetches an up-to-date amount of commanders via Scryfall.
+ * 
+ * @returns the amount of commanders in play.
+ */
 export async function getTotalCommanderCards(): Promise<number> {
   if (commanderCards === 0) {
-    commanderCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_QUERY)
+    commanderCards = await fetchWithHeader(SCRYFALL_DEFAULT_COMMANDER_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
@@ -186,9 +241,14 @@ export async function getTotalCommanderCards(): Promise<number> {
   return commanderCards;
 }
 
+/**
+ * Fetches the amount of legal cards available in the Commander format.
+ * 
+ * @returns the amount of legal cards.
+ */
 export async function getTotalLegalCards(): Promise<number> {
   if (totalLegalCards === 0) {
-    totalLegalCards = await fetch(SCRYFALL_DEFAULT_QUERY)
+    totalLegalCards = await fetchWithHeader(SCRYFALL_DEFAULT_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {
@@ -200,9 +260,14 @@ export async function getTotalLegalCards(): Promise<number> {
   return totalLegalCards;
 }
 
+/**
+ * Fetches the amount of legal commanders available in the Commander format.
+ * 
+ * @returns the amount of legal commanders.
+ */
 export async function getTotalCards(): Promise<number> {
   if (totalCards === 0) {
-    totalCards = await fetch(SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY)
+    totalCards = await fetchWithHeader(SCRYFALL_DEFAULT_COMMANDER_LEGAL_QUERY)
       .then((response: Response) => response.json())
       .then((response: OracleResponse) => response.total_cards)
       .catch((error) => {

@@ -1,3 +1,4 @@
+/** @deprecated in favour of scryfall-api Set */
 export interface SetResponse {
   object: string;
   id: string;
