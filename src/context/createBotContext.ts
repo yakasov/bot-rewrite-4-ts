@@ -4,9 +4,7 @@ import type { Config } from "../types/Config.d.ts";
 import type { BotContext } from "../types/BotContext.d.ts";
 import { generateRollTable } from "../util/generateRollTable";
 
-export function createBotContext(
-  config: Config
-): BotContext {
+export function createBotContext(config: Config): BotContext {
   const client = new Client({
     allowedMentions: {
       parse: ["users", "roles"],
@@ -28,7 +26,7 @@ export function createBotContext(
     config,
     currentDate: moment().tz("Europe/London").toDate(),
     isStatsEnabled: true,
-    runState: { birthdays: 1, minecraft: 1 },
+    runState: { birthdays: 1, minecraft: 1, presence: 0 },
     rollTable: generateRollTable(),
     splash: "",
     stats: undefined,

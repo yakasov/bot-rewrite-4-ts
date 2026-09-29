@@ -14,6 +14,6 @@ export interface BotContext {
   rollTable: ChanceResponse[];
   splash: string;
   stats?: Stats;
-  weather: CurrentWeather;
+  weather?: CurrentWeather;
   uptime: number;
 }
