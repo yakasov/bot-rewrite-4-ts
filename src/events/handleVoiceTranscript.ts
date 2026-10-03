@@ -1,10 +1,13 @@
 import { Channel, Client, GuildMember } from "discord.js";
 import type { BotContext } from "../types/BotContext.d.ts";
-import { REGEX_SWEAR_JAR } from "../consts/constants.js";
+import {
+  REGEX_SWEAR_JAR,
+  THIS_ID_IS_A_CHANNEL_AND_IS_WHERE_THE_VOICE_TRANSCRIPT_SHOULD_BE_LOGGED_LOLOLOLOLOLOL,
+} from "../consts/constants.js";
 import { isSendableChannel } from "../util/typeGuards.js";
 
 // Keep this filth out of consts
-const FILTH: string[] = ["shit", "fuck", "cunt", "retard", "cock", "bitch"];
+const FILTH: string[] = ["shit", "shitting", "fuck", "fucking", "cunt", "retard", "bitch", "whore"];
 const currentPartials: Record<string, string> = {};
 
 export async function handleVoiceTranscript(
@@ -45,7 +48,7 @@ export async function handleVoiceTranscript(
 async function checkSwears(
   guildId: string,
   userId: string,
-  text: string,
+  newText: string,
   context?: BotContext
 ): Promise<void> {
   if (!context) return;
@@ -64,20 +67,23 @@ async function checkSwears(
   if (!nickname) return;
 
   let newNumber = number;
-  for (const word of text.split(" ")) {
+  for (const word of newText.split(" ")) {
     if (FILTH.includes(word.toLowerCase())) {
       newNumber++;
     }
   }
 
+  // Don't set a reason on setNickname since this clogs up the audit log enough as is
   if (newNumber !== number) {
     const newName: string = `[${newNumber}] ${nickname}`;
-    await (member?.setNickname(newName, "Stop swearing!"));
+    await member?.setNickname(newName);
   }
 
-  const botChannel: Channel | undefined = context.client.channels.cache.get("542034119274790912");
+  const botChannel: Channel | undefined = context.client.channels.cache.get(
+    THIS_ID_IS_A_CHANNEL_AND_IS_WHERE_THE_VOICE_TRANSCRIPT_SHOULD_BE_LOGGED_LOLOLOLOLOLOL
+  );
 
   if (botChannel && isSendableChannel(botChannel)) {
-    await botChannel.send(`${Date.now().toLocaleString()}: ${text}`);
+    await botChannel.send(`${Date.now().toLocaleString()}: ${newText}`);
   }
 }
