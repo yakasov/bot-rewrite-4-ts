@@ -86,7 +86,7 @@ async function checkSwears(
     );
 
     if (botChannel && isSendableChannel(botChannel)) {
-      await botChannel.send(`${Date.now().toLocaleString()}: ${stringToSend}`);
+      await botChannel.send(`${new Date().toLocaleString("en-GB")}: ${stringToSend}`);
     }
 
     messageCounter = 0;
