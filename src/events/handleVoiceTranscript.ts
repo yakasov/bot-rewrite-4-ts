@@ -7,7 +7,7 @@ import {
 import { isSendableChannel } from "../util/typeGuards.js";
 
 // Keep this filth out of consts
-const FILTH: string[] = ["shit", "fuck", "cunt", "retard", "bitch", "whore"];
+const FILTH: string[] = ["shit", "shitting", "fucking", "fuck", "cunt", "retard", "bitch", "whore"];
 const currentPartials: Record<string, string> = {};
 let stringToSend = "";
 let messageCounter = 0;
@@ -39,10 +39,6 @@ export async function handleVoiceTranscript(
     newText = text.replace(currentPartials[partialKey], "");
   }
   currentPartials[partialKey] = text;
-
-  console.log(
-    `Transcript from ${userId} (${isPartial ? "partial" : "final"}): ${text}`
-  );
 
   await checkSwears(guildId, userId, newText, context);
 }
