@@ -23,7 +23,7 @@ export function calculateExperience(
       getRequiredExperienceCumulative(userStats.level - 1, context.config),
     0
   );
-  userStats.totalXP = Math.max(experience, userStats.totalXP);
+  userStats.totalXP = Math.max(experience);
 }
 
 /**
@@ -118,6 +118,7 @@ export function updateStatsOnLevelUp(
    * We do it this way so a user can level up multiple times in one go
    * (as opposed to levelXP = 0)
    */
+
   userStats.levelXP =
     userStats.totalXP -
     getRequiredExperienceCumulative(userStats.level, config);
