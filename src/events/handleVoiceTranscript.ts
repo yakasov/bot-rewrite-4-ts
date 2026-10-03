@@ -1,6 +1,7 @@
-import { Client, GuildMember } from "discord.js";
+import { Channel, Client, GuildMember } from "discord.js";
 import type { BotContext } from "../types/BotContext.d.ts";
 import { REGEX_SWEAR_JAR } from "../consts/constants.js";
+import { isSendableChannel } from "../util/typeGuards.js";
 
 // Keep this filth out of consts
 const FILTH: string[] = ["shit", "fuck", "cunt", "retard", "cock", "bitch"];
@@ -72,5 +73,11 @@ async function checkSwears(
   if (newNumber !== number) {
     const newName: string = `[${newNumber}] ${nickname}`;
     await (member?.setNickname(newName, "Stop swearing!"));
+  }
+
+  const botChannel: Channel | undefined = context.client.channels.cache.get("542034119274790912");
+
+  if (botChannel && isSendableChannel(botChannel)) {
+    await botChannel.send(`${Date.now().toLocaleString()}: ${text}`);
   }
 }
