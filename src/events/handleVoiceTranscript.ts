@@ -7,8 +7,10 @@ import {
 import { isSendableChannel } from "../util/typeGuards.js";
 
 // Keep this filth out of consts
-const FILTH: string[] = ["shit", "shitting", "fuck", "fucking", "cunt", "retard", "bitch", "whore"];
+const FILTH: string[] = ["shit", "fuck", "cunt", "retard", "bitch", "whore"];
 const currentPartials: Record<string, string> = {};
+let stringToSend = "";
+let messageCounter = 0;
 
 export async function handleVoiceTranscript(
   guildId: string,
@@ -79,11 +81,19 @@ async function checkSwears(
     await member?.setNickname(newName);
   }
 
-  const botChannel: Channel | undefined = context.client.channels.cache.get(
-    THIS_ID_IS_A_CHANNEL_AND_IS_WHERE_THE_VOICE_TRANSCRIPT_SHOULD_BE_LOGGED_LOLOLOLOLOLOL
-  );
+  messageCounter++;
+  stringToSend = `${stringToSend} ${newText.replace("[PARTIAL]", "")}`;
 
-  if (botChannel && isSendableChannel(botChannel)) {
-    await botChannel.send(`${Date.now().toLocaleString()}: ${newText}`);
+  if (messageCounter === 5) {
+    const botChannel: Channel | undefined = context.client.channels.cache.get(
+      THIS_ID_IS_A_CHANNEL_AND_IS_WHERE_THE_VOICE_TRANSCRIPT_SHOULD_BE_LOGGED_LOLOLOLOLOLOL
+    );
+
+    if (botChannel && isSendableChannel(botChannel)) {
+      await botChannel.send(`${Date.now().toLocaleString()}: ${stringToSend}`);
+    }
+
+    messageCounter = 0;
+    stringToSend = "";
   }
 }
