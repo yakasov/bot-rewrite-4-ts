@@ -18,7 +18,9 @@ export default {
 
     for (const key of Object.keys(userStats)) {
       userStats[key].level = 1;
-      updateStatsOnLevelUp(userStats[key], context.config);
+      console.log(`User ${key} set to level 1`);
     }
+
+    await interaction.reply("maybe fixed");
   },
 };
