@@ -7,14 +7,11 @@ import { Guild } from "discord.js";
 import type { VoiceTranscript } from "../types/voice/VoiceRecognition.d.ts";
 import { AzureSpeechRecognizer } from "./AzureSpeechRecognizer";
 import { DiscordUserVoiceSession } from "./DiscordUserVoiceSession";
-import { handleVoiceTranscript } from "../events/handleVoiceTranscript.js";
+import { handleVoiceTranscriptPartial } from "../events/handleVoiceTranscript.js";
 import { BotContext } from "../types/BotContext.js";
 
 export class VoiceRecognitionManager {
-  private readonly sessions = new Map<
-    string,
-    DiscordUserVoiceSession
-  >();
+  private readonly sessions = new Map<string, DiscordUserVoiceSession>();
 
   public constructor(
     private readonly context: BotContext,
@@ -49,13 +46,18 @@ export class VoiceRecognitionManager {
       this.azureSpeechRegion,
       {
         onPartial: (text) => {
-          handleVoiceTranscript(guild.id, this.targetUserId, "[PARTIAL] " + text, this.context, true);
+          handleVoiceTranscriptPartial(
+            guild.id,
+            this.targetUserId,
+            "[PARTIAL] " + text,
+            this.context
+          );
         },
         onFinal: (text) => {
           void this.onTranscript({
             guildId: guild.id,
             userId: this.targetUserId,
-            text
+            text,
           }).catch((error) => {
             console.error("Failed to handle voice transcript:", error);
           });
@@ -75,10 +77,7 @@ export class VoiceRecognitionManager {
     this.sessions.set(guild.id, session);
 
     void session.start().catch((error) => {
-      console.error(
-        `Voice recognition failed in guild ${guild.id}:`,
-        error
-      );
+      console.error(`Voice recognition failed in guild ${guild.id}:`, error);
 
       if (this.sessions.get(guild.id) === session) {
         this.sessions.delete(guild.id);
@@ -94,8 +93,7 @@ export class VoiceRecognitionManager {
       this.sessions.delete(guildId);
     }
 
-    const connection: VoiceConnection | undefined =
-      getVoiceConnection(guildId);
+    const connection: VoiceConnection | undefined = getVoiceConnection(guildId);
     if (connection) {
       connection.destroy();
     }

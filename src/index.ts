@@ -9,7 +9,7 @@ import { handleClientReady } from "./events/handleClientReady";
 import { handleInteractionCreate } from "./events/handleInteractionCreate";
 import { handleMessageCreate } from "./events/handleMessageCreate";
 import { handleVoiceStateUpdate } from "./events/handleVoiceStateUpdate";
-import { handleVoiceTranscript } from "./events/handleVoiceTranscript";
+import { handleVoiceTranscriptFull } from "./events/handleVoiceTranscript";
 import { loadStatsFromDatabase } from "./database/loadFromDatabase";
 import { DATABASE_KEYS_PRESENT, KEYS } from "./keys";
 import { VoiceRecognitionManager } from "./voice/voiceRecognitionManager";
@@ -26,7 +26,7 @@ const voiceRecognitionManager = new VoiceRecognitionManager(
   THIS_ID_SHOULD_BE_VOICE_PROCESSED,
   KEYS.AZURE_SPEECH_KEY ?? "",
   KEYS.AZURE_SPEECH_REGION ?? "",
-  (transcript) => handleVoiceTranscript(
+  (transcript) => handleVoiceTranscriptFull(
     transcript.guildId,
     transcript.userId,
     transcript.text,
